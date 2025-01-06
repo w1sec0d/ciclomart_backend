@@ -15,4 +15,7 @@ app.use(cors());
 morgan.token('requestBody', (request) => JSON.stringify(request.body));
 app.use(morgan(' :method :url :response-time :requestBody'));
 
+// Rutas
+app.use('/api', require('./routes/routes'));
+
 module.exports = app;
