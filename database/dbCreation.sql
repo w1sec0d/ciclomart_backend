@@ -142,6 +142,21 @@ CREATE TABLE `ciclomart`.`transaccion` (
 ) ENGINE=InnoDB;
 
 -- -----------------------------------------------------
+-- ENVIO
+-- -----------------------------------------------------
+CREATE TABLE `ciclomart`.`envio` (
+  `idEnvio` INT NOT NULL AUTO_INCREMENT,
+  `idTransaccion` INT NOT NULL,
+  `idUsuarioComprador` INT NOT NULL,
+  `fecha` DATETIME NULL,
+  `direccion` VARCHAR(45) NULL,
+  `estado` VARCHAR(45) NULL,
+  PRIMARY KEY (`idEnvio`),
+  FOREIGN KEY (`idTransaccion`) REFERENCES `transaccion`(`idTransaccion`) ON DELETE CASCADE,
+  FOREIGN KEY (`idUsuarioComprador`) REFERENCES `usuario`(`idUsuario`) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- -----------------------------------------------------
 -- CALIFICACION
 -- -----------------------------------------------------
 CREATE TABLE `ciclomart`.`calificacion` (
@@ -158,6 +173,20 @@ CREATE TABLE `ciclomart`.`calificacion` (
   FOREIGN KEY (`idUsuarioComprador`) REFERENCES `usuario`(`idUsuario`) ON DELETE CASCADE,
   FOREIGN KEY (`idTienda`, `idProducto`) REFERENCES `tiendaProducto`(`idTienda`, `idProducto`) ON DELETE CASCADE,
   FOREIGN KEY (`idProducto`, `idUsuarioVendedor`) REFERENCES `documentoProducto`(`idProducto`, `idUsuario`) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- -----------------------------------------------------
+-- MENSAJE
+-- -----------------------------------------------------
+CREATE TABLE `ciclomart`.`mensaje` (
+  `idMensaje` INT NOT NULL AUTO_INCREMENT,
+  `idUsuarioEmisor` INT NOT NULL,
+  `idUsuarioReceptor` INT NOT NULL,
+  `contenido` TEXT(255) NULL,
+  `fecha` DATETIME NULL,
+  PRIMARY KEY (`idMensaje`),
+  FOREIGN KEY (`idUsuarioEmisor`) REFERENCES `usuario`(`idUsuario`) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (`idUsuarioReceptor`) REFERENCES `usuario`(`idUsuario`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
 SET SQL_MODE=@OLD_SQL_MODE;
