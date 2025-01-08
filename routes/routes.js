@@ -1,11 +1,16 @@
 const express = require('express')
 const router = express.Router()
-const db = require('../database/connection.js')
-const { getUsuarios } = require('../controllers/usuario.js')
+const {
+  getUsuarios,
+  registerUsuario,
+  getUsuarioById,
+} = require('../controllers/usuario.js')
 
 //rutas para la tabla persona.
 
 //Ver las personas
 router.get('/usuarios', getUsuarios)
+router.get('/usuarios/:id', getUsuarioById)
+router.post('/usuarios', registerUsuario)
 
 module.exports = router
