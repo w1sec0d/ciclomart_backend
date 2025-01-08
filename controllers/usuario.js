@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt')
 // controller for user
 const db = require('../database/connection')
 
@@ -20,7 +21,7 @@ const getUsuarioById = (request, response) => {
     return
   }
 
-  db.query('SELECT * FROM usuario WHERE id = $1', [id], (error, results) => {
+  db.query('SELECT * FROM usuario WHERE id = ?', [id], (error, results) => {
     if (error) {
       console.error('Error executing query', error)
       response.status(500).send('Internal server error')
@@ -41,7 +42,7 @@ const registerUsuario = async (request, response) => {
   const passwordHash = await bcrypt.hash(password, 10)
 
   db.query(
-    'INSERT INTO usuario (nombre, apellido, email, password, fechaRegistro) VALUES ($1, $2, $3, $4, $5)',
+    'INSERT INTO usuario (nombre, apellido, correo, password, fechaRegistro) VALUES (?, ?, ?, ?, ?)',
     [nombre, apellido, email, passwordHash, new Date()],
     (error, results) => {
       if (error) {
