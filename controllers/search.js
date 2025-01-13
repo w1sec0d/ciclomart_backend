@@ -2,19 +2,17 @@ const db = require('../database/connection')
 
 const search = (request, response) => {
     const { nombre, tipo, categoria, marca, minFecha, maxFecha } = request.query;
-
-    console.log('Funciona')
     
     let query = 'SELECT * FROM producto WHERE 1=1';
     const queryParams = [];
 
     if (nombre) {
-        query += ' AND nombre LIKE ?';
+        query += ' AND LOWER(nombre) LIKE LOWER(?)';
         queryParams.push(`%${nombre}%`);
     }
 
     if (tipo) {
-        query += ' AND tipo = ?';
+        query += ' AND tipo = LOWER(?)';
         queryParams.push(tipo);
     }
 
@@ -24,7 +22,7 @@ const search = (request, response) => {
     }
 
     if (marca) {
-        query += ' AND marca = ?';
+        query += ' AND marca = LOWER(?)';
         queryParams.push(marca);
     }
 
