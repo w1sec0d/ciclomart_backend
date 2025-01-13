@@ -8,11 +8,14 @@ const {
 } = require('../controllers/usuario.js')
 
 const {
-  login
+  login, 
+  sendEmail,
+  evaluateToken,
+  updatePassword,
 } = require('../controllers/login.js')
 
 const {
-  userInfo
+  userInfo,
 } = require('../controllers/userInfo.js')
 
 //rutas para la tabla persona.
@@ -25,5 +28,10 @@ router.post('/usuarios', registerUsuario)
 //autenticacion 
 router.post('/login', login)
 router.get('/userInfo', userInfo)
+router.post('/sendEmail',sendEmail)
+router.get('/evaluateToken/:token', evaluateToken)
+router.post('/updatePassword', updatePassword)
+
+
 
 module.exports = router
