@@ -36,4 +36,5 @@ router.post('/sendEmailCode', sendEmailCode)
 router.post('/validateCode', validateCode)
 router.get('/verifyEmail/:email', verifyEmailv2)
 
+
 module.exports = router

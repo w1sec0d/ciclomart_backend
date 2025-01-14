@@ -3,10 +3,12 @@ const bcrypt = require('bcrypt')
 const db = require('../database/connection')
 const nodemailer = require('nodemailer')
 require('dotenv').config({ path: './controllers/.env' })
+
 const { registerUsuario } = require('./usuario')
 const { json } = require('body-parser')
 
 // Función para loguear al usuario
+
 
 const login = async (req, res) => {
   const { email, password } = req.body
@@ -74,6 +76,7 @@ const verifyEmail = async (email) => {
     )
   })
 }
+
 
 const verifyEmailv2 = async (req, res) => {
   const email = req.params.email
@@ -153,6 +156,7 @@ const sendEmailCode = async (req, res) => {
   }
 }
 
+
 const evaluateToken = (req, res) => {
   const { token } = req.params
   console.log('Holii desde evaluateToken')
@@ -165,6 +169,7 @@ const evaluateToken = (req, res) => {
     res.status(400).send('Invalid o expired token')
   }
 }
+
 
 // Función que valida si el codigo introducido por el usuario es igual al código almacenado en el token
 const validateCode = async (req, res) => {
@@ -221,6 +226,7 @@ const updatePassword = async (req, res) => {
 }
 
 // Función que define los parametros del envio de correo
+
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 465,
@@ -231,7 +237,9 @@ const transporter = nodemailer.createTransport({
   },
 })
 
+
 //Función que envia el correo al usuario (recuperación de contraseña)
+
 const sendVerificationEmail = async (email, token) => {
   await transporter.sendMail({
     from: '"Ciclo Mart Soport" <ciclomartsoporte@gmail.com>',
@@ -241,6 +249,7 @@ const sendVerificationEmail = async (email, token) => {
     html: `<b>Hola, para restablecer tu contraseña, ingresa al siguiente enlace: <a href="http://localhost:5173/passwordRecovery/${token}">Restablecer Contraseña</a></b>`,
   })
 }
+
 
 //Función que envia el código al usuario (para terminar el registro)
 const sendVerificationCode = async (email, token, code) => {
@@ -253,6 +262,7 @@ const sendVerificationCode = async (email, token, code) => {
   })
 }
 
+
 module.exports = {
   login,
   sendEmail,
@@ -261,4 +271,5 @@ module.exports = {
   sendEmailCode,
   validateCode,
   verifyEmailv2,
+
 }
