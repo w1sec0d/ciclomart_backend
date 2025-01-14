@@ -7,7 +7,7 @@ const getTiendas = async (request, response) => {
         .status(404)
         .send({ message: 'Stores cannot be obtained', error: error })
     }
-    response.json(results)
+    response.status(200).json(results)
   })
 }
 
