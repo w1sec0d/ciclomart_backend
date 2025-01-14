@@ -35,4 +35,25 @@ const getComprasById = (request, response) => {
   )
 }
 
-module.exports = { getTransacciones, getComprasById }
+/*Gets Sales from a given user*/
+
+const getVentasById = (request, response) => {
+  const idVendedor = request.params.id
+  if (isNaN(idVendedor)) {
+    return response.status(400).json({ message: 'Id seller not found' })
+  }
+  db.query(
+    'SELECT * FROM transaccion WHERE idVendedor = ?',
+    [idVendedor],
+    (error, results) => {
+      if (error) {
+        return response
+          .status(404)
+          .json({ message: 'Sales not found', error: error })
+      }
+      response.status(200).json(results)
+    }
+  )
+}
+
+module.exports = { getTransacciones, getComprasById, getVentasById }

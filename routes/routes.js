@@ -21,6 +21,7 @@ const { getTiendas } = require('../controllers/tienda.js')
 const {
   getTransacciones,
   getComprasById,
+  getVentasById,
 } = require('../controllers/transaccion.js')
 
 const { userInfo } = require('../controllers/userInfo.js')
@@ -45,5 +46,6 @@ router.get('/getTiendas', getTiendas)
 //Routes for table 'transaccion'
 router.get('/getTransacciones', getTransacciones)
 router.get('/getComprasById/:id', getComprasById)
+router.get('/getVentasById/:id', getVentasById)
 
 module.exports = router
