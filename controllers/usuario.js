@@ -65,7 +65,6 @@ const getUsuarioById = (request, response) => {
   return successRegister;
 };*/
 
-
 const registerUsuario = async (request, response) => {
   const { nombre, apellido, email, password } = request.body
 
