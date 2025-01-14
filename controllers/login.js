@@ -7,7 +7,7 @@ const { registerUsuario } = require('./usuario');
 const { json } = require('body-parser');
 
 
-
+// Función para loguear al usuario
 
 const login = async (req, res) => {
 
@@ -72,6 +72,28 @@ const verifyEmail = async (email) => {
     }); 
 };
 
+const verifyEmailv2 = async (req, res) =>{
+    const email = req.params.email;
+
+    db.query('SELECT * FROM usuario WHERE correo = ?',[email],
+        (err, result) =>{
+            if(err){
+                return res.status(500).send('Internal server error')
+            }
+            if(result.length > 0){
+                return res.status(200).json({
+                    message:true
+                })
+            }
+            return res.status(200).json({
+                message: false
+            })
+        }
+    )
+
+}
+
+//Función que envia un correo al usuario para recuperar su cuenta
 const sendEmail = async (req, res) =>{
 
     try{
@@ -103,6 +125,7 @@ const sendEmail = async (req, res) =>{
     }
 }
 
+//Función que envia un código para terminar el registro
 const sendEmailCode = async (req, res) =>{
     try{
 
@@ -142,6 +165,7 @@ const evaluateToken = (req, res) => {
     }
 }
 
+// Función que valida si el codigo introducido por el usuario es igual al código almacenado en el token
 const validateCode = async (req, res) => {
     const codigo = parseInt(req.body.data.code);
     const token = req.body.token;
@@ -168,6 +192,7 @@ const validateCode = async (req, res) => {
     }
 }
 
+//Función que se utiliza para actualizar el password
 const updatePassword = async (req, res) => {
     
 
@@ -197,7 +222,7 @@ const updatePassword = async (req, res) => {
     }
 }
 
-
+// Función que define los parametros del envio de correo
 const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 465,
@@ -208,6 +233,7 @@ const transporter = nodemailer.createTransport({
     },
   });
 
+  //Función que envia el correo al usuario (recuperación de contraseña)
   const sendVerificationEmail = async (email, token) => { 
     await transporter.sendMail({ 
         from: '"Ciclo Mart Soport" <ciclomartsoporte@gmail.com>', 
@@ -217,6 +243,7 @@ const transporter = nodemailer.createTransport({
     });
   }
 
+  //Función que envia el código al usuario (para terminar el registro)
   const sendVerificationCode = async (email, token, code) => { 
     await transporter.sendMail({ 
         from: '"Ciclo Mart Soport" <ciclomartsoporte@gmail.com>', 
@@ -233,4 +260,5 @@ module.exports = {
     updatePassword,
     sendEmailCode,
     validateCode,
+    verifyEmailv2
 }
