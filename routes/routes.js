@@ -14,7 +14,14 @@ const {
   updatePassword,
 } = require('../controllers/login.js')
 
+/*Stores*/
 const { getTiendas } = require('../controllers/tienda.js')
+
+/*Transactions*/
+const {
+  getTransacciones,
+  getComprasById,
+} = require('../controllers/transaccion.js')
 
 const { userInfo } = require('../controllers/userInfo.js')
 
@@ -32,7 +39,11 @@ router.post('/sendEmail', sendEmail)
 router.get('/evaluateToken/:token', evaluateToken)
 router.post('/updatePassword', updatePassword)
 
-//rutas para la tabla tienda
+//Routes for table 'tienda'
 router.get('/getTiendas', getTiendas)
+
+//Routes for table 'transaccion'
+router.get('/getTransacciones', getTransacciones)
+router.get('/getComprasById/:id', getComprasById)
 
 module.exports = router
