@@ -3,6 +3,10 @@ const bcrypt = require('bcrypt')
 const db = require('../database/connection')
 const nodemailer = require("nodemailer");
 require('dotenv').config({path: './controllers/.env'})
+const { registerUsuario } = require('./usuario');
+const { json } = require('body-parser');
+
+
 
 
 const login = async (req, res) => {
@@ -72,6 +76,7 @@ const sendEmail = async (req, res) =>{
 
     try{
         const email = req.body.data
+
         const user = await verifyEmail(email);
         if(user){
             
@@ -92,11 +97,38 @@ const sendEmail = async (req, res) =>{
             })
         }
     }catch(err){
-        return res.status(401).json({
+        return res.status(500).json({
             message: 'Failed'
         })
     }
-    
+}
+
+const sendEmailCode = async (req, res) =>{
+    try{
+
+        const {email, nombre, apellido, password} = req.body.data
+
+        
+        const code = Math.floor(Math.random() * 10000000)
+        const userForToken = {
+            correo: email,
+            nombre: nombre,
+            apellido: apellido,
+            password: password,
+            code: code
+        }
+
+        const token = jwt.sign(userForToken, process.env.JWT_SECRET, {expiresIn: '1h'});
+        await sendVerificationCode(email, token, code);
+        return res.status(200).json({
+            message:"success"
+        })
+    }catch(error){
+        return res.status(500).json({
+            message: 'Failed'
+        })
+    }
+
 }
 
 const evaluateToken = (req, res) => {
@@ -107,6 +139,32 @@ const evaluateToken = (req, res) => {
         res.send(` <form id="resetPasswordForm" method="post" action="/api/updatePassword"> <input type="hidden" name="token" value="${token}"> <input type="password" name="password" required> <input type="submit" value="Reset Password"> </form> <script> document.getElementById('resetPasswordForm').addEventListener('submit', async (e) => { e.preventDefault(); const form = e.target; const formData = new FormData(form); const data = { token: formData.get('token'), password: formData.get('password') }; const response = await fetch(form.action, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); const result = await response.json(); console.log(result); }); </script> `);
     }catch(err){
         res.status(400).send('Invalid o expired token')
+    }
+}
+
+const validateCode = async (req, res) => {
+    const codigo = parseInt(req.body.data.code);
+    const token = req.body.token;
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const {correo, nombre, apellido, password, code} = decoded;
+
+    console.log("codigo usuario: ", typeof(codigo))
+    console.log("codigo token: ", typeof(code))
+
+    if(codigo === code){
+        
+        return res.status(200).json({
+            correo: correo,
+            nombre: nombre,
+            apellido: apellido,
+            password: password,
+
+        })
+    }else{
+        return res.status(400).json({
+            message: 'Faild'
+        })
     }
 }
 
@@ -140,8 +198,6 @@ const updatePassword = async (req, res) => {
 }
 
 
-
-
 const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 465,
@@ -161,13 +217,20 @@ const transporter = nodemailer.createTransport({
     });
   }
 
-
-
-
+  const sendVerificationCode = async (email, token, code) => { 
+    await transporter.sendMail({ 
+        from: '"Ciclo Mart Soport" <ciclomartsoporte@gmail.com>', 
+        to: email, subject: "Código CicloMart", 
+        text: `¡Hola!, este es tú código de verificación ${code}, ingresa al siguiente enlace: http://localhost:5173/verificacionCode/${token}`, 
+        html: `<b>¡Hola!, este es tú código de verificación ${code}, ingresa al siguiente enlace para poder ingresarlo: <a href="http://localhost:5173/verificacionCode/${token}">Da click aquí</a></b>`,
+    });
+  }
 
 module.exports = {
     login,
     sendEmail,
     evaluateToken,
-    updatePassword
+    updatePassword,
+    sendEmailCode,
+    validateCode,
 }

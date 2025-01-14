@@ -12,6 +12,8 @@ const {
   sendEmail,
   evaluateToken,
   updatePassword,
+  sendEmailCode,
+  validateCode
 } = require('../controllers/login.js')
 
 const {
@@ -31,6 +33,8 @@ router.get('/userInfo', userInfo)
 router.post('/sendEmail',sendEmail)
 router.get('/evaluateToken/:token', evaluateToken)
 router.post('/updatePassword', updatePassword)
+router.post('/sendEmailCode', sendEmailCode)
+router.post('/validateCode', validateCode)
 
 
 
