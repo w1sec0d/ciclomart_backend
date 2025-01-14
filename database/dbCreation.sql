@@ -164,12 +164,12 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `ciclomart`.`calificacion` (
   `idCalificacion` INT NOT NULL AUTO_INCREMENT,
   `idUsuarioComprador` INT NOT NULL,
+  `idDocumentoProducto` INT NOT NULL,
   `idUsuarioVendedor` INT NOT NULL,
   `foto` VARCHAR(120) NULL DEFAULT NULL,
   `comentario` VARCHAR(45) NULL DEFAULT NULL,
   `nota` INT NULL DEFAULT NULL,
   `fecha` DATETIME NULL DEFAULT NULL,
-  `idDocumentoProducto` INT NOT NULL,
   PRIMARY KEY (`idCalificacion`),
   INDEX `idUsuarioComprador` (`idUsuarioComprador` ASC) VISIBLE,
   INDEX `fk_calificacion_usuario1_idx` (`idUsuarioVendedor` ASC) VISIBLE,
@@ -202,7 +202,7 @@ CREATE TABLE IF NOT EXISTS `ciclomart`.`transaccion` (
   `fecha` DATETIME NULL DEFAULT NULL,
   `monto` FLOAT NULL DEFAULT NULL,
   `metodoPago` VARCHAR(45) NULL DEFAULT NULL,
-  `estado` VARCHAR(45) NULL DEFAULT NULL,
+  `estado` ENUM('proceso','exitosa','fallida'),
   PRIMARY KEY (`idTransaccion`),
   INDEX `idCarrito` (`idCarrito` ASC) VISIBLE,
   INDEX `idUsuario` (`idVendedor` ASC) VISIBLE,
@@ -321,7 +321,7 @@ INSERT INTO `ciclomart`.`carritoproducto` (`idCarritoProducto`, `idCarrito`, `id
 
 -- Inserts for TRANSACCION
 INSERT INTO `ciclomart`.`transaccion` (`idTransaccion`, `idCarrito`, `idComprador`, `idVendedor`, `fecha`, `monto`, `metodoPago`, `estado`) VALUES
-(1, 1, 1, 3, '2023-03-02', 550.00, 'Tarjeta de Crédito', 'Completado');
+(1, 1, 1, 3, '2023-03-02', 550.00, 'Tarjeta de Crédito', 'exitosa');
 
 -- Inserts for ENVIO
 INSERT INTO `ciclomart`.`envio` (`idEnvio`, `idTransaccion`, `idUsuarioComprador`, `idUsuarioVendedor`, `fecha`, `direccion`, `estado`) VALUES
