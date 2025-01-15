@@ -1,6 +1,6 @@
 //Coneccion a la base de datos
-const mysql = require('mysql2')
-require('dotenv').config()
+require('dotenv').config({ path: './database/.env' })
+const mysql = require('mysql')
 
 const db = mysql.createPool({
   connectionLimit: 10, // Número máximo de conexiones en el pool

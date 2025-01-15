@@ -31,6 +31,40 @@ const getUsuarioById = (request, response) => {
   })
 }
 
+/*const registerUsuario = async (values) => {
+  console.log(values);
+  const { nombre, apellido, email, password } = values;
+  let successRegister = false;
+
+  if (!nombre || !apellido || !email || !password) {
+    return successRegister;
+  }
+
+  try {
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    await new Promise((resolve, reject) => {
+      db.query(
+        'INSERT INTO usuario (nombre, apellido, correo, password, fechaRegistro) VALUES (?, ?, ?, ?, ?)',
+        [nombre, apellido, email, passwordHash, new Date()],
+        (error, results) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(results);
+          }
+        }
+      );
+    });
+
+    successRegister = true;
+  } catch (error) {
+    console.error('Error al registrar el usuario:', error);
+  }
+
+  return successRegister;
+};*/
+
 const registerUsuario = async (request, response) => {
   const { nombre, apellido, email, password } = request.body
 
