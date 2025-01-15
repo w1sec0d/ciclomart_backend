@@ -54,4 +54,27 @@ const registerUsuario = async (request, response) => {
     }
   )
 }
-module.exports = { getUsuarios, getUsuarioById, registerUsuario }
+
+const updateUsuarioFoto = (request, response) => {
+  const photoUrl = request.param.fotoUrl
+  const idUser = request.param.idUsuario
+  db.query(
+    'UPDATE usuario SET foto = ? WHERE idUsuario = ?',
+    [photoUrl, idUser],
+    (error, results) => {
+      if (error) {
+        console.error('Error executing query', error)
+        response.status(500).send('Internal server error')
+        return
+      }
+      response.status(200).send('User photo updated successfully')
+    }
+  )
+}
+
+module.exports = {
+  getUsuarios,
+  getUsuarioById,
+  registerUsuario,
+  updateUsuarioFoto,
+}

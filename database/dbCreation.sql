@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS `ciclomart`.`usuario` (
   `apellido` VARCHAR(45) NOT NULL,
   `edad` INT NULL DEFAULT NULL,
   `rol` ENUM('comprador', 'cliente', 'administrador') NOT NULL,
+  'foto' VARCHAR(255) NULL,
   `correo` VARCHAR(45) NOT NULL,
   `direccion` VARCHAR(45) NULL DEFAULT NULL,
   `telefono` VARCHAR(45) NULL DEFAULT NULL,
