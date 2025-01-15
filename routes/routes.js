@@ -7,9 +7,7 @@ const {
 } = require('../controllers/usuario.js')
 //rutas para la tabla persona.
 
-const {
-  search
-} = require('../controllers/search.js')
+const { search } = require('../controllers/search.js')
 //rutas para la busqueda de productos
 
 //Ver las personas
