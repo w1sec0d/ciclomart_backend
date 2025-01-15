@@ -4,6 +4,12 @@ const db = require('../database/connection')
 const nodemailer = require('nodemailer')
 require('dotenv').config({ path: './controllers/.env' })
 
+const { registerUsuario } = require('./usuario')
+const { json } = require('body-parser')
+
+// Función para loguear al usuario
+
+
 const login = async (req, res) => {
   const { email, password } = req.body
 
@@ -71,12 +77,31 @@ const verifyEmail = async (email) => {
   })
 }
 
+
+const verifyEmailv2 = async (req, res) => {
+  const email = req.params.email
+
+  db.query('SELECT * FROM usuario WHERE correo = ?', [email], (err, result) => {
+    if (err) {
+      return res.status(500).send('Internal server error')
+    }
+    if (result.length > 0) {
+      return res.status(200).json({
+        message: true,
+      })
+    }
+    return res.status(200).json({
+      message: false,
+    })
+  })
+}
+
+//Función que envia un correo al usuario para recuperar su cuenta
 const sendEmail = async (req, res) => {
   try {
     const email = req.body.data
+
     const user = await verifyEmail(email)
-    console.log('email', email)
-    console.log('user', user)
     if (user) {
       const userForToken = {
         correo: email,
@@ -85,10 +110,8 @@ const sendEmail = async (req, res) => {
       const token = jwt.sign(userForToken, process.env.JWT_SECRET, {
         expiresIn: '1h',
       })
-      console.log('token', token)
 
       await sendVerificationEmail(email, token)
-      console.log('fail')
 
       return res.status(200).json({
         message: 'success',
@@ -99,11 +122,40 @@ const sendEmail = async (req, res) => {
       })
     }
   } catch (err) {
-    return res.status(401).json({
-      message: 'Failed2',
+    return res.status(500).json({
+      message: 'Failed',
     })
   }
 }
+
+//Función que envia un código para terminar el registro
+const sendEmailCode = async (req, res) => {
+  try {
+    const { email, nombre, apellido, password } = req.body.data
+
+    const code = Math.floor(Math.random() * 10000000)
+    const userForToken = {
+      correo: email,
+      nombre: nombre,
+      apellido: apellido,
+      password: password,
+      code: code,
+    }
+
+    const token = jwt.sign(userForToken, process.env.JWT_SECRET, {
+      expiresIn: '1h',
+    })
+    await sendVerificationCode(email, token, code)
+    return res.status(200).json({
+      message: 'success',
+    })
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Failed',
+    })
+  }
+}
+
 
 const evaluateToken = (req, res) => {
   const { token } = req.params
@@ -118,6 +170,33 @@ const evaluateToken = (req, res) => {
   }
 }
 
+
+// Función que valida si el codigo introducido por el usuario es igual al código almacenado en el token
+const validateCode = async (req, res) => {
+  const codigo = parseInt(req.body.data.code)
+  const token = req.body.token
+
+  const decoded = jwt.verify(token, process.env.JWT_SECRET)
+  const { correo, nombre, apellido, password, code } = decoded
+
+  console.log('codigo usuario: ', typeof codigo)
+  console.log('codigo token: ', typeof code)
+
+  if (codigo === code) {
+    return res.status(200).json({
+      correo: correo,
+      nombre: nombre,
+      apellido: apellido,
+      password: password,
+    })
+  } else {
+    return res.status(400).json({
+      message: 'Faild',
+    })
+  }
+}
+
+//Función que se utiliza para actualizar el password
 const updatePassword = async (req, res) => {
   const { data, token } = req.body
 
@@ -146,6 +225,8 @@ const updatePassword = async (req, res) => {
   }
 }
 
+// Función que define los parametros del envio de correo
+
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 465,
@@ -155,6 +236,9 @@ const transporter = nodemailer.createTransport({
     pass: process.env.PASSWORD_ONLINE,
   },
 })
+
+
+//Función que envia el correo al usuario (recuperación de contraseña)
 
 const sendVerificationEmail = async (email, token) => {
   await transporter.sendMail({
@@ -166,9 +250,26 @@ const sendVerificationEmail = async (email, token) => {
   })
 }
 
+
+//Función que envia el código al usuario (para terminar el registro)
+const sendVerificationCode = async (email, token, code) => {
+  await transporter.sendMail({
+    from: '"Ciclo Mart Soport" <ciclomartsoporte@gmail.com>',
+    to: email,
+    subject: 'Código CicloMart',
+    text: `¡Hola!, este es tú código de verificación ${code}, ingresa al siguiente enlace: http://localhost:5173/verificacionCode/${token}`,
+    html: `<b>¡Hola!, este es tú código de verificación ${code}, ingresa al siguiente enlace para poder ingresarlo: <a href="http://localhost:5173/verificacionCode/${token}">Da click aquí</a></b>`,
+  })
+}
+
+
 module.exports = {
   login,
   sendEmail,
   evaluateToken,
   updatePassword,
+  sendEmailCode,
+  validateCode,
+  verifyEmailv2,
+
 }
