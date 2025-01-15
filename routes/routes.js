@@ -6,6 +6,7 @@ const {
   registerUsuario,
   getUsuarioById,
   updateUsuarioFoto,
+  updateUsuario,
 } = require('../controllers/usuario.js')
 
 const {
@@ -34,8 +35,9 @@ router.get('/usuarios', getUsuarios)
 router.get('/usuarios/:id', getUsuarioById)
 router.post('/usuarios', registerUsuario)
 
-//Update Photo
+//Updates userr
 router.put('/updateUsuarioFoto/:idUsuario', updateUsuarioFoto)
+router.put('/updateUsuario/:id', updateUsuario)
 
 //autenticacion
 router.post('/login', login)

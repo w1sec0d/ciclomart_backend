@@ -301,14 +301,19 @@ INSERT INTO `ciclomart`.`usuario` (`nombre`, `apellido`, `edad`, `rol`, `correo`
 ('Javier', 'Hernández', 39, 'comprador', 'javier.hernandez@example.com', 'Calle 10 #40-50, Santa Marta', '3169012345', 'javierhernandez', '$2b$10$uP41SextbAzmP/hjWITrdecMJhb1/JrZzN6M3ptI6EB4zbWcjVDEy', NOW()),
 ('Daniela', 'Ruiz', 24, 'cliente', 'daniela.ruiz@example.com', 'Avenida 90 #20-30, Manizales', '3170123456', 'danielaruiz', '$2b$10$uP41SextbAzmP/hjWITrdecMJhb1/JrZzN6M3ptI6EB4zbWcjVDEy', NOW()),
 ('Héctor', 'Navarro', 41, 'administrador', 'hector.navarro@example.com', 'Carrera 18 #34-56, Cúcuta', '3181234567', 'hectornavarro', '$2b$10$uP41SextbAzmP/hjWITrdecMJhb1/JrZzN6M3ptI6EB4zbWcjVDEy', NOW());
+
 -- Inserts for TIENDA
 INSERT INTO `ciclomart`.`tienda` (`idTienda`, `idUsuarioAdministrador`, `nombre`, `descripcion`, `telefono`) VALUES
 (1, 3, 'Tienda de Bicicletas', 'Venta de bicicletas y accesorios', '3001234567');
 
 -- Inserts for PRODUCTO
+-- Inserts for PRODUCTO
 INSERT INTO `ciclomart`.`producto` (`idProducto`, `nombre`, `tipo`, `categoria`, `marca`, `fechaPublicacion`) VALUES
 (1, 'Bicicleta de Montaña', 'Bicicleta', 'Montaña', 'MarcaX', '2023-01-01'),
-(2, 'Casco de Ciclismo', 'Accesorio', 'Seguridad', 'MarcaY', '2023-02-01');
+(2, 'Casco de Ciclismo', 'Accesorio', 'Seguridad', 'MarcaY', '2023-02-01'),
+(3, 'Bicicleta Eléctrica', 'Bicicleta', 'Eléctrica', 'MarcaC', '2023-06-01'),
+(4, 'Luces de Bicicleta', 'Accesorio', 'Seguridad', 'MarcaD', '2023-07-01'),
+(5, 'Candado de Bicicleta', 'Accesorio', 'Seguridad', 'MarcaE', '2023-08-01');
 
 -- Inserts for DOCUMENTOPRODUCTO
 INSERT INTO `ciclomart`.`documentoproducto` (`idProducto`, `idUsuario`, `tipo`, `descripcion`, `estado`, `precio`, `fechaCompra`) VALUES
@@ -336,7 +341,9 @@ INSERT INTO `ciclomart`.`carrito` (`idCarrito`, `idUsuario`, `cantidadProductos`
 (17, 8, 5, 1500.00, '2023-05-04', 'Completado', 'Efectivo', 'Avenida 50 #10-20, Cali', 20.00),
 (18, 9, 2, 400.00, '2023-05-09', 'Completado', 'PayPal', 'Carrera 7 #45-67, Barranquilla', 0.00),
 (19, 1, 1, 250.00, '2023-05-11', 'Completado', 'Tarjeta de Crédito', 'Calle 123 #45-67, Bogotá', 0.00),
-(20, 2, 2, 540.50, '2023-05-14', 'Completado', 'Transferencia Bancaria', 'Avenida 456 #78-90, Medellín', 10.00);
+(20, 2, 2, 540.50, '2023-05-14', 'Completado', 'Transferencia Bancaria', 'Avenida 456 #78-90, Medellín', 10.00),
+(21, 11, 2, 1200.00, '2023-06-15', 'Pendiente', 'Tarjeta de Crédito', 'Calle 456 #78-90, Bogotá', 5.00),
+(22, 11, 3, 1500.00, '2023-06-20', 'Completado', 'PayPal', 'Avenida 123 #45-67, Medellín', 10.00);
 -- Inserts for CARRITOPRODUCTO
 -- Inserts for CARRITOPRODUCTO
 INSERT INTO `ciclomart`.`carritoproducto` (`idCarritoProducto`, `idCarrito`, `idProducto`, `cantidad`, `precio`) VALUES
@@ -386,7 +393,12 @@ INSERT INTO `ciclomart`.`carritoproducto` (`idCarritoProducto`, `idCarrito`, `id
 (44, 18, 2, 1, 200.00), -- Total 2 productos para carrito 18
 (45, 19, 1, 1, 250.00), -- Total 1 producto para carrito 19
 (46, 20, 1, 1, 270.25),
-(47, 20, 2, 1, 270.25); -- Total 2 productos para carrito 20
+(47, 20, 2, 1, 270.25), -- Total 2 productos para carrito 20
+(48, 21, 5, 1, 1000.00),
+(49, 21, 3, 1, 200.00), -- Total 2 productos para carrito 21
+(50, 22, 2, 1, 1000.00),
+(51, 22, 5, 1, 200.00),
+(52, 22, 3, 1, 300.00); -- Total 3 productos para carrito 22
 
 -- Inserts for TRANSACCION
 INSERT INTO `ciclomart`.`transaccion` (`idTransaccion`, `idCarrito`, `idComprador`, `idVendedor`, `fecha`, `monto`, `metodoPago`, `estado`) VALUES
@@ -398,9 +410,9 @@ INSERT INTO `ciclomart`.`transaccion` (`idTransaccion`, `idCarrito`, `idComprado
 (6, 6, 6, 1, '2023-03-20', 780.00, 'Tarjeta de Crédito', 'exitosa'),
 (7, 7, 7, 2, '2023-03-25', 670.00, 'Transferencia Bancaria', 'fallida'),
 (8, 8, 8, 3, '2023-03-28', 1000.00, 'Efectivo', 'exitosa'),
-(9, 9, 9, 4, '2023-04-02', 400.00, 'PayPal', 'proceso'),
-(10, 10, 1, 5, '2023-04-05', 250.00, 'Tarjeta de Crédito', 'exitosa'),
-(11, 11, 2, 6, '2023-04-10', 540.50, 'Transferencia Bancaria', 'exitosa'),
+(9, 9, 9, 11, '2023-04-02', 400.00, 'PayPal', 'proceso'),
+(10, 10, 1, 11, '2023-04-05', 250.00, 'Tarjeta de Crédito', 'exitosa'),
+(11, 11, 2, 11, '2023-04-10', 540.50, 'Transferencia Bancaria', 'exitosa'),
 (12, 12, 3, 7, '2023-04-15', 890.00, 'Efectivo', 'fallida'),
 (13, 13, 4, 8, '2023-04-20', 700.75, 'Tarjeta de Débito', 'exitosa'),
 (14, 14, 5, 9, '2023-04-25', 300.00, 'PayPal', 'exitosa'),
@@ -409,7 +421,9 @@ INSERT INTO `ciclomart`.`transaccion` (`idTransaccion`, `idCarrito`, `idComprado
 (17, 17, 8, 3, '2023-05-05', 1500.00, 'Efectivo', 'exitosa'),
 (18, 18, 9, 4, '2023-05-10', 400.00, 'PayPal', 'exitosa'),
 (19, 19, 1, 5, '2023-05-12', 250.00, 'Tarjeta de Crédito', 'exitosa'),
-(20, 20, 2, 6, '2023-05-15', 540.50, 'Transferencia Bancaria', 'exitosa');
+(20, 20, 2, 6, '2023-05-15', 540.50, 'Transferencia Bancaria', 'exitosa'),
+(21, 21, 11, 4, '2023-06-15', 1200.00, 'Tarjeta de Crédito', 'proceso'),
+(22, 22, 11, 5, '2023-06-20', 1500.00, 'PayPal', 'exitosa');
 
 -- Inserts for ENVIO
 INSERT INTO `ciclomart`.`envio` (`idEnvio`, `idTransaccion`, `idUsuarioComprador`, `idUsuarioVendedor`, `fecha`, `direccion`, `estado`) VALUES
@@ -436,7 +450,9 @@ SELECT
     t.idVendedor,
     c.metodoPago AS metodoPago,
     comprador.nombre AS compradorNombre,
+    comprador.apellido AS compradorApellido,	
     vendedor.nombre AS vendedorNombre,
+    vendedor.apellido AS vendedorApellido,
 	p.idProducto,    
 	p.nombre AS nombre_producto,
     p.tipo AS tipo_producto,
@@ -459,6 +475,12 @@ JOIN
 
 
 
+select * from productosCompradorVendedor;
+select * from transaccion;
+select * from carrito;
+select * from carritoProducto; 
+select * from producto;
+select * from usuario;
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
