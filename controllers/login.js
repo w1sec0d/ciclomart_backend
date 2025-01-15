@@ -24,13 +24,13 @@ const login = async (req, res) => {
     async (err, result) => {
       if (err) {
         return res.status(500).json({
-          message: 'internal server error',
+          message: 'Error en el servidor, intentalo más tarde',
         })
       }
 
       if (result.length === 0) {
         return res.status(401).json({
-          message: 'Error en el servidor, intentalo más tarde',
+          message: 'Credenciales incorrectas, intentalo de nuevo',
         })
       }
 
@@ -40,7 +40,7 @@ const login = async (req, res) => {
 
       if (!passwordUser) {
         return res.status(401).json({
-          message: 'Error en el servidor, intentalo más tarde',
+          message: 'Credenciales incorrectas, intentalo de nuevo',
         })
       }
 
