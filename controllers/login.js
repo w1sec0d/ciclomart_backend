@@ -30,7 +30,7 @@ const login = async (req, res) => {
 
       if (result.length === 0) {
         return res.status(401).json({
-          message: 'Failed',
+          message: 'Error en el servidor, intentalo más tarde',
         })
       }
 
@@ -40,7 +40,7 @@ const login = async (req, res) => {
 
       if (!passwordUser) {
         return res.status(401).json({
-          message: 'Failed',
+          message: 'Error en el servidor, intentalo más tarde',
         })
       }
 
@@ -104,16 +104,16 @@ const sendEmail = async (req, res) => {
       await sendVerificationEmail(email, token)
 
       return res.status(200).json({
-        message: 'success',
+        message: 'exito',
       })
     } else {
       return res.status(401).json({
-        message: 'Failed',
+        message: 'Error en el servidor, intentalo más tarde',
       })
     }
   } catch (err) {
     return res.status(500).json({
-      message: 'Failed',
+      message: 'Error en el servidor, intentalo más tarde',
     })
   }
 }
@@ -136,7 +136,6 @@ const sendRegisterCode = async (req, res) => {
       expiresIn: '1h',
     })
 
-    console.log('email', email)
     // validate email
     const isEmailAvailable = await verifyEmail(email)
     if (!isEmailAvailable) {
@@ -148,13 +147,13 @@ const sendRegisterCode = async (req, res) => {
     await sendVerificationCode(email, token, code)
 
     return res.status(200).json({
-      message: 'success',
+      message: 'Codigo de confirmación enviado con éxito',
       email,
       token,
     })
   } catch (error) {
     return res.status(500).json({
-      message: 'Failed',
+      message: 'Error en el servidor, intentalo más tarde',
     })
   }
 }
@@ -212,11 +211,11 @@ const updatePassword = async (req, res) => {
       (err, result) => {
         if (err) {
           return res.status(500).json({
-            message: 'Failed',
+            message: 'Error en el servidor, intentalo más tarde',
           })
         } else {
           return res.status(200).json({
-            message: 'success',
+            message: 'exito',
           })
         }
       }

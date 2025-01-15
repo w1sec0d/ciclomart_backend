@@ -69,7 +69,7 @@ const registerUsuario = async (request, response) => {
   const { nombre, apellido, email, password } = request.body
 
   if (!nombre || !apellido || !email || !password) {
-    response.status(400).send('Missing fields')
+    response.status(400).send('Datos Faltantes')
     return
   }
 
@@ -81,10 +81,10 @@ const registerUsuario = async (request, response) => {
     (error, results) => {
       if (error) {
         console.error('Error executing query', error)
-        response.status(500).send('Internal server error')
+        response.status(500).send('Error en el servidor, intentalo más tarde')
         return
       }
-      response.status(201).send('User added successfully')
+      response.status(201).send('Usuario añadido satisfactoriamente')
     }
   )
 }
