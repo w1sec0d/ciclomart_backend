@@ -145,10 +145,12 @@ const sendRegisterCode = async (req, res) => {
       })
     }
 
-    // await sendVerificationCode(email, token, code)
+    await sendVerificationCode(email, token, code)
 
     return res.status(200).json({
       message: 'success',
+      email,
+      token,
     })
   } catch (error) {
     return res.status(500).json({
@@ -243,19 +245,21 @@ const sendVerificationEmail = async (email, token) => {
     from: '"Ciclo Mart Soport" <ciclomartsoporte@gmail.com>',
     to: email,
     subject: 'Recuperación de contraseña',
-    text: `¡Hola!, para restablecer tu contraseña, ingresa al siguiente enlace: http://localhost:5173/passwordRecovery/${token}`,
-    html: `<b>Hola, para restablecer tu contraseña, ingresa al siguiente enlace: <a href="http://localhost:5173/passwordRecovery/${token}">Restablecer Contraseña</a></b>`,
+    text: `¡Hola!, para restablecer tu contraseña, ingresa al siguiente enlace: ${process.env.FRONTEND_URL}/passwordRecovery/${token}`,
+    html: `<b>Hola, para restablecer tu contraseña, ingresa al siguiente enlace: <a href="${process.env.FRONTEND_URL}/passwordRecovery/${token}">Restablecer Contraseña</a></b>`,
   })
 }
 
 //Función que envia el código al usuario (para terminar el registro)
 const sendVerificationCode = async (email, token, code) => {
+  console.log('code', code)
+
   await transporter.sendMail({
-    from: '"Ciclo Mart Soport" <ciclomartsoporte@gmail.com>',
+    from: '"Ciclo Mart Soporte" <ciclomartsoporte@gmail.com>',
     to: email,
     subject: 'Código CicloMart',
-    text: `¡Hola!, este es tú código de verificación ${code}, ingresa al siguiente enlace: http://localhost:5173/verificacionCode/${token}`,
-    html: `<b>¡Hola!, este es tú código de verificación ${code}, ingresa al siguiente enlace para poder ingresarlo: <a href="http://localhost:5173/verificacionCode/${token}">Da click aquí</a></b>`,
+    text: `¡Hola!, este es tu código de verificación: ${code} Puedes ingresar el código en CicloMart o hacer click aquí: ${process.env.FRONTEND_URL}/verificationCode/${token}?code=${code}`,
+    html: `¡Hola!, este es tu código de verificación: <b>${code}</b> Puedes ingresar el código en CicloMart o hacer click aquí: <a href="${process.env.FRONTEND_URL}/verificationCode/${token}?code=${code}">Da click aquí</a>`,
   })
 }
 
