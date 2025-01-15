@@ -22,7 +22,7 @@ const getComprasById = (request, response) => {
   }
 
   db.query(
-    'SELECT * FROM transaccion WHERE idComprador = ?',
+    'SELECT * FROM transaccion WHERE idComprador = ? AND transaccion.estado = "exitosa"',
     [idComprador],
     (error, results) => {
       if (error) {
@@ -43,7 +43,7 @@ const getVentasById = (request, response) => {
     return response.status(400).json({ message: 'Id seller not found' })
   }
   db.query(
-    'SELECT * FROM transaccion WHERE idVendedor = ?',
+    'SELECT * FROM transaccion WHERE idVendedor = ? AND transaccion.estado = "exitosa"',
     [idVendedor],
     (error, results) => {
       if (error) {
