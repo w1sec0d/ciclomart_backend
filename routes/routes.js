@@ -5,6 +5,7 @@ const {
   getUsuarios,
   registerUsuario,
   getUsuarioById,
+  updateUsuarioFoto,
 } = require('../controllers/usuario.js')
 
 const {
@@ -32,6 +33,9 @@ const { userInfo } = require('../controllers/userInfo.js')
 router.get('/usuarios', getUsuarios)
 router.get('/usuarios/:id', getUsuarioById)
 router.post('/usuarios', registerUsuario)
+
+//Update Photo
+router.put('/updateUsuarioFoto/:fotoUrl/:idUsuario', updateUsuarioFoto)
 
 //autenticacion
 router.post('/login', login)
