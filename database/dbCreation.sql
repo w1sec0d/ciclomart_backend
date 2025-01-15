@@ -450,11 +450,11 @@ SELECT
     t.idVendedor,
     c.metodoPago AS metodoPago,
     comprador.nombre AS compradorNombre,
-    comprador.apellido AS compradorApellido,	
+    comprador.apellido AS compradorApellido,    
     vendedor.nombre AS vendedorNombre,
     vendedor.apellido AS vendedorApellido,
-	p.idProducto,    
-	p.nombre AS nombre_producto,
+    p.idProducto,    
+    p.nombre AS nombre_producto,
     p.tipo AS tipo_producto,
     p.categoria AS categoria_producto,
     p.marca AS marca_producto,
@@ -471,8 +471,9 @@ JOIN
 JOIN 
     usuario comprador ON t.idComprador = comprador.idUsuario
 JOIN 
-    usuario vendedor ON t.idVendedor = vendedor.idUsuario;
-
+    usuario vendedor ON t.idVendedor = vendedor.idUsuario
+WHERE 
+    t.estado = 'exitosa';
 
 
 select * from productosCompradorVendedor;
