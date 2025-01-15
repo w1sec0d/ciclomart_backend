@@ -35,7 +35,7 @@ router.get('/usuarios/:id', getUsuarioById)
 router.post('/usuarios', registerUsuario)
 
 //Update Photo
-router.put('/updateUsuarioFoto/:fotoUrl/:idUsuario', updateUsuarioFoto)
+router.put('/updateUsuarioFoto/:idUsuario', updateUsuarioFoto)
 
 //autenticacion
 router.post('/login', login)

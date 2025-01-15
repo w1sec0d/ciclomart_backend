@@ -56,8 +56,8 @@ const registerUsuario = async (request, response) => {
 }
 
 const updateUsuarioFoto = (request, response) => {
-  const photoUrl = request.param.fotoUrl
-  const idUser = request.param.idUsuario
+  const photoUrl = request.body.photoUrl
+  const idUser = request.params.idUsuario
   db.query(
     'UPDATE usuario SET foto = ? WHERE idUsuario = ?',
     [photoUrl, idUser],
