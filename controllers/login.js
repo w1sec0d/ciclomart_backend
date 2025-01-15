@@ -1,15 +1,20 @@
+const db = require('../database/connection')
+// third party libraries
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
-const db = require('../database/connection')
 const nodemailer = require('nodemailer')
+const crypto = require('crypto')
+
 require('dotenv').config({ path: './controllers/.env' })
 
 const { registerUsuario } = require('./usuario')
 const { json } = require('body-parser')
 
+const generateVerificationCode = () => {
+  return crypto.randomInt(1000000, 10000000) // Generates a 7-digit number
+}
+
 // Función para loguear al usuario
-
-
 const login = async (req, res) => {
   const { email, password } = req.body
 
@@ -25,7 +30,7 @@ const login = async (req, res) => {
 
       if (result.length === 0) {
         return res.status(401).json({
-          message: 'Failed',
+          message: 'Error en el servidor, intentalo más tarde',
         })
       }
 
@@ -35,7 +40,7 @@ const login = async (req, res) => {
 
       if (!passwordUser) {
         return res.status(401).json({
-          message: 'Failed',
+          message: 'Error en el servidor, intentalo más tarde',
         })
       }
 
@@ -60,40 +65,25 @@ const login = async (req, res) => {
 // Funcion para verificar si el email existe en la bd
 
 const verifyEmail = async (email) => {
-  return new Promise((resolve, reject) => {
-    db.query(
-      'SELECT * FROM usuario WHERE correo = ?',
-      [email],
-      (err, result) => {
-        if (err) {
-          reject(err)
-        } else if (result.length === 0) {
-          resolve(false)
-        } else {
-          resolve(true)
+  console.log('email', email)
+
+  try {
+    const result = await new Promise((resolve, reject) => {
+      db.query(
+        'SELECT * FROM usuario WHERE correo = ?',
+        [email],
+        (err, result) => {
+          if (err) {
+            return reject(err)
+          }
+          resolve(result)
         }
-      }
-    )
-  })
-}
-
-
-const verifyEmailv2 = async (req, res) => {
-  const email = req.params.email
-
-  db.query('SELECT * FROM usuario WHERE correo = ?', [email], (err, result) => {
-    if (err) {
-      return res.status(500).send('Internal server error')
-    }
-    if (result.length > 0) {
-      return res.status(200).json({
-        message: true,
-      })
-    }
-    return res.status(200).json({
-      message: false,
+      )
     })
-  })
+    return result.length === 0
+  } catch (error) {
+    console.error('Error verifying email:', error)
+  }
 }
 
 //Función que envia un correo al usuario para recuperar su cuenta
@@ -114,26 +104,26 @@ const sendEmail = async (req, res) => {
       await sendVerificationEmail(email, token)
 
       return res.status(200).json({
-        message: 'success',
+        message: 'exito',
       })
     } else {
       return res.status(401).json({
-        message: 'Failed',
+        message: 'Error en el servidor, intentalo más tarde',
       })
     }
   } catch (err) {
     return res.status(500).json({
-      message: 'Failed',
+      message: 'Error en el servidor, intentalo más tarde',
     })
   }
 }
 
 //Función que envia un código para terminar el registro
-const sendEmailCode = async (req, res) => {
+const sendRegisterCode = async (req, res) => {
   try {
     const { email, nombre, apellido, password } = req.body.data
 
-    const code = Math.floor(Math.random() * 10000000)
+    const code = generateVerificationCode()
     const userForToken = {
       correo: email,
       nombre: nombre,
@@ -145,17 +135,28 @@ const sendEmailCode = async (req, res) => {
     const token = jwt.sign(userForToken, process.env.JWT_SECRET, {
       expiresIn: '1h',
     })
+
+    // validate email
+    const isEmailAvailable = await verifyEmail(email)
+    if (!isEmailAvailable) {
+      return res.status(400).json({
+        message: 'El correo ya se encuentra registrado',
+      })
+    }
+
     await sendVerificationCode(email, token, code)
+
     return res.status(200).json({
-      message: 'success',
+      message: 'Codigo de confirmación enviado con éxito',
+      email,
+      token,
     })
   } catch (error) {
     return res.status(500).json({
-      message: 'Failed',
+      message: 'Error en el servidor, intentalo más tarde',
     })
   }
 }
-
 
 const evaluateToken = (req, res) => {
   const { token } = req.params
@@ -169,7 +170,6 @@ const evaluateToken = (req, res) => {
     res.status(400).send('Invalid o expired token')
   }
 }
-
 
 // Función que valida si el codigo introducido por el usuario es igual al código almacenado en el token
 const validateCode = async (req, res) => {
@@ -211,11 +211,11 @@ const updatePassword = async (req, res) => {
       (err, result) => {
         if (err) {
           return res.status(500).json({
-            message: 'Failed',
+            message: 'Error en el servidor, intentalo más tarde',
           })
         } else {
           return res.status(200).json({
-            message: 'success',
+            message: 'exito',
           })
         }
       }
@@ -237,7 +237,6 @@ const transporter = nodemailer.createTransport({
   },
 })
 
-
 //Función que envia el correo al usuario (recuperación de contraseña)
 
 const sendVerificationEmail = async (email, token) => {
@@ -245,31 +244,30 @@ const sendVerificationEmail = async (email, token) => {
     from: '"Ciclo Mart Soport" <ciclomartsoporte@gmail.com>',
     to: email,
     subject: 'Recuperación de contraseña',
-    text: `¡Hola!, para restablecer tu contraseña, ingresa al siguiente enlace: http://localhost:5173/passwordRecovery/${token}`,
-    html: `<b>Hola, para restablecer tu contraseña, ingresa al siguiente enlace: <a href="http://localhost:5173/passwordRecovery/${token}">Restablecer Contraseña</a></b>`,
+    text: `¡Hola!, para restablecer tu contraseña, ingresa al siguiente enlace: ${process.env.FRONTEND_URL}/passwordRecovery/${token}`,
+    html: `<b>Hola, para restablecer tu contraseña, ingresa al siguiente enlace: <a href="${process.env.FRONTEND_URL}/passwordRecovery/${token}">Restablecer Contraseña</a></b>`,
   })
 }
-
 
 //Función que envia el código al usuario (para terminar el registro)
 const sendVerificationCode = async (email, token, code) => {
+  console.log('code', code)
+
   await transporter.sendMail({
-    from: '"Ciclo Mart Soport" <ciclomartsoporte@gmail.com>',
+    from: '"Ciclo Mart Soporte" <ciclomartsoporte@gmail.com>',
     to: email,
     subject: 'Código CicloMart',
-    text: `¡Hola!, este es tú código de verificación ${code}, ingresa al siguiente enlace: http://localhost:5173/verificacionCode/${token}`,
-    html: `<b>¡Hola!, este es tú código de verificación ${code}, ingresa al siguiente enlace para poder ingresarlo: <a href="http://localhost:5173/verificacionCode/${token}">Da click aquí</a></b>`,
+    text: `¡Hola!, este es tu código de verificación: ${code} Puedes ingresar el código en CicloMart o hacer click aquí: ${process.env.FRONTEND_URL}/verificationCode/${token}?code=${code}`,
+    html: `¡Hola!, este es tu código de verificación: <b>${code}</b> Puedes ingresar el código en CicloMart o hacer click aquí: <a href="${process.env.FRONTEND_URL}/verificationCode/${token}?code=${code}">Da click aquí</a>`,
   })
 }
-
 
 module.exports = {
   login,
   sendEmail,
   evaluateToken,
   updatePassword,
-  sendEmailCode,
+  sendRegisterCode,
   validateCode,
-  verifyEmailv2,
-
+  verifyEmail,
 }
