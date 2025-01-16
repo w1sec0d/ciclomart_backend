@@ -11,7 +11,7 @@ const port = process.env.DB_PORT
 app.use(bodyParser.json())
 // Configure CORS to allow requests from the frontend
 const corsOptions = {
-  origin: 'https://ciclomart-front.onrender.com',
+  origin: process.env.FRONTEND_URL,
   optionsSuccessStatus: 200, // For legacy browser support
 }
 app.use(cors(corsOptions))
