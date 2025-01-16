@@ -76,7 +76,7 @@ CREATE TABLE `ciclomart`.`bicicleta` (
     `tamaño de rueda` VARCHAR(45) NULL,
     `tipo de frenos` VARCHAR(45) NULL,
     `velocidades` INT NULL,
-    `suspensión` VARCHAR(45) NULL,
+    `suspension` VARCHAR(45) NULL,
     `transmision` VARCHAR(45) NULL,
     `peso` INT NULL,
     `color` VARCHAR(45) NULL,
@@ -328,29 +328,6 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- INSERTS
 -- -----------------------------------------------------
-INSERT INTO ciclomart.producto (idProducto, tipo, nombre, precio, marca, disponibilidad, `método de envio`, fechaPublicacion, condición, `tipo de bicicleta`, `tamaño del marco`, `material del marco`, `tamaño de rueda`, `tipo de frenos`, velocidades, suspensión, transmision, peso, color, extras, categoria, compatibilidad)
-VALUES
-(1, 'bicicleta', 'mountain bike', 500, 'giant', 'inmediata', 'gratis', '2023-01-01', 'nuevo', 'montaña', 'M', 'aluminio', '29', 'disco', 21, 'delantera', 'shimano', 15, 'negro', 'portabotellas', NULL, NULL),
-(2, 'bicicleta', 'road bike', 750, 'MarcaX', 'preventa', 'costo', '2023-02-01', 'nuevo', 'carretera', 'L', 'carbono', '28', 'caliper', 18, 'ninguna', 'sram', 8, 'rojo', 'luces', NULL, NULL),
-(3, 'repuesto', 'cadena de bicicleta', 25, 'shimano', 'pedido', 'retiro', '2023-03-01', 'nuevo', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'transmision', 'universal'),
-(4, 'repuesto', 'llanta de bicicleta', 40, 'sram', 'agotado', 'gratis', '2023-04-01', 'nuevo', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ruedas', '29'),
-(5, 'bicicleta', 'bmx', 300, 'MarcaY', 'inmediata', 'costo', '2023-05-01', 'nuevo', 'bmx', 'S', 'acero', '20', 'v-brake', 1, 'ninguna', 'ninguna', 12, 'azul', 'pegatinas', NULL, NULL),
-(6, 'repuesto', 'sillín de bicicleta', 35, 'campagnolo', 'preventa', 'retiro', '2023-06-01', 'nuevo', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'asiento', 'universal'),
-(7, 'bicicleta', 'hybrid bike', 600, 'giant', 'pedido', 'gratis', '2023-07-01', 'nuevo', 'híbrida', 'M', 'aluminio', '27.5', 'disco', 24, 'delantera', 'shimano', 14, 'verde', 'guardabarros', NULL, NULL),
-(8, 'repuesto', 'pedales de bicicleta', 20, 'shimano', 'agotado', 'costo', '2023-08-01', 'nuevo', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'pedales', 'universal'),
-(9, 'bicicleta', 'electric bike', 1200, 'MarcaX', 'inmediata', 'retiro', '2023-09-01', 'nuevo', 'eléctrica', 'L', 'aluminio', '29', 'disco', 21, 'delantera', 'bosch', 20, 'negro', 'batería extra', NULL, NULL),
-(10, 'repuesto', 'frenos de disco', 50, 'sram', 'preventa', 'gratis', '2023-10-01', 'nuevo', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'frenos', 'universal'),
-(11, 'bicicleta', 'gravel bike', 850, 'MarcaY', 'preventa', 'costo', '2023-11-01', 'nuevo', 'gravel', 'M', 'carbono', '28', 'disco', 22, 'ninguna', 'shimano', 9, 'gris', 'bolsa de cuadro', NULL, NULL),
-(12, 'bicicleta', 'folding bike', 450, 'giant', 'pedido', 'gratis', '2023-12-01', 'nuevo', 'plegable', 'S', 'aluminio', '20', 'v-brake', 7, 'ninguna', 'ninguna', 11, 'blanco', 'portaequipajes', NULL, NULL),
-(13, 'repuesto', 'cambio trasero', 60, 'campagnolo', 'inmediata', 'retiro', '2024-01-01', 'nuevo', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'transmision', 'campagnolo'),
-(14, 'repuesto', 'manillar de bicicleta', 30, 'shimano', 'agotado', 'costo', '2024-02-01', 'nuevo', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'manillar', 'universal'),
-(15, 'bicicleta', 'cruiser bike', 550, 'MarcaX', 'inmediata', 'gratis', '2024-03-01', 'nuevo', 'crucero', 'L', 'acero', '26', 'coaster', 1, 'ninguna', 'ninguna', 18, 'verde', 'cesta delantera', NULL, NULL),
-(16, 'repuesto', 'tija de sillín', 45, 'sram', 'preventa', 'retiro', '2024-04-01', 'nuevo', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'asiento', 'universal'),
-(17, 'bicicleta', 'tandem bike', 1300, 'MarcaY', 'pedido', 'costo', '2024-05-01', 'nuevo', 'tándem', 'XL', 'aluminio', '28', 'disco', 21, 'delantera', 'shimano', 25, 'azul', 'doble asiento', NULL, NULL),
-(18, 'repuesto', 'horquilla de suspensión', 120, 'shimano', 'agotado', 'gratis', '2024-06-01', 'nuevo', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'suspensión', '29'),
-(19, 'bicicleta', 'fixie bike', 400, 'giant', 'inmediata', 'retiro', '2024-07-01', 'nuevo', 'fixie', 'M', 'acero', '28', 'caliper', 1, 'ninguna', 'ninguna', 10, 'negro', 'correa de cuero', NULL, NULL),
-(20, 'repuesto', 'bielas de bicicleta', 70, 'campagnolo', 'preventa', 'costo', '2024-08-01', 'nuevo', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'transmision', 'campagnolo');
-
 -- Inserts for USUARIO
 INSERT INTO `ciclomart`.`usuario` (`nombre`, `apellido`, `edad`, `rol`, `correo`, `direccion`, `telefono`, `username`, `password`, `fechaRegistro`) VALUES
 ('Sofía', 'Ramírez', 27, 'cliente', 'sofia.ramirez@example.com', 'Carrera 15 #34-56, Bogotá', '3102345678', 'sofiaramirez', '$2b$10$uP41SextbAzmP/hjWITrdecMJhb1/JrZzN6M3ptI6EB4zbWcjVDEy', NOW()),
@@ -492,6 +469,35 @@ INSERT INTO `ciclomart`.`mensaje` (`idMensaje`, `idUsuarioEmisor`, `idUsuarioRec
 (1, 1, 3, 1, 'Hola, estoy interesado en tu producto', '2023-03-01'),
 (2, 3, 1, 1, 'Hola, claro, está disponible', '2023-03-02');
 
+INSERT INTO producto (idProducto, tipo, nombre, precio, marca, disponibilidad, `método de envio`, fechaPublicacion, condición) VALUES
+(20, 'bicicleta', 'Bicicleta de montaña', 700000, 'MarcaX', 'inmediata', 'costo', '2023-04-05', 'Nuevo'),
+(42, 'bicicleta', 'Bicicleta de carretera', 1200000, 'MarcaY', 'inmediata', 'costo', '2023-05-10', 'Nuevo'),
+(3, 'repuesto', 'Cadena de bicicleta', 50000, 'shimano', 'preventa', 'costo', '2023-06-15', 'Nuevo'),
+(4, 'repuesto', 'Llanta de bicicleta', 80000, 'sram', 'preventa', 'costo', '2023-07-20', 'Nuevo'),
+(5, 'bicicleta', 'Bicicleta BMX', 500000, 'trek', 'pedido', 'gratis', '2023-08-25', 'Nuevo'),
+(6, 'repuesto', 'Frenos de disco', 1000000, 'campagnolo', 'preventa', 'costo', '2023-09-30', 'Nuevo'),
+(7, 'bicicleta', 'Bicicleta eléctrica', 1500000, 'giant', 'agotado', 'retiro', '2023-10-05', 'Nuevo'),
+(8, 'repuesto', 'Pedales de bicicleta', 40000, 'giant', 'preventa', 'costo', '2023-11-10', 'Nuevo'),
+(9, 'bicicleta', 'Bicicleta plegable', 800000, 'trek', 'inmediata', 'costo', '2023-12-15', 'Nuevo'),
+(10, 'repuesto', 'Sillín de bicicleta', 60000, 'shimano', 'inmediata', 'retiro', '2024-01-20', 'Nuevo'),
+(11, 'bicicleta', 'Bicicleta de paseo', 600000, 'Marcay', 'inmediata', 'costo', '2024-02-25', 'Nuevo'),
+(12, 'repuesto', 'Manillar de bicicleta', 700000, 'shimano', 'preventa', 'costo', '2024-03-30', 'Nuevo');
+
+INSERT INTO repuesto (idRepuesto, categoria, compatibilidad) VALUES
+(3, 'transmision', 'ruta'),
+(4, 'rueda', 'montaña'),
+(6, 'frenos', 'ruta'),
+(8, 'pedales', 'bmx'),
+(10, 'asiento', 'ruta'),
+(12, 'manubrio', 'ruta');
+
+INSERT INTO bicicleta (idBicicleta, `tipo de bicicleta`, `tamaño del marco`, `tamaño de rueda` , `material del marco`, `tipo de frenos`, velocidades, suspension, transmision, color, extras) VALUES
+(20, 'montala', 'medium', '26', 'aluminio',  'disco', '3', 'doble', 'doble', 'amarillo', 'luces'),
+(42, 'ruta', 'large', '26', 'carbono' ,'convencional', '5', 'sin', 'triple', 'rojo', 'timbre'),
+(5, 'bmx', 'xl', '27.5', 'carbono', 'convencional', '7', 'doble', 'monoplato', 'azul', 'parrilla'),
+(7, 'ruta', 'medium', '27.5', 'carbono', 'disco', '7', 'delantera', 'doble', 'verde', 'candado'),
+(9, 'ruta', 'medium', '29', 'acero', 'disco', '10', 'doble', 'triple', 'medio', 'timbre'),
+(11, 'montaña', 'large',  '29', 'aluminio', 'convencional', '24', 'doble', 'monoplato', 'amarillo', 'luces');
 
 -- Eliminar la vista si existe
 DROP VIEW IF EXISTS productosCompradorVendedor;
