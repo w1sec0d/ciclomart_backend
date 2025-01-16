@@ -5,6 +5,8 @@ const {
   getUsuarios,
   registerUsuario,
   getUsuarioById,
+  updateUsuarioFoto,
+  updateUsuario,
 } = require('../controllers/usuario.js')
 
 const {
@@ -16,6 +18,16 @@ const {
   validateCode,
   verifyEmail,
 } = require('../controllers/login.js')
+
+/*Stores*/
+const { getTiendas } = require('../controllers/tienda.js')
+
+/*Transactions*/
+const {
+  getTransacciones,
+  getComprasById,
+  getVentasById,
+} = require('../controllers/transaccion.js')
 
 const { userInfo } = require('../controllers/userInfo.js')
 
@@ -31,6 +43,10 @@ router.post('/usuarios', registerUsuario)
 //Buscar productos
 router.get('/search', search)
 
+//Updates userr
+router.put('/updateUsuarioFoto/:idUsuario', updateUsuarioFoto)
+router.put('/updateUsuario/:id', updateUsuario)
+
 //autenticacion
 router.post('/login', login)
 router.get('/userInfo', userInfo)
@@ -39,5 +55,13 @@ router.get('/evaluateToken/:token', evaluateToken)
 router.post('/updatePassword', updatePassword)
 router.post('/sendRegisterCode', sendRegisterCode)
 router.post('/validateCode', validateCode)
+
+//Routes for table 'tienda'
+router.get('/getTiendas', getTiendas)
+
+//Routes for table 'transaccion'
+router.get('/getTransacciones', getTransacciones)
+router.get('/getComprasById/:id', getComprasById)
+router.get('/getVentasById/:id', getVentasById)
 
 module.exports = router
