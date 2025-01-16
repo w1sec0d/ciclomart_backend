@@ -31,11 +31,45 @@ const getUsuarioById = (request, response) => {
   })
 }
 
+/*const registerUsuario = async (values) => {
+  console.log(values);
+  const { nombre, apellido, email, password } = values;
+  let successRegister = false;
+
+  if (!nombre || !apellido || !email || !password) {
+    return successRegister;
+  }
+
+  try {
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    await new Promise((resolve, reject) => {
+      db.query(
+        'INSERT INTO usuario (nombre, apellido, correo, password, fechaRegistro) VALUES (?, ?, ?, ?, ?)',
+        [nombre, apellido, email, passwordHash, new Date()],
+        (error, results) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(results);
+          }
+        }
+      );
+    });
+
+    successRegister = true;
+  } catch (error) {
+    console.error('Error al registrar el usuario:', error);
+  }
+
+  return successRegister;
+};*/
+
 const registerUsuario = async (request, response) => {
   const { nombre, apellido, email, password } = request.body
 
   if (!nombre || !apellido || !email || !password) {
-    response.status(400).send('Missing fields')
+    response.status(400).send('Datos Faltantes')
     return
   }
 
@@ -47,10 +81,10 @@ const registerUsuario = async (request, response) => {
     (error, results) => {
       if (error) {
         console.error('Error executing query', error)
-        response.status(500).send('Internal server error')
+        response.status(500).send('Error en el servidor, intentalo más tarde')
         return
       }
-      response.status(201).send('User added successfully')
+      response.status(201).send('Usuario añadido satisfactoriamente')
     }
   )
 }
