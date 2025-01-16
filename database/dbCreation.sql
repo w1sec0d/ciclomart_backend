@@ -47,7 +47,7 @@ CREATE TABLE `ciclomart`.`producto` (
   `idProducto` INT NOT NULL,
   `tipo` VARCHAR(45) NOT NULL,
   `nombre` VARCHAR(60) NULL,
-  `precio` INT NOT NULL,
+  `precio` INT NULL,
   `marca` VARCHAR(45) NULL,
   `disponibilidad` VARCHAR(45) NULL,
   `método de envio` VARCHAR(45) NULL,
@@ -367,16 +367,6 @@ INSERT INTO `ciclomart`.`usuario` (`nombre`, `apellido`, `edad`, `rol`, `correo`
 -- Inserts for TIENDA
 INSERT INTO `ciclomart`.`tienda` (`idTienda`, `idUsuarioAdministrador`, `nombre`, `descripcion`, `telefono`) VALUES
 (1, 3, 'Tienda de Bicicletas', 'Venta de bicicletas y accesorios', '3001234567');
-
-
--- Inserts for PRODUCTO
-INSERT INTO `ciclomart`.`producto` (`idProducto`, `nombre`, `tipo`, `categoria`, `marca`, `fechaPublicacion`) VALUES
-(1, 'Bicicleta de Montaña', 'Bicicleta', 'Montaña', 'MarcaX', '2023-01-01'),
-(2, 'Casco de Ciclismo', 'Accesorio', 'Seguridad', 'MarcaY', '2023-02-01'),
-(3, 'Bicicleta Eléctrica', 'Bicicleta', 'Eléctrica', 'MarcaC', '2023-06-01'),
-(4, 'Luces de Bicicleta', 'Accesorio', 'Seguridad', 'MarcaD', '2023-07-01'),
-(5, 'Candado de Bicicleta', 'Accesorio', 'Seguridad', 'MarcaE', '2023-08-01');
-
 
 -- Inserts for DOCUMENTOPRODUCTO
 INSERT INTO `ciclomart`.`documentoproducto` (`idProducto`, `idUsuario`, `tipo`, `descripcion`, `estado`, `precio`, `fechaCompra`) VALUES
