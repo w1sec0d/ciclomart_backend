@@ -86,12 +86,32 @@ const verifyEmail = async (email) => {
   }
 }
 
+const verifyEmail2 = async (email) => {
+  return new Promise((resolve, reject) => {
+    db.query(
+      'SELECT * FROM usuario WHERE correo = ?',
+      [email],
+      (err, result) => {
+        if (err) {
+          reject(err)
+        } else if (result.length === 0) {
+          resolve(false)
+        } else {
+          resolve(true)
+        }
+      }
+    )
+  })
+}
+
 //Función que envia un correo al usuario para recuperar su cuenta
 const sendEmail = async (req, res) => {
   try {
     const email = req.body.data
+    console.log('email', email)
 
-    const user = await verifyEmail(email)
+    const user = await verifyEmail2(email)
+    console.log('user', user)
     if (user) {
       const userForToken = {
         correo: email,
