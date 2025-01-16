@@ -9,7 +9,12 @@ const app = express()
 const port = process.env.DB_PORT
 
 app.use(bodyParser.json())
-app.use(cors())
+// Configure CORS to allow requests from the frontend
+const corsOptions = {
+  origin: 'https://ciclomart-front.onrender.com',
+  optionsSuccessStatus: 200, // For legacy browser support
+}
+app.use(cors(corsOptions))
 
 // Middleware para registrar el cuerpo de la solicitud
 morgan.token('requestBody', (request) => JSON.stringify(request.body))
