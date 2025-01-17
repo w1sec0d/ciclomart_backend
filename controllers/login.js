@@ -211,7 +211,7 @@ const validateCode = async (req, res) => {
     })
   } else {
     return res.status(400).json({
-      message: 'Faild',
+      message: 'Codigo no congruente! Intentalo de nuevo',
     })
   }
 }
