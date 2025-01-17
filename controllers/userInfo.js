@@ -7,7 +7,7 @@ const userInfo = async (req, res) => {
   const authHeader = req.headers.authorization
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'No token provided' })
+    return res.status(401).json({ message: 'No se proporcionó token' })
   }
 
   const token = authHeader.split(' ')[1]
@@ -21,11 +21,12 @@ const userInfo = async (req, res) => {
       (err, result) => {
         if (err) {
           return res.status(500).json({
-            message: 'internal server error',
+            message:
+              'Error en el servidor, no se puede obtener la información del usuario',
           })
         }
         if (result.length === 0) {
-          return res.status(404).json({ message: 'User not found' })
+          return res.status(404).json({ message: 'Usuario no encontrado' })
         }
         const user = result[0]
         res.status(200).json({ user })
@@ -33,7 +34,7 @@ const userInfo = async (req, res) => {
     )
   } catch (error) {
     res.status(401).json({
-      message: 'Token is not valid',
+      message: 'Token inválido',
     })
   }
 }
