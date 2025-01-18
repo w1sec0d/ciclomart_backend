@@ -1,3 +1,6 @@
+-- Script que instancia de forma estándar la base de datos de CicloMart
+-- compatible con mysql workbench 8.0
+
 -- MySQL Workbench Forward Engineering
 
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;

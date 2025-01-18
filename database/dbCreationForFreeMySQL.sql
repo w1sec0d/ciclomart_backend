@@ -1,3 +1,11 @@
+-- Script modificado para instanciar la base de datos 
+-- de forma remota en freemysqlhosting.net
+
+-- Elimina las referencias completas a las tablas
+-- como ciclomart.tabla y algunas otras caracteristicas
+-- que no son soportadas por freemysqlhosting.net como la
+-- visibilidad de las llaves foraneas
+
 -- -----------------------------------------------------
 -- Schema mydb
 -- -----------------------------------------------------
