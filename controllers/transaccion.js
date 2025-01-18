@@ -50,12 +50,10 @@ const getVentasById = (request, response) => {
     [idVendedor],
     (error, results) => {
       if (error) {
-        return response
-          .status(500)
-          .json({
-            message: 'Error en el servidor, no se encontraron las ventas',
-            error: error,
-          })
+        return response.status(500).json({
+          message: 'Error en el servidor, no se encontraron las ventas',
+          error: error,
+        })
       }
       response.status(200).json(results)
     }

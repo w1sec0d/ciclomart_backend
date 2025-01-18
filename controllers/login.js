@@ -1,22 +1,25 @@
+// Descripcion: Contiene la lógica de las peticiones de login
+
+// Carga variables de entorno y módulos necesarios
+require('dotenv').config()
 const db = require('../database/connection')
-// third party libraries
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const nodemailer = require('nodemailer')
-const crypto = require('crypto')
-
-require('dotenv').config({ path: './controllers/.env' })
+const generateVerificationCode = require('../utils/generateVerificationCode')
 
 const { registerUsuario } = require('./usuario')
 const { json } = require('body-parser')
 
-const generateVerificationCode = () => {
-  return crypto.randomInt(1000000, 10000000) // Generates a 7-digit number
-}
-
 // Función para loguear al usuario
 const login = async (req, res) => {
   const { email, password } = req.body
+
+  if (!email || !password) {
+    return res.status(400).json({
+      message: 'Credenciales incompletas, verifica tus datos',
+    })
+  }
 
   db.query(
     'SELECT * FROM usuario WHERE correo = ?',
@@ -28,6 +31,7 @@ const login = async (req, res) => {
         })
       }
 
+      // Si no existe el usuario
       if (result.length === 0) {
         return res.status(401).json({
           message: 'Credenciales incorrectas, intentalo de nuevo',
@@ -38,12 +42,14 @@ const login = async (req, res) => {
 
       const passwordUser = await bcrypt.compare(password, user.password)
 
+      // Si la contraseña no coincide
       if (!passwordUser) {
         return res.status(401).json({
           message: 'Credenciales incorrectas, intentalo de nuevo',
         })
       }
 
+      // Se encripta un token con la información del usuario
       const userForToken = {
         id: user.idUsuario,
         correo: user.correo,
@@ -63,7 +69,6 @@ const login = async (req, res) => {
 }
 
 // Funcion para verificar si el email existe en la bd
-
 const verifyEmail = async (email) => {
   console.log('email', email)
 
