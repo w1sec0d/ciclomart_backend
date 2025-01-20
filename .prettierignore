@@ -1,2 +1,3 @@
+# Archivos a ser ignorados por el formateador de código
 node_modules
 .env

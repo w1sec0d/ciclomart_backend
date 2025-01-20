@@ -1,7 +1,7 @@
 {
   "name": "ciclomart_back",
   "version": "1.0.0",
-  "description": "Ciclomart app backend made with express.js and node",
+  "description": "App backend de la aplicacion de ciclomart hecha con express",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
