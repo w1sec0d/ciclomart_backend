@@ -4,9 +4,11 @@ const db = require('../database/connection.js')
 const getTransacciones = (request, response) => {
   db.query('SELECT * FROM transaccion', (error, results) => {
     if (error) {
-      return response
-        .status(404)
-        .json({ message: 'Transactions cannot be obtained', error: error })
+      return response.status(500).json({
+        message:
+          'Error interno del servidor, no se pueden obtener las transacciones',
+        error: error,
+      })
     }
     response.status(200).json(results)
   })
@@ -18,7 +20,7 @@ const getComprasById = (request, response) => {
   const idComprador = request.params.id
 
   if (isNaN(idComprador)) {
-    return response.status(400).json({ message: 'id buyer not found' })
+    return response.status(400).json({ message: 'Id de comprador inválida' })
   }
 
   db.query(
@@ -26,9 +28,10 @@ const getComprasById = (request, response) => {
     [idComprador],
     (error, results) => {
       if (error) {
-        return response
-          .status(404)
-          .json({ message: 'Purchases not found', error: error })
+        return response.status(500).json({
+          message: 'Error, no se pueden obtener las tiendas',
+          error: error,
+        })
       }
       response.status(200).json(results)
     }
@@ -40,16 +43,17 @@ const getComprasById = (request, response) => {
 const getVentasById = (request, response) => {
   const idVendedor = request.params.id
   if (isNaN(idVendedor)) {
-    return response.status(400).json({ message: 'Id seller not found' })
+    return response.status(400).json({ message: 'Id de vendedor inválida' })
   }
   db.query(
     'SELECT * FROM transaccion WHERE idVendedor = ? AND transaccion.estado = "exitosa"',
     [idVendedor],
     (error, results) => {
       if (error) {
-        return response
-          .status(404)
-          .json({ message: 'Sales not found', error: error })
+        return response.status(500).json({
+          message: 'Error en el servidor, no se encontraron las ventas',
+          error: error,
+        })
       }
       response.status(200).json(results)
     }

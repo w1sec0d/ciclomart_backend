@@ -1,6 +1,8 @@
+// Configura las rutas de la API
 const express = require('express')
 const router = express.Router()
 
+// Controladores usuarios
 const {
   getUsuarios,
   registerUsuario,
@@ -9,6 +11,9 @@ const {
   updateUsuario,
 } = require('../controllers/usuario.js')
 
+const { userInfo } = require('../controllers/userInfo.js')
+
+// Controladores autenticación
 const {
   login,
   sendEmail,
@@ -19,35 +24,27 @@ const {
   verifyEmail,
 } = require('../controllers/login.js')
 
-/*Stores*/
-const { getTiendas } = require('../controllers/tienda.js')
-
-/*Transactions*/
+// Controladores transaccion
 const {
   getTransacciones,
   getComprasById,
   getVentasById,
 } = require('../controllers/transaccion.js')
 
-const { userInfo } = require('../controllers/userInfo.js')
+// Controladores tienda
+const { getTiendas } = require('../controllers/tienda.js')
 
-//rutas para la tabla persona.
-
+// Controlador de busqueda
 const { search } = require('../controllers/search.js')
-//rutas para la busqueda de productos
 
-//Ver las personas
+// Rutas usuarios
 router.get('/usuarios', getUsuarios)
 router.get('/usuarios/:id', getUsuarioById)
 router.post('/usuarios', registerUsuario)
-//Buscar productos
-router.get('/search', search)
-
-//Updates userr
 router.put('/updateUsuarioFoto/:idUsuario', updateUsuarioFoto)
 router.put('/updateUsuario/:id', updateUsuario)
 
-//autenticacion
+// Rutas de autenticación
 router.post('/login', login)
 router.get('/userInfo', userInfo)
 router.post('/sendEmail', sendEmail)
@@ -56,12 +53,15 @@ router.post('/updatePassword', updatePassword)
 router.post('/sendRegisterCode', sendRegisterCode)
 router.post('/validateCode', validateCode)
 
-//Routes for table 'tienda'
-router.get('/getTiendas', getTiendas)
-
-//Routes for table 'transaccion'
+// Rutas de transacciones
 router.get('/getTransacciones', getTransacciones)
 router.get('/getComprasById/:id', getComprasById)
 router.get('/getVentasById/:id', getVentasById)
+
+// Rutas de tienda
+router.get('/getTiendas', getTiendas)
+
+// Rutas de búsqueda
+router.get('/search', search)
 
 module.exports = router
