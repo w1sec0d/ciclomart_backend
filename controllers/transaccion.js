@@ -1,6 +1,6 @@
 const db = require('../database/connection.js')
 
-/*Gets all transactions*/
+// Obtiene todas las transacciones
 const getTransacciones = (request, response) => {
   db.query('SELECT * FROM transaccion', (error, results) => {
     if (error) {
@@ -14,8 +14,7 @@ const getTransacciones = (request, response) => {
   })
 }
 
-/*Gets purchases from a given user*/
-
+// Obtiene las compras de un usuario dado
 const getComprasById = (request, response) => {
   const idComprador = request.params.id
 
@@ -38,8 +37,7 @@ const getComprasById = (request, response) => {
   )
 }
 
-/*Gets Sales from a given user*/
-
+// Obtiene las ventas de un usuario dado
 const getVentasById = (request, response) => {
   const idVendedor = request.params.id
   if (isNaN(idVendedor)) {

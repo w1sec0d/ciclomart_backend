@@ -1,5 +1,6 @@
 const db = require('../database/connection.js')
 
+// Obtiene todas las tiendas
 const getTiendas = async (request, response) => {
   db.query('SELECT * FROM tienda', (error, results) => {
     if (error) {
