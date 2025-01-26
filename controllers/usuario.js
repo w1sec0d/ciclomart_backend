@@ -1,70 +1,38 @@
 const bcrypt = require('bcrypt')
-// controller for user
 const db = require('../database/connection')
 
+// Obtiene todos los usuarios
 const getUsuarios = (request, response) => {
   db.query('SELECT * FROM usuario', (error, results) => {
     if (error) {
-      console.error('Error executing query', error)
-      response.status(500).send('Internal server error')
+      console.error('Error ejecutando la consulta', error)
+      response.status(500).send('Error interno del servidor')
       return
     }
     response.json(results)
   })
 }
 
+// Obtiene un usuario por su ID
 const getUsuarioById = (request, response) => {
   const id = parseInt(request.params.id)
 
   if (isNaN(id)) {
-    response.status(400).send('Bad id parameter')
+    response.status(400).send('Parámetro de ID inválido')
     return
   }
 
   db.query('SELECT * FROM usuario WHERE id = ?', [id], (error, results) => {
     if (error) {
-      console.error('Error executing query', error)
-      response.status(500).send('Internal server error')
+      console.error('Error ejecutando la consulta', error)
+      response.status(500).send('Error interno del servidor')
       return
     }
     response.json(results)
   })
 }
 
-/*const registerUsuario = async (values) => {
-  console.log(values);
-  const { nombre, apellido, email, password } = values;
-  let successRegister = false;
-
-  if (!nombre || !apellido || !email || !password) {
-    return successRegister;
-  }
-
-  try {
-    const passwordHash = await bcrypt.hash(password, 10);
-
-    await new Promise((resolve, reject) => {
-      db.query(
-        'INSERT INTO usuario (nombre, apellido, correo, password, fechaRegistro) VALUES (?, ?, ?, ?, ?)',
-        [nombre, apellido, email, passwordHash, new Date()],
-        (error, results) => {
-          if (error) {
-            reject(error);
-          } else {
-            resolve(results);
-          }
-        }
-      );
-    });
-
-    successRegister = true;
-  } catch (error) {
-    console.error('Error al registrar el usuario:', error);
-  }
-
-  return successRegister;
-};*/
-
+// Registra un nuevo usuario
 const registerUsuario = async (request, response) => {
   const { nombre, apellido, email, password } = request.body
 
@@ -80,7 +48,7 @@ const registerUsuario = async (request, response) => {
     [nombre, apellido, email, passwordHash, new Date()],
     (error, results) => {
       if (error) {
-        console.error('Error executing query', error)
+        console.error('Error ejecutando la consulta', error)
         response.status(500).send('Error en el servidor, intentalo más tarde')
         return
       }
@@ -89,6 +57,7 @@ const registerUsuario = async (request, response) => {
   )
 }
 
+// Actualiza la foto de un usuario
 const updateUsuarioFoto = (request, response) => {
   const photoUrl = request.body.photoUrl
   const idUser = parseInt(request.params.idUsuario)
@@ -97,21 +66,22 @@ const updateUsuarioFoto = (request, response) => {
     [photoUrl, idUser],
     (error, results) => {
       if (error) {
-        console.error('Error executing query', error)
-        response.status(500).send('Internal server error')
+        console.error('Error ejecutando la consulta', error)
+        response.status(500).send('Error interno del servidor')
         return
       }
-      response.status(200).send('User photo updated successfully')
+      response.status(200).send('Foto del usuario actualizada correctamente')
     }
   )
 }
 
+// Actualiza los datos de un usuario
 const updateUsuario = (request, response) => {
   const id = parseInt(request.params.id)
   const fields = request.body
 
   if (isNaN(id)) {
-    response.status(400).send('Bad id parameter')
+    response.status(400).send('Parámetro de ID inválido')
     return
   }
 
@@ -139,24 +109,22 @@ const updateUsuario = (request, response) => {
   }
 
   if (updates.length === 0) {
-    response.status(400).send('No valid fields to update')
+    response.status(400).send('No hay campos válidos para actualizar')
     return
   }
 
-  // Agregar el id al final del arreglo de valores
   values.push(id)
 
   // Construir la consulta SQL dinámica
   const query = `UPDATE usuario SET ${updates.join(', ')} WHERE idUsuario = ?`
 
-  // Ejecutar la consulta SQL
   db.query(query, values, (error, results) => {
     if (error) {
-      console.error('Error executing query', error)
-      response.status(500).send('Internal server error')
+      console.error('Error ejecutando la consulta', error)
+      response.status(500).send('Error interno del servidor')
       return
     }
-    response.status(200).send('User updated successfully')
+    response.status(200).send('Usuario actualizado correctamente')
   })
 }
 
