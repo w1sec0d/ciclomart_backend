@@ -25,7 +25,6 @@ const search = (request, response) => {
       return
     }
     response.json(results)
-    console.log(results)
   })
 }
 
