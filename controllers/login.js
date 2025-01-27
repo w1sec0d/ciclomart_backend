@@ -60,7 +60,7 @@ const login = async (req, res) => {
 }
 
 // Verifica si el email existe en la base de datos
-const verifyEmail = async (email) => {
+const isEmailAvailable = async (email) => {
   try {
     const result = await new Promise((resolve, reject) => {
       db.query(
@@ -70,40 +70,26 @@ const verifyEmail = async (email) => {
           if (err) {
             return reject(err)
           }
-          resolve(result)
+          if (result.length === 0) {
+            return resolve(true) // Correo no existe
+          }
+          resolve(false) // Correo existe
         }
       )
     })
-    return result.length === 0
+    return result
   } catch (error) {
     console.error('Error verificando el email:', error)
+    throw error
   }
-}
-
-const verifyEmail2 = async (email) => {
-  return new Promise((resolve, reject) => {
-    db.query(
-      'SELECT * FROM usuario WHERE correo = ?',
-      [email],
-      (err, result) => {
-        if (err) {
-          reject(err)
-        } else if (result.length === 0) {
-          resolve(false)
-        } else {
-          resolve(true)
-        }
-      }
-    )
-  })
 }
 
 // Envía un correo al usuario para recuperar su cuenta
 const sendEmail = async (req, res) => {
   try {
     const email = req.body.data
-    const user = await verifyEmail2(email)
-    if (user) {
+    const user = await isEmailAvailable(email)
+    if (!user) {
       const userForToken = { correo: email }
       const token = jwt.sign(userForToken, process.env.JWT_SECRET, {
         expiresIn: '1h',
@@ -111,9 +97,9 @@ const sendEmail = async (req, res) => {
       await sendVerificationEmail(email, token)
       return res.status(200).json({ message: 'exito' })
     } else {
-      return res
-        .status(401)
-        .json({ message: 'Error en el servidor, intentalo más tarde' })
+      return res.status(401).json({
+        message: 'El correo no existe en el sistema, verifícalo de nuevo',
+      })
     }
   } catch (err) {
     return res
@@ -126,13 +112,20 @@ const sendEmail = async (req, res) => {
 const sendRegisterCode = async (req, res) => {
   try {
     const { email, nombre, apellido, password } = req.body.data
+    if (!req.body.data) {
+      return res
+        .status(400)
+        .json({ message: 'Faltan datos de registro, intentalo de nuevo' })
+    }
+
     const code = generateVerificationCode()
+
     const userForToken = { correo: email, nombre, apellido, password, code }
     const token = jwt.sign(userForToken, process.env.JWT_SECRET, {
       expiresIn: '1h',
     })
+    const isEmailAvailable = await isEmailAvailable(email)
 
-    const isEmailAvailable = await verifyEmail(email)
     if (!isEmailAvailable) {
       return res
         .status(400)
@@ -148,7 +141,7 @@ const sendRegisterCode = async (req, res) => {
   } catch (error) {
     return res
       .status(500)
-      .json({ message: 'Error en el servidor, intentalo más tarde' })
+      .json({ message: 'Error en el servidor, intentalo más tarde', error })
   }
 }
 
@@ -232,8 +225,6 @@ const sendVerificationEmail = async (email, token) => {
 
 // Envía el código al usuario (para terminar el registro)
 const sendVerificationCode = async (email, token, code) => {
-  console.log('code', code)
-
   await transporter.sendMail({
     from: '"Ciclo Mart Soporte" <ciclomartsoporte@gmail.com>',
     to: email,
@@ -250,5 +241,5 @@ module.exports = {
   updatePassword,
   sendRegisterCode,
   validateCode,
-  verifyEmail,
+  isEmailAvailable,
 }
