@@ -5,9 +5,8 @@ require('dotenv').config()
 const db = require('../database/connection')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
-const nodemailer = require('nodemailer')
+const emailTransporter = require('../utils/emailTransporter')
 const generateVerificationCode = require('../utils/generateVerificationCode')
-const { registerUsuario } = require('./usuario')
 
 // Función para loguear al usuario
 const login = async (req, res) => {
@@ -85,7 +84,7 @@ const isEmailAvailable = async (email) => {
 }
 
 // Envía un correo al usuario para recuperar su cuenta
-const sendEmail = async (req, res) => {
+const sendRecover = async (req, res) => {
   try {
     const email = req.body.data
     const user = await isEmailAvailable(email)
@@ -94,8 +93,12 @@ const sendEmail = async (req, res) => {
       const token = jwt.sign(userForToken, process.env.JWT_SECRET, {
         expiresIn: '1h',
       })
-      await sendVerificationEmail(email, token)
-      return res.status(200).json({ message: 'exito' })
+      await sendRecoverEmail(email, token)
+      return res
+        .status(200)
+        .json({
+          message: 'Se ha enviado un correo de verificación a tu correo',
+        })
     } else {
       return res.status(401).json({
         message: 'El correo no existe en el sistema, verifícalo de nuevo',
@@ -145,25 +148,12 @@ const sendRegisterCode = async (req, res) => {
   }
 }
 
-// Evalúa el token para restablecer la contraseña
-const evaluateToken = (req, res) => {
-  const { token } = req.params
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
-    res.send(
-      ` <form id="resetPasswordForm" method="post" action="/api/updatePassword"> <input type="hidden" name="token" value="${token}"> <input type="password" name="password" required> <input type="submit" value="Reset Password"> </form> <script> document.getElementById('resetPasswordForm').addEventListener('submit', async (e) => { e.preventDefault(); const form = e.target; const formData = new FormData(form); const data = { token: formData.get('token'), password: formData.get('password') }; const response = await fetch(form.action, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); const result = await response.json(); console.log(result); }); </script> `
-    )
-  } catch (err) {
-    res.status(400).send('Token inválido o expirado')
-  }
-}
-
 // Valida si el código introducido por el usuario es igual al código almacenado en el token
 const validateCode = async (req, res) => {
   const codigo = parseInt(req.body.data.code)
   const token = req.body.token
 
-  const decoded = jwt.verify(token, process.env.JWT_SECRET)
+  const decoded = verifyToken(token)
   const { correo, nombre, apellido, password, code } = decoded
 
   if (codigo === code) {
@@ -175,12 +165,28 @@ const validateCode = async (req, res) => {
   }
 }
 
+// Evalúa el token para restablecer la contraseña
+const verifyToken = (token) => {
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    return decoded
+  } catch (error) {
+    if (error.name === 'TokenExpiredError') {
+      console.error('Token has expired')
+    } else {
+      console.error('Token verification failed:', error)
+    }
+    throw error
+  }
+}
+
 // Actualiza la contraseña del usuario
 const updatePassword = async (req, res) => {
+  d
   const { data, token } = req.body
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    const decoded = verifyToken(token)
     const hashedPassword = await bcrypt.hash(data, 10)
 
     db.query(
@@ -192,7 +198,9 @@ const updatePassword = async (req, res) => {
             .status(500)
             .json({ message: 'Error en el servidor, intentalo más tarde' })
         } else {
-          return res.status(200).json({ message: 'exito' })
+          return res
+            .status(200)
+            .json({ message: 'Contraseña actualizada con éxito' })
         }
       }
     )
@@ -201,20 +209,9 @@ const updatePassword = async (req, res) => {
   }
 }
 
-// Define los parámetros del envío de correo
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
-  auth: {
-    user: process.env.EMAIL_ONLINE,
-    pass: process.env.PASSWORD_ONLINE,
-  },
-})
-
 // Envía el correo al usuario (recuperación de contraseña)
-const sendVerificationEmail = async (email, token) => {
-  await transporter.sendMail({
+const sendRecoverEmail = async (email, token) => {
+  await emailTransporter.sendMail({
     from: '"Ciclo Mart Soporte" <ciclomartsoporte@gmail.com>',
     to: email,
     subject: 'Recuperación de contraseña',
@@ -225,7 +222,7 @@ const sendVerificationEmail = async (email, token) => {
 
 // Envía el código al usuario (para terminar el registro)
 const sendVerificationCode = async (email, token, code) => {
-  await transporter.sendMail({
+  await emailTransporter.sendMail({
     from: '"Ciclo Mart Soporte" <ciclomartsoporte@gmail.com>',
     to: email,
     subject: 'Código CicloMart',
@@ -236,8 +233,8 @@ const sendVerificationCode = async (email, token, code) => {
 
 module.exports = {
   login,
-  sendEmail,
-  evaluateToken,
+  sendRecover,
+  verifyToken,
   updatePassword,
   sendRegisterCode,
   validateCode,
