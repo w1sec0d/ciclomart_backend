@@ -21,20 +21,31 @@ const userInfo = async (req, res) => {
       (err, result) => {
         if (err) {
           return res.status(500).json({
+            success: false,
             message:
               'Error en el servidor, no se puede obtener la información del usuario',
+            error: err.message,
           })
         }
         if (result.length === 0) {
-          return res.status(404).json({ message: 'Usuario no encontrado' })
+          return res.status(404).json({
+            success: false,
+            message: 'Usuario no encontrado',
+          })
         }
         const user = result[0]
-        res.status(200).json({ user })
+        res.status(200).json({
+          success: true,
+          message: 'Información del usuario obtenida exitosamente',
+          data: { user },
+        })
       }
     )
   } catch (error) {
     res.status(401).json({
+      success: false,
       message: 'Token inválido',
+      error: error.message,
     })
   }
 }

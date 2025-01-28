@@ -21,10 +21,17 @@ const search = (request, response) => {
   db.query(query, queryParams, (error, results) => {
     if (error) {
       console.error('Error ejecutando la consulta', error)
-      response.status(500).send('Error interno del servidor')
-      return
+      return response.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: error.message,
+      })
     }
-    response.json(results)
+    response.status(200).json({
+      success: true,
+      message: 'Búsqueda realizada exitosamente',
+      data: results,
+    })
   })
 }
 
