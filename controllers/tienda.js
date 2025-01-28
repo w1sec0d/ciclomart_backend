@@ -10,7 +10,7 @@ const getTiendas = async (request, response) => {
         error: error.message,
       })
     }
-    response.status(200).json({
+    return response.status(200).json({
       success: true,
       message: 'Tiendas obtenidas exitosamente',
       data: results,

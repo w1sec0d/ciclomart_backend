@@ -13,7 +13,7 @@ const getUsuarios = (request, response) => {
       })
     }
 
-    response.status(200).json({
+    return response.status(200).json({
       success: true,
       message: 'Usuarios obtenidos exitosamente',
       data: results,
@@ -26,7 +26,10 @@ const getUsuarioById = (request, response) => {
   const id = parseInt(request.params.id)
 
   if (isNaN(id)) {
-    return response.status(400).send('Parámetro de ID inválido')
+    return response.status(400).json({
+      success: false,
+      message: 'ID de usuario inválido',
+    })
   }
 
   db.query('SELECT * FROM usuario WHERE id = ?', [id], (error, results) => {
@@ -38,7 +41,7 @@ const getUsuarioById = (request, response) => {
         error: error.message,
       })
     }
-    response.status(200).json({
+    return response.status(200).json({
       success: true,
       message: 'Usuario obtenido exitosamente',
       data: results,
@@ -51,8 +54,10 @@ const registerUsuario = async (request, response) => {
   const { nombre, apellido, email, password } = request.body
 
   if (!nombre || !apellido || !email || !password) {
-    response.status(400).send('Datos Faltantes')
-    return
+    return response.status(400).json({
+      success: false,
+      message: 'Faltan campos obligatorios',
+    })
   }
 
   const passwordHash = await bcrypt.hash(password, 10)
@@ -69,7 +74,7 @@ const registerUsuario = async (request, response) => {
           error: error.message,
         })
       }
-      response.status(201).json({
+      return response.status(201).json({
         success: true,
         message: 'Usuario añadido satisfactoriamente',
       })
@@ -93,7 +98,7 @@ const updateUsuarioFoto = (request, response) => {
           error: error.message,
         })
       }
-      response.status(200).json({
+      return response.status(200).json({
         success: true,
         message: 'Foto del usuario actualizada correctamente',
       })
@@ -107,8 +112,10 @@ const updateUsuario = (request, response) => {
   const fields = request.body
 
   if (isNaN(id)) {
-    response.status(400).send('Parámetro de ID inválido')
-    return
+    return response.status(400).json({
+      success: false,
+      message: 'ID de usuario inválido',
+    })
   }
 
   const validFields = [
@@ -135,8 +142,10 @@ const updateUsuario = (request, response) => {
   }
 
   if (updates.length === 0) {
-    response.status(400).send('No hay campos válidos para actualizar')
-    return
+    return response.status(400).json({
+      success: false,
+      message: 'No se proporcionaron campos a actualizar',
+    })
   }
 
   values.push(id)
@@ -153,7 +162,7 @@ const updateUsuario = (request, response) => {
         error: error.message,
       })
     }
-    response.status(200).json({
+    return response.status(200).json({
       success: true,
       message: 'Usuario actualizado correctamente',
     })

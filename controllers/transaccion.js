@@ -11,7 +11,7 @@ const getTransacciones = (request, response) => {
         error: error.message,
       })
     }
-    response.status(200).json({
+    return response.status(200).json({
       success: true,
       message: 'Transacciones obtenidas exitosamente',
       data: results,
@@ -38,7 +38,7 @@ const getComprasById = (request, response) => {
           error: error.message,
         })
       }
-      response.status(200).json({
+      return response.status(200).json({
         success: true,
         message: 'Compras obtenidas exitosamente',
         data: results,
@@ -64,7 +64,7 @@ const getVentasById = (request, response) => {
           error: error.message,
         })
       }
-      response.status(200).json({
+      return response.status(200).json({
         success: true,
         message: 'Ventas obtenidas exitosamente',
         data: results,
