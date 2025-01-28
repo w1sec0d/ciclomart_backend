@@ -6,10 +6,18 @@ const getUsuarios = (request, response) => {
   db.query('SELECT * FROM usuario', (error, results) => {
     if (error) {
       console.error('Error ejecutando la consulta', error)
-      response.status(500).send('Error interno del servidor')
-      return
+      return response.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: error.message,
+      })
     }
-    response.json(results)
+
+    response.status(200).json({
+      success: true,
+      message: 'Usuarios obtenidos exitosamente',
+      data: results,
+    })
   })
 }
 
@@ -18,17 +26,23 @@ const getUsuarioById = (request, response) => {
   const id = parseInt(request.params.id)
 
   if (isNaN(id)) {
-    response.status(400).send('Parámetro de ID inválido')
-    return
+    return response.status(400).send('Parámetro de ID inválido')
   }
 
   db.query('SELECT * FROM usuario WHERE id = ?', [id], (error, results) => {
     if (error) {
       console.error('Error ejecutando la consulta', error)
-      response.status(500).send('Error interno del servidor')
-      return
+      return response.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: error.message,
+      })
     }
-    response.json(results)
+    response.status(200).json({
+      success: true,
+      message: 'Usuario obtenido exitosamente',
+      data: results,
+    })
   })
 }
 
@@ -49,10 +63,16 @@ const registerUsuario = async (request, response) => {
     (error, results) => {
       if (error) {
         console.error('Error ejecutando la consulta', error)
-        response.status(500).send('Error en el servidor, intentalo más tarde')
-        return
+        return response.status(500).json({
+          success: false,
+          message: 'Error en el servidor, intentalo más tarde',
+          error: error.message,
+        })
       }
-      response.status(201).send('Usuario añadido satisfactoriamente')
+      response.status(201).json({
+        success: true,
+        message: 'Usuario añadido satisfactoriamente',
+      })
     }
   )
 }
@@ -67,10 +87,16 @@ const updateUsuarioFoto = (request, response) => {
     (error, results) => {
       if (error) {
         console.error('Error ejecutando la consulta', error)
-        response.status(500).send('Error interno del servidor')
-        return
+        return response.status(500).json({
+          success: false,
+          message: 'Error interno del servidor',
+          error: error.message,
+        })
       }
-      response.status(200).send('Foto del usuario actualizada correctamente')
+      response.status(200).json({
+        success: true,
+        message: 'Foto del usuario actualizada correctamente',
+      })
     }
   )
 }
@@ -121,10 +147,16 @@ const updateUsuario = (request, response) => {
   db.query(query, values, (error, results) => {
     if (error) {
       console.error('Error ejecutando la consulta', error)
-      response.status(500).send('Error interno del servidor')
-      return
+      return response.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: error.message,
+      })
     }
-    response.status(200).send('Usuario actualizado correctamente')
+    response.status(200).json({
+      success: true,
+      message: 'Usuario actualizado correctamente',
+    })
   })
 }
 

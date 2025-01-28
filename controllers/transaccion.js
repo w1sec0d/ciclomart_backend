@@ -5,12 +5,17 @@ const getTransacciones = (request, response) => {
   db.query('SELECT * FROM transaccion', (error, results) => {
     if (error) {
       return response.status(500).json({
+        success: false,
         message:
           'Error interno del servidor, no se pueden obtener las transacciones',
-        error: error,
+        error: error.message,
       })
     }
-    response.status(200).json(results)
+    response.status(200).json({
+      success: true,
+      message: 'Transacciones obtenidas exitosamente',
+      data: results,
+    })
   })
 }
 
@@ -28,11 +33,16 @@ const getComprasById = (request, response) => {
     (error, results) => {
       if (error) {
         return response.status(500).json({
+          success: false,
           message: 'Error, no se pueden obtener las tiendas',
-          error: error,
+          error: error.message,
         })
       }
-      response.status(200).json(results)
+      response.status(200).json({
+        success: true,
+        message: 'Compras obtenidas exitosamente',
+        data: results,
+      })
     }
   )
 }
@@ -49,11 +59,16 @@ const getVentasById = (request, response) => {
     (error, results) => {
       if (error) {
         return response.status(500).json({
+          success: false,
           message: 'Error en el servidor, no se encontraron las ventas',
-          error: error,
+          error: error.message,
         })
       }
-      response.status(200).json(results)
+      response.status(200).json({
+        success: true,
+        message: 'Ventas obtenidas exitosamente',
+        data: results,
+      })
     }
   )
 }
