@@ -27,7 +27,7 @@ const search = (request, response) => {
         error: error.message,
       })
     }
-    response.status(200).json({
+    return response.status(200).json({
       success: true,
       message: 'Búsqueda realizada exitosamente',
       data: results,
