@@ -16,12 +16,11 @@ const { userInfo } = require('../controllers/userInfo.js')
 // Controladores autenticación
 const {
   login,
-  sendEmail,
-  evaluateToken,
+  sendRecover,
+  verifyToken,
   updatePassword,
   sendRegisterCode,
   validateCode,
-  verifyEmail,
 } = require('../controllers/login.js')
 
 // Controladores transaccion
@@ -47,8 +46,8 @@ router.put('/updateUsuario/:id', updateUsuario)
 // Rutas de autenticación
 router.post('/login', login)
 router.get('/userInfo', userInfo)
-router.post('/sendEmail', sendEmail)
-router.get('/evaluateToken/:token', evaluateToken)
+router.post('/sendRecover', sendRecover)
+router.get('/verifyToken/:token', verifyToken)
 router.post('/updatePassword', updatePassword)
 router.post('/sendRegisterCode', sendRegisterCode)
 router.post('/validateCode', validateCode)

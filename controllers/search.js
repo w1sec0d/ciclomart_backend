@@ -1,5 +1,6 @@
 const db = require('../database/connection')
 
+// Realiza una búsqueda de productos
 const search = (request, response) => {
   const { nombre, tipo } = request.query
 
@@ -19,12 +20,18 @@ const search = (request, response) => {
 
   db.query(query, queryParams, (error, results) => {
     if (error) {
-      console.error('Error executing query', error)
-      response.status(500).send('Internal server error')
-      return
+      console.error('Error ejecutando la consulta', error)
+      return response.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: error.message,
+      })
     }
-    response.json(results)
-    console.log(results)
+    return response.status(200).json({
+      success: true,
+      message: 'Búsqueda realizada exitosamente',
+      data: results,
+    })
   })
 }
 
