@@ -2,12 +2,15 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const db = require('../database/connection')
 
-const userInfo = async (req, res) => {
+const userInfo = async (request, response) => {
   // Obtiene el encabezado de la autorización de la solicitud
-  const authHeader = req.headers.authorization
+  const authHeader = request.headers.authorization
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'No se proporcionó token' })
+    return response.status(401).json({
+      success: false,
+      message: 'No se proporcionó token',
+    })
   }
 
   const token = authHeader.split(' ')[1]
@@ -20,7 +23,7 @@ const userInfo = async (req, res) => {
       [decoded.id],
       (err, result) => {
         if (err) {
-          return res.status(500).json({
+          return response.status(500).json({
             success: false,
             message:
               'Error en el servidor, no se puede obtener la información del usuario',
@@ -28,21 +31,21 @@ const userInfo = async (req, res) => {
           })
         }
         if (result.length === 0) {
-          return res.status(404).json({
+          return response.status(404).json({
             success: false,
             message: 'Usuario no encontrado',
           })
         }
         const user = result[0]
-        res.status(200).json({
+        response.status(200).json({
           success: true,
           message: 'Información del usuario obtenida exitosamente',
-          data: { user },
+          user,
         })
       }
     )
   } catch (error) {
-    res.status(401).json({
+    response.status(401).json({
       success: false,
       message: 'Token inválido',
       error: error.message,

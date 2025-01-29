@@ -16,7 +16,7 @@ const getUsuarios = (request, response) => {
     return response.status(200).json({
       success: true,
       message: 'Usuarios obtenidos exitosamente',
-      data: results,
+      results,
     })
   })
 }
@@ -44,7 +44,7 @@ const getUsuarioById = (request, response) => {
     return response.status(200).json({
       success: true,
       message: 'Usuario obtenido exitosamente',
-      data: results,
+      results,
     })
   })
 }

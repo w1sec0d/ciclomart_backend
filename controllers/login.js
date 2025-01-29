@@ -9,11 +9,11 @@ const { emailTransporter } = require('../utils/email')
 const generateVerificationCode = require('../utils/generateVerificationCode')
 
 // Función para loguear al usuario
-const login = async (req, res) => {
-  const { email, password } = req.body
+const login = async (request, response) => {
+  const { email, password } = request.body
 
   if (!email || !password) {
-    return res.status(400).json({
+    return response.status(400).json({
       success: false,
       message: 'Credenciales incompletas, verifica tus datos',
     })
@@ -24,7 +24,7 @@ const login = async (req, res) => {
     [email],
     async (err, result) => {
       if (err) {
-        return res.status(500).json({
+        return response.status(500).json({
           success: false,
           message: 'Error en el servidor, intentalo más tarde',
           error: err.message,
@@ -32,7 +32,7 @@ const login = async (req, res) => {
       }
 
       if (result.length === 0) {
-        return res.status(401).json({
+        return response.status(401).json({
           success: false,
           message: 'Credenciales incorrectas, intentalo de nuevo',
         })
@@ -42,7 +42,7 @@ const login = async (req, res) => {
       const passwordUser = await bcrypt.compare(password, user.password)
 
       if (!passwordUser) {
-        return res.status(401).json({
+        return response.status(401).json({
           success: false,
           message: 'Credenciales incorrectas, intentalo de nuevo',
         })
@@ -58,10 +58,11 @@ const login = async (req, res) => {
         expiresIn: '1h',
       })
 
-      res.status(200).json({
+      response.status(200).json({
         success: true,
         message: 'Login exitoso',
-        data: { token, user: result[0] },
+        token,
+        user: result[0],
       })
     }
   )
@@ -93,9 +94,9 @@ const isEmailAvailable = async (email) => {
 }
 
 // Envía un correo al usuario para recuperar su cuenta
-const sendRecover = async (req, res) => {
+const sendRecover = async (request, response) => {
   try {
-    const email = req.body.data
+    const email = request.body.data
     const user = await isEmailAvailable(email)
     if (!user) {
       const userForToken = { correo: email }
@@ -103,18 +104,18 @@ const sendRecover = async (req, res) => {
         expiresIn: '1h',
       })
       await sendRecoverEmail(email, token)
-      return res.status(200).json({
+      return response.status(200).json({
         success: true,
         message: 'Se ha enviado un correo de verificación a tu correo',
       })
     } else {
-      return res.status(401).json({
+      return response.status(401).json({
         success: false,
         message: 'El correo no existe en el sistema, verifícalo de nuevo',
       })
     }
   } catch (err) {
-    return res.status(500).json({
+    return response.status(500).json({
       success: false,
       message: 'Error en el servidor, intentalo más tarde',
       error: err.message,
@@ -123,11 +124,11 @@ const sendRecover = async (req, res) => {
 }
 
 // Envía un código para terminar el registro
-const sendRegisterCode = async (req, res) => {
+const sendRegisterCode = async (request, response) => {
   try {
-    const { email, nombre, apellido, password } = req.body.data
-    if (!req.body.data) {
-      return res.status(400).json({
+    const { email, nombre, apellido, password } = request.body.data
+    if (!request.body.data) {
+      return response.status(400).json({
         success: false,
         message: 'Faltan datos de registro, intentalo de nuevo',
       })
@@ -143,7 +144,7 @@ const sendRegisterCode = async (req, res) => {
     const validEmail = await isEmailAvailable(email)
 
     if (!validEmail) {
-      return res.status(400).json({
+      return response.status(400).json({
         success: false,
         message: 'El correo ya se encuentra registrado',
       })
@@ -152,15 +153,16 @@ const sendRegisterCode = async (req, res) => {
 
     await sendVerificationCode(email, token, code)
     console.log('error')
-    return res.status(200).json({
+    return response.status(200).json({
       success: true,
       message: 'Codigo de confirmación enviado con éxito',
-      data: { email, token },
+      email,
+      token,
     })
   } catch (error) {
     console.log('eRror desde aca')
 
-    return res.status(500).json({
+    return response.status(500).json({
       success: false,
       message: 'Error en el servidor, intentalo más tarde',
       error: error.message,
@@ -169,21 +171,24 @@ const sendRegisterCode = async (req, res) => {
 }
 
 // Valida si el código introducido por el usuario es igual al código almacenado en el token
-const validateCode = async (req, res) => {
-  const codigo = parseInt(req.body.data.code)
-  const token = req.body.token
+const validateCode = async (request, response) => {
+  const codigo = parseInt(request.body.data.code)
+  const token = request.body.token
 
   const decoded = verifyToken(token)
   const { correo, nombre, apellido, password, code } = decoded
 
   if (codigo === code) {
-    return res.status(200).json({
+    return response.status(200).json({
       success: true,
       message: 'Código validado correctamente',
-      data: { correo, nombre, apellido, password },
+      correo,
+      nombre,
+      apellido,
+      password,
     })
   } else {
-    return res.status(400).json({
+    return response.status(400).json({
       success: false,
       message: 'Codigo no congruente! Intentalo de nuevo',
     })
@@ -206,8 +211,8 @@ const verifyToken = (token) => {
 }
 
 // Actualiza la contraseña del usuario
-const updatePassword = async (req, res) => {
-  const { data, token } = req.body
+const updatePassword = async (request, response) => {
+  const { data, token } = request.body
 
   try {
     const decoded = verifyToken(token)
@@ -218,13 +223,13 @@ const updatePassword = async (req, res) => {
       [hashedPassword, decoded.correo],
       (err, result) => {
         if (err) {
-          return res.status(500).json({
+          return response.status(500).json({
             success: false,
             message: 'Error en el servidor, intentalo más tarde',
             error: err.message,
           })
         } else {
-          return res.status(200).json({
+          return response.status(200).json({
             success: true,
             message: 'Contraseña actualizada con éxito',
           })
@@ -232,7 +237,7 @@ const updatePassword = async (req, res) => {
       }
     )
   } catch (err) {
-    res.status(400).json({
+    response.status(400).json({
       success: false,
       message: 'Token inválido o expirado',
       error: err.message,
