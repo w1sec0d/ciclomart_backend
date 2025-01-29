@@ -21,7 +21,6 @@ const {
   updatePassword,
   sendRegisterCode,
   validateCode,
-  isEmailAvailable,
 } = require('../controllers/login.js')
 
 // Controladores transaccion

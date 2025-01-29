@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer')
+
 // Define los parámetros del envío de correo
 const emailTransporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
@@ -10,4 +11,6 @@ const emailTransporter = nodemailer.createTransport({
   },
 })
 
-module.exports = emailTransporter
+module.exports = {
+  emailTransporter,
+}
