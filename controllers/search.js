@@ -30,7 +30,7 @@ const search = (request, response) => {
     return response.status(200).json({
       success: true,
       message: 'Búsqueda realizada exitosamente',
-      data: results,
+      results,
     })
   })
 }
