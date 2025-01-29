@@ -13,7 +13,7 @@ const getTiendas = async (request, response) => {
     return response.status(200).json({
       success: true,
       message: 'Tiendas obtenidas exitosamente',
-      data: results,
+      results,
     })
   })
 }

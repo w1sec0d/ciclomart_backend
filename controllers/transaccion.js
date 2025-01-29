@@ -14,7 +14,7 @@ const getTransacciones = (request, response) => {
     return response.status(200).json({
       success: true,
       message: 'Transacciones obtenidas exitosamente',
-      data: results,
+      results,
     })
   })
 }
@@ -24,7 +24,10 @@ const getComprasById = (request, response) => {
   const idComprador = request.params.id
 
   if (isNaN(idComprador)) {
-    return response.status(400).json({ message: 'Id de comprador inválida' })
+    return response.status(400).json({
+      success: false,
+      message: 'Id de comprador inválida',
+    })
   }
 
   db.query(
@@ -41,7 +44,7 @@ const getComprasById = (request, response) => {
       return response.status(200).json({
         success: true,
         message: 'Compras obtenidas exitosamente',
-        data: results,
+        results,
       })
     }
   )
@@ -51,7 +54,9 @@ const getComprasById = (request, response) => {
 const getVentasById = (request, response) => {
   const idVendedor = request.params.id
   if (isNaN(idVendedor)) {
-    return response.status(400).json({ message: 'Id de vendedor inválida' })
+    return response
+      .status(400)
+      .json({ message: 'Id de vendedor inválida', success: false })
   }
   db.query(
     'SELECT * FROM transaccion WHERE idVendedor = ? AND transaccion.estado = "exitosa"',
@@ -67,7 +72,7 @@ const getVentasById = (request, response) => {
       return response.status(200).json({
         success: true,
         message: 'Ventas obtenidas exitosamente',
-        data: results,
+        results,
       })
     }
   )
