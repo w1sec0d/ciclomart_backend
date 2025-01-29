@@ -5,7 +5,7 @@ require('dotenv').config()
 const db = require('../database/connection')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
-const emailTransporter = require('../utils/emailTransporter')
+const { emailTransporter } = require('../utils/email')
 const generateVerificationCode = require('../utils/generateVerificationCode')
 
 // Función para loguear al usuario
@@ -139,22 +139,27 @@ const sendRegisterCode = async (req, res) => {
     const token = jwt.sign(userForToken, process.env.JWT_SECRET, {
       expiresIn: '1h',
     })
-    const isEmailAvailable = await isEmailAvailable(email)
 
-    if (!isEmailAvailable) {
+    const validEmail = await isEmailAvailable(email)
+
+    if (!validEmail) {
       return res.status(400).json({
         success: false,
         message: 'El correo ya se encuentra registrado',
       })
     }
+    console.log('no error')
 
     await sendVerificationCode(email, token, code)
+    console.log('error')
     return res.status(200).json({
       success: true,
       message: 'Codigo de confirmación enviado con éxito',
       data: { email, token },
     })
   } catch (error) {
+    console.log('eRror desde aca')
+
     return res.status(500).json({
       success: false,
       message: 'Error en el servidor, intentalo más tarde',
@@ -264,5 +269,4 @@ module.exports = {
   updatePassword,
   sendRegisterCode,
   validateCode,
-  isEmailAvailable,
 }
