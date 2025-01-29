@@ -1,21 +1,25 @@
 const db = require('../database/connection.js')
 
-/*Gets all transactions*/
+// Obtiene todas las transacciones
 const getTransacciones = (request, response) => {
   db.query('SELECT * FROM transaccion', (error, results) => {
     if (error) {
       return response.status(500).json({
+        success: false,
         message:
           'Error interno del servidor, no se pueden obtener las transacciones',
-        error: error,
+        error: error.message,
       })
     }
-    response.status(200).json(results)
+    return response.status(200).json({
+      success: true,
+      message: 'Transacciones obtenidas exitosamente',
+      data: results,
+    })
   })
 }
 
-/*Gets purchases from a given user*/
-
+// Obtiene las compras de un usuario dado
 const getComprasById = (request, response) => {
   const idComprador = request.params.id
 
@@ -29,17 +33,21 @@ const getComprasById = (request, response) => {
     (error, results) => {
       if (error) {
         return response.status(500).json({
+          success: false,
           message: 'Error, no se pueden obtener las tiendas',
-          error: error,
+          error: error.message,
         })
       }
-      response.status(200).json(results)
+      return response.status(200).json({
+        success: true,
+        message: 'Compras obtenidas exitosamente',
+        data: results,
+      })
     }
   )
 }
 
-/*Gets Sales from a given user*/
-
+// Obtiene las ventas de un usuario dado
 const getVentasById = (request, response) => {
   const idVendedor = request.params.id
   if (isNaN(idVendedor)) {
@@ -51,11 +59,16 @@ const getVentasById = (request, response) => {
     (error, results) => {
       if (error) {
         return response.status(500).json({
+          success: false,
           message: 'Error en el servidor, no se encontraron las ventas',
-          error: error,
+          error: error.message,
         })
       }
-      response.status(200).json(results)
+      return response.status(200).json({
+        success: true,
+        message: 'Ventas obtenidas exitosamente',
+        data: results,
+      })
     }
   )
 }
