@@ -36,6 +36,9 @@ const { getTiendas } = require('../controllers/tienda.js')
 // Controlador de busqueda
 const { search } = require('../controllers/search.js')
 
+// Controladores de calificaciones de productos 
+const { ratingProduct } = require('../controllers/ratingProduct.js')
+
 // Rutas usuarios
 router.get('/usuarios', getUsuarios)
 router.get('/usuarios/:id', getUsuarioById)
@@ -62,5 +65,8 @@ router.get('/getTiendas', getTiendas)
 
 // Rutas de búsqueda
 router.get('/search', search)
+
+//Rutas calificaciones productos
+router.get('/ratingProduct/:id', ratingProduct)
 
 module.exports = router
