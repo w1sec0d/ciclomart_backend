@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const db = require('../database/connection')
+const { verifyToken } = require('./login')
 
 const userInfo = async (request, response) => {
   // Obtiene el encabezado de la autorización de la solicitud
