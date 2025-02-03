@@ -61,7 +61,8 @@ const login = async (req, res) => {
       res.status(200).json({
         success: true,
         message: 'Login exitoso',
-        data: { token, user: result[0] },
+        token,
+        user: result[0],
       })
     }
   )
@@ -155,11 +156,10 @@ const sendRegisterCode = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: 'Codigo de confirmación enviado con éxito',
-      data: { email, token },
+      email,
+      token,
     })
   } catch (error) {
-    console.log('eRror desde aca')
-
     return res.status(500).json({
       success: false,
       message: 'Error en el servidor, intentalo más tarde',
@@ -180,7 +180,10 @@ const validateCode = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: 'Código validado correctamente',
-      data: { correo, nombre, apellido, password },
+      correo,
+      nombre,
+      apellido,
+      password,
     })
   } else {
     return res.status(400).json({
