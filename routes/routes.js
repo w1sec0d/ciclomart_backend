@@ -26,8 +26,8 @@ const {
 // Controladores transaccion
 const {
   getTransacciones,
-  getComprasById,
-  getVentasById,
+  getCompras,
+  getVentas,
 } = require('../controllers/transaccion.js')
 
 // Controladores tienda
@@ -53,14 +53,15 @@ router.post('/sendRegisterCode', sendRegisterCode)
 router.post('/validateCode', validateCode)
 
 // Rutas de transacciones
-router.get('/getTransacciones', getTransacciones)
-router.get('/getComprasById/:id', getComprasById)
-router.get('/getVentasById/:id', getVentasById)
+router.get('/transacciones', getTransacciones)
+router.get('/compras/:id', getCompras)
+router.get('/ventas/:id', getVentas)
 
 // Rutas de tienda
-router.get('/getTiendas', getTiendas)
+router.get('/tiendas', getTiendas)
 
-// Rutas de búsqueda
+// Rutas de productos
 router.get('/search', search)
+router.get('/productos', search)
 
 module.exports = router
