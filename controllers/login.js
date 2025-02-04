@@ -10,62 +10,71 @@ const generateVerificationCode = require('../utils/generateVerificationCode')
 
 // Función para loguear al usuario
 const login = async (req, res) => {
-  const { email, password } = req.body
+  try {
+    const { email, password } = req.body
 
-  if (!email || !password) {
-    return res.status(400).json({
-      success: false,
-      message: 'Credenciales incompletas, verifica tus datos',
-    })
-  }
-
-  db.query(
-    'SELECT * FROM usuario WHERE correo = ?',
-    [email],
-    async (err, result) => {
-      if (err) {
-        return res.status(500).json({
-          success: false,
-          message: 'Error en el servidor, intentalo más tarde',
-          error: err.message,
-        })
-      }
-
-      if (result.length === 0) {
-        return res.status(401).json({
-          success: false,
-          message: 'Credenciales incorrectas, intentalo de nuevo',
-        })
-      }
-
-      const user = result[0]
-      const passwordUser = await bcrypt.compare(password, user.password)
-
-      if (!passwordUser) {
-        return res.status(401).json({
-          success: false,
-          message: 'Credenciales incorrectas, intentalo de nuevo',
-        })
-      }
-
-      const userForToken = {
-        id: user.idUsuario,
-        correo: user.correo,
-        username: user.username,
-      }
-
-      const token = jwt.sign(userForToken, process.env.JWT_SECRET, {
-        expiresIn: '1h',
-      })
-
-      res.status(200).json({
-        success: true,
-        message: 'Login exitoso',
-        token,
-        user: result[0],
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Credenciales incompletas, verifica tus datos',
       })
     }
-  )
+
+    db.query(
+      'SELECT * FROM usuario WHERE correo = ?',
+      [email],
+      async (err, result) => {
+        if (err) {
+          return res.status(500).json({
+            success: false,
+            message: 'Error en el servidor, intentalo más tarde',
+            error: err.message,
+          })
+        }
+
+        if (result.length === 0) {
+          return res.status(401).json({
+            success: false,
+            message: 'Credenciales incorrectas, intentalo de nuevo',
+          })
+        }
+
+        const user = result[0]
+        const passwordUser = await bcrypt.compare(password, user.password)
+
+        if (!passwordUser) {
+          return res.status(401).json({
+            success: false,
+            message: 'Credenciales incorrectas, intentalo de nuevo',
+          })
+        }
+
+        const userForToken = {
+          id: user.idUsuario,
+          correo: user.correo,
+          username: user.username,
+        }
+
+        const token = jwt.sign(userForToken, process.env.JWT_SECRET, {
+          expiresIn: '1h',
+        })
+
+        res.status(200).json({
+          success: true,
+          message: 'Login exitoso',
+          token,
+          user: result[0],
+        })
+      }
+    )
+  } catch (error) {
+    console.error('Error en el servidor', error)
+    return res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor',
+      error: error.message,
+    })
+  }
 }
 
 // Verifica si el email existe en la base de datos
@@ -149,10 +158,8 @@ const sendRegisterCode = async (req, res) => {
         message: 'El correo ya se encuentra registrado',
       })
     }
-    console.log('no error')
 
     await sendVerificationCode(email, token, code)
-    console.log('error')
     return res.status(200).json({
       success: true,
       message: 'Codigo de confirmación enviado con éxito',
@@ -170,25 +177,34 @@ const sendRegisterCode = async (req, res) => {
 
 // Valida si el código introducido por el usuario es igual al código almacenado en el token
 const validateCode = async (req, res) => {
-  const codigo = parseInt(req.body.data.code)
-  const token = req.body.token
+  try {
+    const codigo = parseInt(req.body.data.code)
+    const token = req.body.token
 
-  const decoded = verifyToken(token)
-  const { correo, nombre, apellido, password, code } = decoded
+    const decoded = verifyToken(token)
+    const { correo, nombre, apellido, password, code } = decoded
 
-  if (codigo === code) {
-    return res.status(200).json({
-      success: true,
-      message: 'Código validado correctamente',
-      correo,
-      nombre,
-      apellido,
-      password,
-    })
-  } else {
-    return res.status(400).json({
+    if (codigo === code) {
+      return res.status(200).json({
+        success: true,
+        message: 'Código validado correctamente',
+        correo,
+        nombre,
+        apellido,
+        password,
+      })
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: 'Codigo no congruente! Intentalo de nuevo',
+      })
+    }
+  } catch (error) {
+    console.error('Error en el servidor', error)
+    return res.status(500).json({
       success: false,
-      message: 'Codigo no congruente! Intentalo de nuevo',
+      message: 'Error interno del servidor',
+      error: error.message,
     })
   }
 }
@@ -210,9 +226,9 @@ const verifyToken = (token) => {
 
 // Actualiza la contraseña del usuario
 const updatePassword = async (req, res) => {
-  const { data, token } = req.body
-
   try {
+    const { data, token } = req.body
+
     const decoded = verifyToken(token)
     const hashedPassword = await bcrypt.hash(data, 10)
 
