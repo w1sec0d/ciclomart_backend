@@ -1,4 +1,6 @@
 const db = require('../database/connection')
+// importa mercadoPagoClient
+const { preference } = require('../utils/mercadoPago')
 
 const getProducto = async (req, res) => {
   try {
@@ -69,4 +71,46 @@ const getProductById = async (req, res) => {
   }
 }
 
-module.exports = { getProducto, getProductById }
+const createPreference = async (req, res) => {
+  try {
+    const { title, quantity, price, id } = req.body
+    console.log('title', title)
+
+    const preferenceBody = {
+      items: [
+        {
+          title,
+          quantity: Number(quantity),
+          unit_price: Number(price),
+          currency_id: 'COP',
+        },
+      ],
+      back_urls: {
+        success: process.env.FRONTEND_URL + '/product/' + id + '/success',
+        failure: process.env.FRONTEND_URL + '/product/' + id + '/failure',
+        pending: process.env.FRONTEND_URL + '/product/' + id + '/pending',
+      },
+      auto_return: 'approved',
+    }
+    console.log('preferenceBody', preferenceBody)
+    const result = await preference.create({
+      body: preferenceBody
+    })
+
+    res.status(200).json({
+      success: true,
+      message: 'Preferencia de MercadoPago creada exitosamente',
+      preferenceId: result.id,
+    })
+  }
+  catch (error) {
+    console.error('Error creando preferencia de MercadoPago:', error)
+    res.status(500).json({
+      success: false,
+      message: 'Error creando preferencia de MercadoPago',
+      error: error.message,
+    })
+  }
+}
+
+module.exports = { getProducto, getProductById, createPreference }
