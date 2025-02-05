@@ -28,4 +28,45 @@ const getProducto = async (req, res) => {
   }
 }
 
-module.exports = { getProducto }
+const getProductById = async (req, res) => {
+  try {
+    const id = parseInt(req.params.id)
+
+    if (isNaN(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'ID de producto inválido',
+      })
+    }
+
+    db.query(
+      'SELECT * FROM producto WHERE idProducto = ?',
+      [id],
+      (error, results) => {
+        if (error) {
+          console.error('Error obteniendo producto:', error)
+          return res.status(500).json({
+            success: false,
+            message: 'Error obteniendo producto',
+            error: error.message,
+          })
+        }
+
+        res.status(200).json({
+          success: true,
+          message: 'Producto obtenido exitosamente',
+          results,
+        })
+      }
+    )
+  } catch (error) {
+    console.error('Error obteniendo producto:', error)
+    res.status(500).json({
+      success: false,
+      message: 'Error obteniendo producto',
+      error: error.message,
+    })
+  }
+}
+
+module.exports = { getProducto, getProductById }

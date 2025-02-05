@@ -36,7 +36,7 @@ const { getTiendas } = require('../controllers/tienda.js')
 // Controlador de busqueda
 const { search } = require('../controllers/search.js')
 
-const { getProducto } = require('../controllers/producto.js')
+const { getProducto, getProductById } = require('../controllers/producto.js')
 
 // Rutas usuarios
 router.get('/usuarios', getUsuarios)
@@ -65,5 +65,6 @@ router.get('/tiendas', getTiendas)
 // Rutas de productos
 router.get('/search', search)
 router.get('/productos', getProducto)
+router.get('/productos/:id', getProductById)
 
 module.exports = router
