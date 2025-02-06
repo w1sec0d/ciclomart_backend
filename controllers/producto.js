@@ -86,9 +86,9 @@ const createPreference = async (req, res) => {
         },
       ],
       back_urls: {
-        success: process.env.FRONTEND_URL + '/product/' + id + '/success',
-        failure: process.env.FRONTEND_URL + '/product/' + id + '/failure',
-        pending: process.env.FRONTEND_URL + '/product/' + id + '/pending',
+        success: process.env.FRONTEND_URL + '/success',
+        failure: process.env.FRONTEND_URL + '/failure',
+        pending: process.env.FRONTEND_URL + '/pending',
       },
       auto_return: 'approved',
     }
