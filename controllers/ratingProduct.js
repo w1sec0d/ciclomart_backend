@@ -14,7 +14,7 @@ const ratingProduct = (request, response) => {
         })
     }
 
-    db.query('SELECT * FROM VistaCalificacionesProducto WHERE idProducto = ?',[idProducto],
+    db.query('SELECT * FROM VistaCalificacionesProducto WHERE idDocumentoProducto = ?',[idProducto],
         (error, results) => {
             if(error){
                 console.error('Error realizando la consulta ', error);
@@ -40,7 +40,7 @@ const averageProductRatings = (request, response) => {
     const {id} = request.params;
     const idProducto = parseInt(id);
 
-    db.query('SELECT AVG(cal.nota) AS avg_calificacion FROM calificacion cal JOIN documentoproducto dp ON cal.idDocumentoProducto = dp.idDocumentoProducto WHERE dp.idProducto = ?',[idProducto],
+    db.query('SELECT AVG(cal.nota) AS avg_calificacion FROM calificacion cal JOIN documentoproducto dp ON cal.idDocumentoProducto = dp.idDocumentoProducto WHERE dp.idDocumentoProducto = ?',[idProducto],
         (error, results) => {
             if(error){
                 console.error('Error realizando la consulta ', error);
@@ -62,8 +62,9 @@ const averageProductRatings = (request, response) => {
 // Permite revisar si un usuario compro un producto. De vuelve el id vendedor
 const checkUserPurchase = (request, response) => {
 
-    console.log("Hola estoy llegando vacio", request.body);
-    const {idComprador, idDocProducto} = request.body;
+
+    const {idComprador, idDocProducto} = request.params;
+
 
     if(!idComprador || !idDocProducto){
         return response.status(400).json({
