@@ -17,7 +17,7 @@ const search = (request, response) => {
     query += ' AND LOWER(nombre) LIKE LOWER(?)'
     queryParams.push(`%${nombre}%`)
   }
-  
+
   db.query(query, queryParams, (error, results) => {
     if (error) {
       console.error('Error ejecutando la consulta', error)

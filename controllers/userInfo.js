@@ -16,11 +16,8 @@ const userInfo = async (request, response) => {
 
   const token = authHeader.split(' ')[1]
 
-
   try {
-
     const decoded = verifyToken(token)
-
 
     db.query(
       'SELECT * FROM usuario WHERE idUsuario = ?',

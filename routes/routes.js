@@ -36,8 +36,13 @@ const { getTiendas } = require('../controllers/tienda.js')
 // Controlador de busqueda
 const { search } = require('../controllers/search.js')
 
-// Controladores de calificaciones de productos 
-const { ratingProduct, averageProductRatings, addRatingProduct, checkUserPurchase } = require('../controllers/ratingProduct.js')
+// Controladores de calificaciones de productos
+const {
+  ratingProduct,
+  averageProductRatings,
+  addRatingProduct,
+  checkUserPurchase,
+} = require('../controllers/ratingProduct.js')
 
 // Rutas usuarios
 router.get('/usuarios', getUsuarios)
