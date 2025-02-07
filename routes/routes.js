@@ -70,6 +70,6 @@ router.get('/search', search)
 router.get('/ratingProduct/:id', ratingProduct)
 router.get('/averageProductRatings/:id', averageProductRatings)
 router.post('/addRatingProduct', addRatingProduct)
-router.get('/checkUserPurchase/:id1/:id2', checkUserPurchase)
+router.get('/checkUserPurchase/:idComprador/:idDocProducto', checkUserPurchase)
 
 module.exports = router
