@@ -36,7 +36,17 @@ const { getTiendas } = require('../controllers/tienda.js')
 // Controlador de busqueda
 const { search } = require('../controllers/search.js')
 
+
+// Controladores de calificaciones de productos
+const {
+  ratingProduct,
+  averageProductRatings,
+  addRatingProduct,
+  checkUserPurchase,
+} = require('../controllers/ratingProduct.js')
+
 const { getProducto } = require('../controllers/producto.js')
+
 
 // Rutas usuarios
 router.get('/usuarios', getUsuarios)
@@ -65,5 +75,11 @@ router.get('/tiendas', getTiendas)
 // Rutas de productos
 router.get('/search', search)
 router.get('/productos', getProducto)
+
+//Rutas calificaciones productos
+router.get('/ratingProduct/:id', ratingProduct)
+router.get('/averageProductRatings/:id', averageProductRatings)
+router.post('/addRatingProduct', addRatingProduct)
+router.get('/checkUserPurchase/:idComprador/:idDocProducto', checkUserPurchase)
 
 module.exports = router
