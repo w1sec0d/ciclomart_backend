@@ -20,7 +20,7 @@ const getTransacciones = (request, response) => {
 }
 
 // Obtiene las compras de un usuario dado
-const getComprasById = (request, response) => {
+const getCompras = (request, response) => {
   const idComprador = request.params.id
 
   if (isNaN(idComprador)) {
@@ -51,7 +51,7 @@ const getComprasById = (request, response) => {
 }
 
 // Obtiene las ventas de un usuario dado
-const getVentasById = (request, response) => {
+const getVentas = (request, response) => {
   const idVendedor = request.params.id
   if (isNaN(idVendedor)) {
     return response
@@ -78,4 +78,4 @@ const getVentasById = (request, response) => {
   )
 }
 
-module.exports = { getTransacciones, getComprasById, getVentasById }
+module.exports = { getTransacciones, getCompras, getVentas }
