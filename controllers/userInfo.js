@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const db = require('../database/connection')
+const { verifyToken } = require('./login')
 
 const userInfo = async (request, response) => {
   // Obtiene el encabezado de la autorización de la solicitud
@@ -15,8 +16,11 @@ const userInfo = async (request, response) => {
 
   const token = authHeader.split(' ')[1]
 
+
   try {
+
     const decoded = verifyToken(token)
+
 
     db.query(
       'SELECT * FROM usuario WHERE idUsuario = ?',
