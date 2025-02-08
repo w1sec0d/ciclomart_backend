@@ -27,10 +27,14 @@
     "morgan": "^1.10.0",
     "mysql": "^2.18.1",
     "mysql2": "^3.12.0",
-    "nodemailer": "^6.9.16",
+    "nodemailer": "^6.10.0",
     "nodemon": "^3.1.9"
   },
   "devDependencies": {
     "prettier": "^3.4.2"
+  },
+  "overrides": {
+    "ajv": "^8.17.1",
+    "whatwg-url": "^14.0.0"
   }
 }

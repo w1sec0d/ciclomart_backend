@@ -94,7 +94,7 @@ const createPreference = async (req, res) => {
     }
     console.log('preferenceBody', preferenceBody)
     const result = await preference.create({
-      body: preferenceBody
+      body: preferenceBody,
     })
 
     res.status(200).json({
@@ -102,10 +102,9 @@ const createPreference = async (req, res) => {
       message: 'Preferencia de MercadoPago creada exitosamente',
       preferenceId: result.id,
       paymentURL: result.init_point,
-      result
+      result,
     })
-  }
-  catch (error) {
+  } catch (error) {
     console.error('Error creando preferencia de MercadoPago:', error)
     res.status(500).json({
       success: false,
