@@ -73,7 +73,7 @@ const getProductById = async (req, res) => {
 
 const createPreference = async (req, res) => {
   try {
-    const { title, quantity, price, id } = req.body
+    const { title, quantity, unit_price } = req.body
     console.log('title', title)
 
     const preferenceBody = {
@@ -81,7 +81,7 @@ const createPreference = async (req, res) => {
         {
           title,
           quantity: Number(quantity),
-          unit_price: Number(price),
+          unit_price: Number(unit_price),
           currency_id: 'COP',
         },
       ],
@@ -101,6 +101,8 @@ const createPreference = async (req, res) => {
       success: true,
       message: 'Preferencia de MercadoPago creada exitosamente',
       preferenceId: result.id,
+      paymentURL: result.init_point,
+      result
     })
   }
   catch (error) {
