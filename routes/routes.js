@@ -41,6 +41,13 @@ const {
   getProductById,
   createPreference,
 } = require('../controllers/producto.js')
+// Controladores de calificaciones de productos
+const {
+  ratingProduct,
+  averageProductRatings,
+  addRatingProduct,
+  checkUserPurchase,
+} = require('../controllers/ratingProduct.js')
 
 // Rutas usuarios
 router.get('/usuarios', getUsuarios)
@@ -72,5 +79,11 @@ router.get('/productos', getProducto)
 router.get('/productos/:id', getProductById)
 // Mercado Pago
 router.post('/createPreference', createPreference)
+
+//Rutas calificaciones productos
+router.get('/ratingProduct/:id', ratingProduct)
+router.get('/averageProductRatings/:id', averageProductRatings)
+router.post('/addRatingProduct', addRatingProduct)
+router.get('/checkUserPurchase/:idComprador/:idDocProducto', checkUserPurchase)
 
 module.exports = router
