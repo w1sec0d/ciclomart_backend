@@ -36,7 +36,11 @@ const { getTiendas } = require('../controllers/tienda.js')
 // Controlador de busqueda
 const { search } = require('../controllers/search.js')
 
-const { getProducto, getProductById, createPreference } = require('../controllers/producto.js')
+const {
+  getProducto,
+  getProductById,
+  createPreference,
+} = require('../controllers/producto.js')
 
 // Rutas usuarios
 router.get('/usuarios', getUsuarios)
@@ -68,6 +72,5 @@ router.get('/productos', getProducto)
 router.get('/productos/:id', getProductById)
 // Mercado Pago
 router.post('/createPreference', createPreference)
-
 
 module.exports = router
