@@ -44,7 +44,11 @@ const {
   checkUserPurchase,
 } = require('../controllers/ratingProduct.js')
 
-const { getProducto } = require('../controllers/producto.js')
+// Controlador de productos
+const { 
+  getProducto,
+  publishProducto,
+ } = require('../controllers/producto.js')
 
 // Rutas usuarios
 router.get('/usuarios', getUsuarios)
@@ -73,6 +77,7 @@ router.get('/tiendas', getTiendas)
 // Rutas de productos
 router.get('/search', search)
 router.get('/productos', getProducto)
+router.post('/addProduct', publishProducto)
 
 //Rutas calificaciones productos
 router.get('/ratingProduct/:id', ratingProduct)
