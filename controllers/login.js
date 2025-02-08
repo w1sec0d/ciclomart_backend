@@ -200,9 +200,9 @@ const verifyToken = (token) => {
     return decoded
   } catch (error) {
     if (error.name === 'TokenExpiredError') {
-      console.error('Token has expired')
+      console.log('!El token ha expirado')
     } else {
-      console.error('Token verification failed:', error)
+      console.error('Verificacion del token fallida', error)
     }
     throw error
   }

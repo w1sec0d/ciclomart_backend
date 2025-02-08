@@ -1,5 +1,4 @@
 const db = require('../database/connection')
-const { merge } = require('../routes/routes')
 
 // Obtiene todas las calificaciones de un producto
 const ratingProduct = (request, response) => {
