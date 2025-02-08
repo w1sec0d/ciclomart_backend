@@ -4,7 +4,7 @@
   "description": "App backend de la aplicacion de ciclomart hecha con express",
   "main": "index.js",
   "scripts": {
-    "start": "node --trace-warnings index.js",
+    "start": "node index.js",
     "dev": "nodemon index.js",
     "json-server": "json-server --watch test-db.json --port 4000",
     "test": "echo \"Error: no test specified\" && exit 1",
