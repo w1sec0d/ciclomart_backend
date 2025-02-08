@@ -216,9 +216,9 @@ const verifyToken = (token) => {
     return decoded
   } catch (error) {
     if (error.name === 'TokenExpiredError') {
-      console.error('Token has expired')
+      console.error('!El token del usuario ha vencido')
     } else {
-      console.error('Token verification failed:', error)
+      console.error('Verificacion de token fallida:', error)
     }
     throw error
   }
