@@ -278,10 +278,6 @@ Ref "documento_ibfk_1":"modelo"."idModelo" < "documento"."idModelo" [update: cas
 
 Ref "documento_ibfk_2":"usuario"."idUsuario" < "documento"."idUsuario" [update: cascade, delete: cascade]
 
-Ref "fk_documento_tienda1":"tienda"."idTienda" < "documento"."idTienda" [update: no action, delete: no action]
-
-Ref "fk_documento_carritoProducto1":"carritoProducto"."idCarritoProducto" < "documento"."idCarritoProducto" [update: no action, delete: no action]
-
 Ref "calificacion_ibfk_1":"usuario"."idUsuario" < "calificacion"."idUsuarioComprador" [delete: cascade]
 
 Ref "fk_calificacion_usuario1":"usuario"."idUsuario" < "calificacion"."idUsuarioVendedor" [update: no action, delete: no action]
