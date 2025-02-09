@@ -1,0 +1,287 @@
+// Usa lenguaje dbml para definir la base de datos
+// Documentación: https://dbml.dbdiagram.io/docs
+
+// Posibles enums
+Enum "usuario_rol_enum" {
+  "comprador"
+  "cliente"
+  "administrador"
+}
+
+Enum "transaccion_estado_enum" {
+  "pendiente"
+  "exitosa"
+  "fallida"
+}
+
+Table "usuario" {
+  "idUsuario" INT [pk, not null, increment]
+  "nombre" VARCHAR(45) [not null]
+  "apellido" VARCHAR(45) [not null]
+  "fechaNacimiento" DATE 
+  "rol" usuario_rol_enum [default:"comprador"]
+  "foto" VARCHAR(255)
+  "correo" VARCHAR [not null]
+  "direccion" VARCHAR 
+  "telefono" VARCHAR(45) 
+  "username" VARCHAR(45) 
+  "password" VARCHAR(64) [not null]
+  "fechaRegistro" DATETIME [default: `now()`]
+}
+
+// Representa 
+Table "modelo" {
+  "idModelo" INT [pk, not null]
+  "nombre" VARCHAR [not null]
+  "tipo" VARCHAR(45) [not null]
+  "descripcion" VARCHAR [not null]
+  "idMarca" INT [not null]
+  Indexes {
+    idMarca [name: "idMarca"]
+    nombre [name:"nombre"]
+  }
+}
+
+Table "imagen" {
+  "idImagen" INT [pk, not null, increment]
+  "url" VARCHAR
+}
+
+Table "bicicleta" {
+  "idBicicleta" INT [pk, not null]
+  "tipoBicicleta" VARCHAR(45)
+  "color" VARCHAR(45)
+  "genero" VARCHAR(45)
+  "edad" VARCHAR(45)
+  "tamañoMarco" VARCHAR(45)
+  "materialMarco" VARCHAR(45)
+  "tamañoRueda" VARCHAR(45)
+  "tipoFrenos" VARCHAR(45)
+  "velocidades" VARCHAR(45)
+  "suspension" VARCHAR(45)
+  "transmision" VARCHAR(45)
+  "tipoPedales" VARCHAR(45)
+  "manubrio" VARCHAR(45)
+  "pesoBicicleta" FLOAT
+  "pesoMaximo" FLOAT
+  "extras" VARCHAR(100)
+  //Componentes especificos
+  "idCadena" INT
+  "idRueda" INT
+  "idPedalier" INT
+  "idSillin" INT
+  "idFreno" INT
+  "idManubrio" INT
+  "idCassette" INT
+  Indexes {
+    idCadena [name: "modelo_ibfk_1"]
+    idRueda [name: "modelo_ibfk_2"]
+    idPedalier [name: "modelo_ibfk_3"]
+    idSillin [name: "modelo_ibfk_4"]
+    idFreno [name: "modelo_ibfk_5"]
+    idManubrio [name: "modelo_ibfk_6"]
+    idCassette [name: "modelo_ibfk_7"]
+  }
+}
+
+Table "componente" {
+  "idComponente" INT [pk, not null]
+  "idMarca" INT
+  "nombre" VARCHAR [not null]
+  "categoria" VARCHAR
+  "compatibilidad" VARCHAR
+}
+
+Table "marca" {
+  "idMarca" INT [pk, not null]
+  "nombre" VARCHAR(45) [not null]
+}
+
+Table "tienda" {
+  "idTienda" INT [pk, not null]
+  "idUsuarioAdministrador" INT [not null]
+  "nombre" VARCHAR(45) 
+  "descripcion" VARCHAR(45) 
+  "telefono" VARCHAR(25) 
+
+  Indexes {
+    idUsuarioAdministrador [name: "idUsuarioAdministrador"]
+  }
+}
+
+Table "carrito" {
+  "idCarrito" INT [pk, not null, increment]
+  "idUsuario" INT [not null]
+  "cantidadProductos" INT [default: '0']
+  "precioTotal" FLOAT 
+  "fecha" DATETIME 
+  "estado" VARCHAR(45) 
+  "metodoPago" VARCHAR(45) 
+  "direccionEnvio" VARCHAR(45) 
+  "descuento" FLOAT 
+
+  Indexes {
+    idUsuario [name: "idUsuario"]
+  }
+}
+
+Table "carritoProducto" {
+  "idCarritoProducto" INT [pk, not null, increment]
+  "idCarrito" INT [not null]
+  "idModelo" INT [not null]
+  "cantidad" INT 
+  "precio" FLOAT 
+
+  Indexes {
+    idCarrito [name: "idCarrito"]
+    idModelo [name: "fk_carritoProducto_modelo1_idx"]
+  }
+}
+
+Table "documentoProducto" {
+  "idDocumentoProducto" INT [pk, not null, increment]
+  "idModelo" INT [not null]
+  "idUsuario" INT
+  "idTienda" INT
+  "idCarritoProducto" INT
+  "tipo" VARCHAR(45) 
+  "descripcion" VARCHAR(45) 
+  "estado" VARCHAR(45) 
+  "precio" FLOAT 
+  "fechaCompra" VARCHAR(45) 
+
+  Indexes {
+    idUsuario [name: "idUsuario"]
+    idTienda [name: "fk_documentoProducto_tienda1_idx"]
+    idCarritoProducto [name: "fk_documentoProducto_carritoProducto1_idx"]
+  }
+}
+
+Table "calificacion" {
+  "idCalificacion" INT [pk, not null, increment]
+  "idUsuarioComprador" INT [not null]
+  "idDocumentoProducto" INT [not null]
+  "idUsuarioVendedor" INT [not null]
+  "foto" VARCHAR(120) 
+  "comentario" VARCHAR(45) 
+  "nota" INT 
+  "fecha" DATETIME 
+
+  Indexes {
+    idUsuarioComprador [name: "idUsuarioComprador"]
+    idUsuarioVendedor [name: "fk_calificacion_usuario1_idx"]
+    idDocumentoProducto [name: "fk_calificacion_documentoProducto1_idx"]
+  }
+}
+
+Table "transaccion" {
+  "idTransaccion" INT [pk, not null, increment]
+  "idCarrito" INT [not null]
+  "idComprador" INT [not null]
+  "fecha" DATETIME 
+  "monto" FLOAT 
+  "metodoPago" VARCHAR(45) 
+  "estado" transaccion_estado_enum
+
+  Indexes {
+    idCarrito [name: "idCarrito"]
+    idComprador [name: "fk_transaccion_usuario1_idx"]
+  }
+}
+
+Table "envio" {
+  "idEnvio" INT [pk, not null, increment]
+  "idTransaccion" INT [not null]
+  "idUsuarioComprador" INT [not null]
+  "idUsuarioVendedor" INT [not null]
+  "fecha" DATETIME 
+  "direccion" VARCHAR(45) 
+  "estado" VARCHAR(45) 
+
+  Indexes {
+    idTransaccion [name: "idTransaccion"]
+    idUsuarioComprador [name: "idUsuarioComprador"]
+    idUsuarioVendedor [name: "fk_envio_usuario1_idx"]
+  }
+}
+
+Table "mensaje" {
+  "idMensaje" INT [pk, not null, increment]
+  "idUsuarioEmisor" INT [not null]
+  "idUsuarioReceptor" INT [not null]
+  "idTransaccion" INT [not null]
+  "contenido" TEXT 
+  "fecha" DATETIME 
+
+  Indexes {
+    idUsuarioEmisor [name: "idUsuarioEmisor"]
+    idTransaccion [name: "fk_mensaje_transaccion1_idx"]
+    idUsuarioReceptor [name: "fk_mensaje_usuario1_idx"]
+  }
+}
+
+Ref "idMarca": "modelo"."idMarca" - "marca"."idMarca"
+
+Ref "bicicleta_ibfk_1": "modelo"."idModelo" - "bicicleta"."idBicicleta"
+
+Ref "repuesto_ibfk_1":"modelo"."idModelo" < "componente"."idComponente"
+
+Ref "modelo_ibfk_1":"bicicleta"."idCadena" - "componente"."idComponente"
+
+Ref "modelo_ibfk_2":"bicicleta"."idRueda" -  "componente"."idComponente"
+
+Ref "modelo_ibfk_3":"bicicleta"."idPedalier" -  "componente"."idComponente"
+
+Ref "modelo_ibfk_4":"bicicleta"."idSillin" -  "componente"."idComponente"
+
+Ref "modelo_ibfk_5":"bicicleta"."idFreno" -  "componente"."idComponente"
+
+Ref "modelo_ibfk_6":"bicicleta"."idManubrio" -  "componente"."idComponente"
+
+Ref "modelo_ibfk_7":"bicicleta"."idCassette" -  "componente"."idComponente"
+
+Ref "marca_ibfk_1":"marca"."idMarca" <  "componente"."idComponente"
+
+Ref "tienda_ibfk_1":"usuario"."idUsuario" < "tienda"."idUsuarioAdministrador" [update: cascade]
+
+Ref "carrito_ibfk_1":"usuario"."idUsuario" < "carrito"."idUsuario" [update: cascade, delete: cascade]
+
+Ref "carritoProducto_ibfk_1":"carrito"."idCarrito" < "carritoProducto"."idCarrito" [update: cascade, delete: cascade]
+
+Ref "fk_carritoProducto_modelo1":"modelo"."idModelo" < "carritoProducto"."idModelo" [update: no action, delete: no action]
+
+Ref "documentoProducto_ibfk_1":"modelo"."idModelo" < "documentoProducto"."idModelo" [update: cascade, delete: cascade]
+
+Ref "documentoProducto_ibfk_2":"usuario"."idUsuario" < "documentoProducto"."idUsuario" [update: cascade, delete: cascade]
+
+Ref "fk_documentoProducto_tienda1":"tienda"."idTienda" < "documentoProducto"."idTienda" [update: no action, delete: no action]
+
+Ref "fk_documentoProducto_carritoProducto1":"carritoProducto"."idCarritoProducto" < "documentoProducto"."idCarritoProducto" [update: no action, delete: no action]
+
+Ref "calificacion_ibfk_1":"usuario"."idUsuario" < "calificacion"."idUsuarioComprador" [delete: cascade]
+
+Ref "fk_calificacion_usuario1":"usuario"."idUsuario" < "calificacion"."idUsuarioVendedor" [update: no action, delete: no action]
+
+Ref "fk_calificacion_documentoProducto1":"documentoProducto"."idDocumentoProducto" < "calificacion"."idDocumentoProducto" [update: no action, delete: no action]
+
+Ref "transaccion_ibfk_1":"carrito"."idCarrito" < "transaccion"."idCarrito" [delete: cascade]
+
+Ref "fk_transaccion_usuario1":"usuario"."idUsuario" < "transaccion"."idComprador" [update: no action, delete: no action]
+
+Ref "envio_ibfk_1":"transaccion"."idTransaccion" < "envio"."idTransaccion" [delete: cascade]
+
+Ref "envio_ibfk_2":"usuario"."idUsuario" < "envio"."idUsuarioComprador" [delete: cascade]
+
+Ref "fk_envio_usuario1":"usuario"."idUsuario" < "envio"."idUsuarioVendedor" [update: no action, delete: no action]
+
+Ref "mensaje_ibfk_1":"usuario"."idUsuario" < "mensaje"."idUsuarioEmisor" [update: cascade, delete: cascade]
+
+Ref "fk_mensaje_transaccion1":"transaccion"."idTransaccion" < "mensaje"."idTransaccion" [update: no action, delete: no action]
+
+Ref "fk_mensaje_usuario1":"usuario"."idUsuario" < "mensaje"."idUsuarioReceptor" [update: no action, delete: no action]
+
+Ref: "tienda"."nombre" < "documentoProducto"."idUsuario"
+
+Ref: "documentoProducto"."idUsuario" < "documentoProducto"."idTienda"
+
+Ref: "modelo"."idModelo"<"imagen"."idImagen"
