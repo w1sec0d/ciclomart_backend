@@ -1,3 +1,10 @@
+-- Script generado por dbdiagram.io
+-- Inicializa la base de datos ciclomart en mysql workbench 8.0
+
+-- Recomiendo crear un esquema aparte para probar
+DROP DATABASE IF EXISTS ciclomart2;
+CREATE DATABASE ciclomart2;
+USE ciclomart2;
 CREATE TABLE `usuario` (
   `idUsuario` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `nombre` VARCHAR(45) NOT NULL,
@@ -10,7 +17,7 @@ CREATE TABLE `usuario` (
   `telefono` VARCHAR(60),
   `username` VARCHAR(45),
   `password` VARCHAR(64) NOT NULL,
-  `fechaRegistro` DATETIME DEFAULT (now())
+  `fechaRegistro` DATETIME DEFAULT (CURRENT_TIMESTAMP)
 );
 
 CREATE TABLE `modelo` (
@@ -23,7 +30,7 @@ CREATE TABLE `modelo` (
 
 CREATE TABLE `imagen` (
   `idImagen` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `url` VARCHAR,
+  `url` VARCHAR(255),
   `idModelo` INT,
   `idDocumento` INT,
   `idUsuario` INT
@@ -60,8 +67,8 @@ CREATE TABLE `componente` (
   `idComponente` INT PRIMARY KEY NOT NULL,
   `idMarca` INT,
   `nombre` VARCHAR(255) NOT NULL,
-  `categoria` VARCHAR,
-  `compatibilidad` VARCHAR
+  `categoria` VARCHAR(255),
+  `compatibilidad` VARCHAR(255)
 );
 
 CREATE TABLE `marca` (
@@ -72,7 +79,7 @@ CREATE TABLE `marca` (
 CREATE TABLE `tienda` (
   `idTienda` INT PRIMARY KEY NOT NULL,
   `idUsuarioAdministrador` INT NOT NULL,
-  `nombre` varchar(255),
+  `nombre` VARCHAR(255),
   `descripcion` text,
   `telefono` VARCHAR(60)
 );
@@ -80,7 +87,7 @@ CREATE TABLE `tienda` (
 CREATE TABLE `carrito` (
   `idCarrito` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `idUsuario` INT NOT NULL,
-  `cantidadProductos` INT DEFAULT '0',
+  `cantidadProductos` INT DEFAULT 0,
   `precioTotal` FLOAT,
   `fecha` DATETIME,
   `estado` VARCHAR(45),
@@ -119,7 +126,7 @@ CREATE TABLE `producto` (
   `disponibilidad` ENUM ('disponible', 'vendido', 'reservado') DEFAULT 'disponible',
   `costoEnvio` float NOT NULL DEFAULT 0,
   `retiroEnTienda` BOOL NOT NULL DEFAULT true,
-  `fechaPublicacion` datetime DEFAULT 'now()'
+  `fechaPublicacion` datetime DEFAULT (CURRENT_TIMESTAMP)
 );
 
 CREATE TABLE `calificacion` (
@@ -131,7 +138,7 @@ CREATE TABLE `calificacion` (
   `foto` VARCHAR(255),
   `comentario` TEXT,
   `nota` INT,
-  `fecha` DATETIME DEFAULT 'now()'
+  `fecha` DATETIME DEFAULT (CURRENT_TIMESTAMP)
 );
 
 CREATE TABLE `transaccion` (
@@ -158,7 +165,7 @@ CREATE TABLE `transaccionProducto` (
   `idTransaccion` INT NOT NULL,
   `idProducto` INT NOT NULL,
   `cantidad` INT NOT NULL,
-  `fecha` DATETIME DEFAULT 'now()',
+  `fecha` DATETIME DEFAULT (CURRENT_TIMESTAMP),
   `direccion` TEXT,
   `estadoEnvio` VARCHAR(45)
 );
@@ -196,8 +203,6 @@ CREATE INDEX `nombre` ON `marca` (`nombre`);
 CREATE INDEX `nombre` ON `tienda` (`nombre`);
 
 CREATE INDEX `idUsuario` ON `carrito` (`idUsuario`);
-
-CREATE INDEX `idCarrito` ON `carritoProducto` (`idCarrito`);
 
 CREATE INDEX `idUsuario` ON `documento` (`idUsuario`);
 
@@ -243,7 +248,7 @@ ALTER TABLE `tienda` ADD CONSTRAINT `tienda_ibfk_1` FOREIGN KEY (`idUsuarioAdmin
 
 ALTER TABLE `carrito` ADD CONSTRAINT `carrito_ibfk_1` FOREIGN KEY (`idUsuario`) REFERENCES `usuario` (`idUsuario`) ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE `carritoProducto` ADD CONSTRAINT `carritoProducto_ibfk_1` FOREIGN KEY (`idCarrito`) REFERENCES `carrito` (`idCarrito`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `carritoProducto` ADD FOREIGN KEY (`idCarrito`) REFERENCES `carrito` (`idCarrito`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE `carritoProducto` ADD FOREIGN KEY (`idProducto`) REFERENCES `producto` (`idProducto`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 

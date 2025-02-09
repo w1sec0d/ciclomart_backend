@@ -32,20 +32,20 @@ Table "usuario" {
   "fechaNacimiento" DATE 
   "rol" usuario_rol_enum [default:"comprador"]
   "foto" VARCHAR(255)
-  "correo" VARCHAR [not null]
-  "direccion" VARCHAR 
+  "correo" VARCHAR(255) [not null]
+  "direccion" VARCHAR(255)
   "telefono" VARCHAR(60) 
   "username" VARCHAR(45) 
   "password" VARCHAR(64) [not null]
-  "fechaRegistro" DATETIME [default: `now()`]
+  "fechaRegistro" DATETIME [default: `CURRENT_TIMESTAMP`]
 }
 
 // Representa 
 Table "modelo" {
   "idModelo" INT [pk, not null]
-  "nombre" VARCHAR [not null]
+  "nombre" VARCHAR(255) [not null]
   "tipo" VARCHAR(45) [not null]
-  "descripcion" VARCHAR [not null]
+  "descripcion" VARCHAR(255) [not null]
   "idMarca" INT [not null]
   Indexes {
     idMarca [name: "idMarca"]
@@ -55,7 +55,7 @@ Table "modelo" {
 
 Table "imagen" {
   "idImagen" INT [pk, not null, increment]
-  "url" VARCHAR
+  "url" VARCHAR(255)
   "idModelo" INT
   "idDocumento" INT
   "idUsuario" INT
@@ -107,9 +107,9 @@ Table "bicicleta" {
 Table "componente" {
   "idComponente" INT [pk, not null]
   "idMarca" INT
-  "nombre" VARCHAR [not null]
-  "categoria" VARCHAR
-  "compatibilidad" VARCHAR
+  "nombre" VARCHAR(255) [not null]
+  "categoria" VARCHAR(255)
+  "compatibilidad" VARCHAR(255)
   Indexes {
     nombre [name:"nombre"]
     idMarca [name:"marca_ibfk_1"]
@@ -127,7 +127,7 @@ Table "marca" {
 Table "tienda" {
   "idTienda" INT [pk, not null]
   "idUsuarioAdministrador" INT [not null]
-  "nombre" varchar
+  "nombre" VARCHAR(255)
   "descripcion" text
   "telefono" VARCHAR(60) 
   Indexes {
@@ -138,7 +138,7 @@ Table "tienda" {
 Table "carrito" {
   "idCarrito" INT [pk, not null, increment]
   "idUsuario" INT [not null]
-  "cantidadProductos" INT [default: '0']
+  "cantidadProductos" INT [default: 0]
   "precioTotal" FLOAT 
   "fecha" DATETIME 
   "estado" VARCHAR(45) 
@@ -156,10 +156,6 @@ Table "carritoProducto" {
   "idProducto" INT [not null]
   "cantidad" INT 
   "precio_unitario" FLOAT 
-
-  Indexes {
-    idCarrito [name: "idCarrito"]
-  }
 }
 
 // Representa un documento oficial de propiedad
@@ -190,7 +186,7 @@ Table "producto" {
   "disponibilidad" producto_disponibilidad_enum [default: "disponible"]
   "costoEnvio" float [not null, default: 0]
   "retiroEnTienda" BOOL [not null, default: true]
-  "fechaPublicacion" datetime [default: "now()"]
+  "fechaPublicacion" datetime [default: `CURRENT_TIMESTAMP`]
 }
 
 
@@ -200,10 +196,10 @@ Table "calificacion" {
   "idProducto" INT [not null]
   "idUsuarioVendedor" INT
   "idTienda" INT
-  "foto" VARCHAR 
+  "foto" VARCHAR(255)
   "comentario" TEXT
   "nota" INT 
-  "fecha" DATETIME [default: "now()"]
+  "fecha" DATETIME [default: `CURRENT_TIMESTAMP`]
 
   Indexes {
     idUsuarioComprador [name: "idUsuarioComprador"]
@@ -245,7 +241,7 @@ Table "transaccionProducto" {
   "idTransaccion" INT [not null]
   "idProducto" INT [not null]
   "cantidad" INT [not null]
-  "fecha" DATETIME [default: "now()"]
+  "fecha" DATETIME [default: `CURRENT_TIMESTAMP`]
   "direccion" TEXT
   "estadoEnvio" VARCHAR(45) 
   Indexes {
@@ -280,7 +276,7 @@ Ref "tienda_ibfk_1":"usuario"."idUsuario" < "tienda"."idUsuarioAdministrador" [u
 
 Ref "carrito_ibfk_1":"usuario"."idUsuario" < "carrito"."idUsuario" [update: cascade, delete: cascade]
 
-Ref "carritoProducto_ibfk_1":"carrito"."idCarrito" < "carritoProducto"."idCarrito" [update: cascade, delete: cascade]
+Ref: "carrito"."idCarrito" < "carritoProducto"."idCarrito" [update: cascade, delete: cascade]
 
 Ref: "producto"."idProducto" < "carritoProducto"."idProducto" [update: no action, delete: no action]
 
