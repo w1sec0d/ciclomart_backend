@@ -56,6 +56,15 @@ Table "modelo" {
 Table "imagen" {
   "idImagen" INT [pk, not null, increment]
   "url" VARCHAR
+  "idModelo" INT
+  "idDocumento" INT
+  "idUsuario" INT
+
+  Indexes {
+    idModelo [name: "imagen_modelo"]
+    idDocumento [name: "imagen_documento"]
+    idUsuario [name: "imagen_usuario"]
+  }
 }
 
 Table "bicicleta" {
@@ -103,6 +112,7 @@ Table "componente" {
   "compatibilidad" VARCHAR
   Indexes {
     nombre [name:"nombre"]
+    idMarca [name:"marca_ibfk_1"]
   }
 }
 
@@ -143,13 +153,12 @@ Table "carrito" {
 Table "carritoProducto" {
   "idCarritoProducto" INT [pk, not null, increment]
   "idCarrito" INT [not null]
-  "idModelo" INT [not null]
+  "idProducto" INT [not null]
   "cantidad" INT 
-  "precio" FLOAT 
+  "precio_unitario" FLOAT 
 
   Indexes {
     idCarrito [name: "idCarrito"]
-    idModelo [name: "fk_carritoProducto_modelo1_idx"]
   }
 }
 
@@ -175,26 +184,30 @@ Table "producto" {
   "idTienda" INT
   "idVendedor" INT
   "precio" FLOAT
+  "precioCompleto" FLOAT
   "cantidad" INT [default: 0]
   "estado" producto_estado_enum [default: "nuevo"]
   "disponibilidad" producto_disponibilidad_enum [default: "disponible"]
+  "costoEnvio" float [not null, default: 0]
+  "retiroEnTienda" BOOL [not null, default: true]
+  "fechaPublicacion" datetime [default: "now()"]
 }
 
 
 Table "calificacion" {
   "idCalificacion" INT [pk, not null, increment]
   "idUsuarioComprador" INT [not null]
-  "idDocumento" INT [not null]
-  "idUsuarioVendedor" INT [not null]
-  "foto" VARCHAR(120) 
-  "comentario" VARCHAR(45) 
+  "idProducto" INT [not null]
+  "idUsuarioVendedor" INT
+  "idTienda" INT
+  "foto" VARCHAR 
+  "comentario" TEXT
   "nota" INT 
-  "fecha" DATETIME 
+  "fecha" DATETIME [default: "now()"]
 
   Indexes {
     idUsuarioComprador [name: "idUsuarioComprador"]
     idUsuarioVendedor [name: "fk_calificacion_usuario1_idx"]
-    idDocumento [name: "fk_calificacion_documento1_idx"]
   }
 }
 
@@ -213,34 +226,31 @@ Table "transaccion" {
   }
 }
 
-Table "envio" {
-  "idEnvio" INT [pk, not null, increment]
-  "idTransaccion" INT [not null]
-  "idUsuarioComprador" INT [not null]
-  "idUsuarioVendedor" INT [not null]
-  "fecha" DATETIME 
-  "direccion" VARCHAR(45) 
-  "estado" VARCHAR(45) 
-
-  Indexes {
-    idTransaccion [name: "idTransaccion"]
-    idUsuarioComprador [name: "idUsuarioComprador"]
-    idUsuarioVendedor [name: "fk_envio_usuario1_idx"]
-  }
-}
-
 Table "mensaje" {
   "idMensaje" INT [pk, not null, increment]
   "idUsuarioEmisor" INT [not null]
   "idUsuarioReceptor" INT [not null]
-  "idTransaccion" INT [not null]
+  "idTransaccionProducto" INT [not null]
   "contenido" TEXT 
   "fecha" DATETIME 
 
   Indexes {
     idUsuarioEmisor [name: "idUsuarioEmisor"]
-    idTransaccion [name: "fk_mensaje_transaccion1_idx"]
     idUsuarioReceptor [name: "fk_mensaje_usuario1_idx"]
+  }
+}
+
+Table "transaccionProducto" {
+  "idTransaccionProducto" INT [pk, not null, increment]
+  "idTransaccion" INT [not null]
+  "idProducto" INT [not null]
+  "cantidad" INT [not null]
+  "fecha" DATETIME [default: "now()"]
+  "direccion" TEXT
+  "estadoEnvio" VARCHAR(45) 
+  Indexes {
+    idTransaccion [name: "fk_transaccionProducto_transaccion_idx"]
+    idProducto [name: "fk_transaccionProducto_producto_idx"]
   }
 }
 
@@ -272,7 +282,7 @@ Ref "carrito_ibfk_1":"usuario"."idUsuario" < "carrito"."idUsuario" [update: casc
 
 Ref "carritoProducto_ibfk_1":"carrito"."idCarrito" < "carritoProducto"."idCarrito" [update: cascade, delete: cascade]
 
-Ref "fk_carritoProducto_modelo1":"modelo"."idModelo" < "carritoProducto"."idModelo" [update: no action, delete: no action]
+Ref: "producto"."idProducto" < "carritoProducto"."idProducto" [update: no action, delete: no action]
 
 Ref "documento_ibfk_1":"modelo"."idModelo" < "documento"."idModelo" [update: cascade, delete: cascade]
 
@@ -282,24 +292,32 @@ Ref "calificacion_ibfk_1":"usuario"."idUsuario" < "calificacion"."idUsuarioCompr
 
 Ref "fk_calificacion_usuario1":"usuario"."idUsuario" < "calificacion"."idUsuarioVendedor" [update: no action, delete: no action]
 
-Ref "fk_calificacion_documento1":"documento"."idDocumento" < "calificacion"."idDocumento" [update: no action, delete: no action]
+Ref: "producto"."idProducto" < "calificacion"."idProducto" [update: no action, delete: no action]
 
 Ref "transaccion_ibfk_1":"carrito"."idCarrito" < "transaccion"."idCarrito" [delete: cascade]
 
 Ref "fk_transaccion_usuario1":"usuario"."idUsuario" < "transaccion"."idComprador" [update: no action, delete: no action]
 
-Ref "envio_ibfk_1":"transaccion"."idTransaccion" < "envio"."idTransaccion" [delete: cascade]
-
-Ref "envio_ibfk_2":"usuario"."idUsuario" < "envio"."idUsuarioComprador" [delete: cascade]
-
-Ref "fk_envio_usuario1":"usuario"."idUsuario" < "envio"."idUsuarioVendedor" [update: no action, delete: no action]
-
 Ref "mensaje_ibfk_1":"usuario"."idUsuario" < "mensaje"."idUsuarioEmisor" [update: cascade, delete: cascade]
 
-Ref "fk_mensaje_transaccion1":"transaccion"."idTransaccion" < "mensaje"."idTransaccion" [update: no action, delete: no action]
+Ref:"transaccionProducto"."idTransaccionProducto" < "mensaje"."idTransaccionProducto" [update: no action, delete: no action]
 
 Ref "fk_mensaje_usuario1":"usuario"."idUsuario" < "mensaje"."idUsuarioReceptor" [update: no action, delete: no action]
 
-Ref: "tienda"."nombre" < "documento"."idUsuario"
+Ref "imagen_modelo": "imagen"."idModelo" > "modelo"."idModelo" 
 
-Ref: "modelo"."idModelo"<"imagen"."idImagen"
+Ref "imagen_documento": "imagen"."idDocumento" > "documento"."idDocumento"
+
+Ref "imagen_usuario": "imagen"."idUsuario" - "usuario"."idUsuario"
+
+Ref: "modelo"."idModelo" < "producto"."idModelo"
+
+Ref: "tienda"."idTienda" < "producto"."idTienda"
+
+Ref: "usuario"."idUsuario" < "producto"."idVendedor"
+
+Ref: "tienda"."idTienda" < "calificacion"."idTienda"
+
+Ref: "transaccion"."idTransaccion" < "transaccionProducto"."idTransaccion"
+
+Ref: "transaccionProducto"."idProducto" > "producto"."idProducto"
