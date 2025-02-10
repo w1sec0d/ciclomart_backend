@@ -118,24 +118,42 @@ const updateUsuarioFoto = (request, response) => {
   try {
     const photoUrl = request.body.photoUrl
     const idUser = parseInt(request.params.idUsuario)
-    db.query(
-      'UPDATE usuario SET foto = ? WHERE idUsuario = ?',
-      [photoUrl, idUser],
-      (error, results) => {
-        if (error) {
-          console.error('Error ejecutando la consulta', error)
-          return response.status(500).json({
-            success: false,
-            message: 'Error interno del servidor',
-            error: error.message,
-          })
-        }
-        return response.status(200).json({
-          success: true,
-          message: 'Foto del usuario actualizada correctamente',
+
+    if (!photoUrl) {
+      return response.status(400).json({
+        success: false,
+        message: 'No se proporcionó una URL de la foto',
+      })
+    }
+
+    if (isNaN(idUser)) {
+      return response.status(400).json({
+        success: false,
+        message: 'ID de usuario inválido',
+      })
+    }
+
+    // Usar INSERT ... ON DUPLICATE KEY UPDATE para insertar o actualizar la URL de la foto
+    const query = `
+      INSERT INTO imagen (idUsuario, url) 
+      VALUES (?, ?)
+      ON DUPLICATE KEY UPDATE url = VALUES(url)
+    `
+
+    db.query(query, [idUser, photoUrl], (error, results) => {
+      if (error) {
+        console.error('Error ejecutando la consulta', error)
+        return response.status(500).json({
+          success: false,
+          message: 'Error interno del servidor',
+          error: error.message,
         })
       }
-    )
+      return response.status(200).json({
+        success: true,
+        message: 'Foto del usuario actualizada correctamente',
+      })
+    })
   } catch (error) {
     console.error('Error en el servidor', error)
     return response.status(500).json({
