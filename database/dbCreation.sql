@@ -362,7 +362,11 @@ SELECT
     marca.idMarca,
     marca.nombre AS nombreMarca,
     imagen.idImagen,
-    imagen.url AS imagenURL
+    imagen.url AS imagenURL,
+    usuario.idUsuario AS idVendedor,
+    usuario.nombre AS nombreVendedor,
+    usuario.apellido AS apellidoVendedor,
+    usuario.correo AS correoVendedor
 FROM 
     producto
 JOIN 
@@ -373,6 +377,8 @@ LEFT JOIN
     marca ON modelo.idMarca = marca.idMarca
 LEFT JOIN 
     imagen ON modelo.idModelo = imagen.idModelo
+LEFT JOIN 
+    usuario ON producto.idVendedor = usuario.idUsuario
 ORDER BY 
     producto.ventas DESC;
 
