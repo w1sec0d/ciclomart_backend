@@ -31,9 +31,10 @@ CREATE TABLE `modelo` (
   `idMarca` int 
 );
 
+
 CREATE TABLE `imagen` (
   `idImagen` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `idUsuario` int,
+  `idUsuario` int UNIQUE,
   `idDocumento` int,
   `idModelo` int,
   `url` varchar(255)
@@ -366,7 +367,8 @@ SELECT
     usuario.idUsuario AS idVendedor,
     usuario.nombre AS nombreVendedor,
     usuario.apellido AS apellidoVendedor,
-    usuario.correo AS correoVendedor
+    usuario.correo AS correoVendedor,
+    imagen_vendedor.url AS fotoVendedor
 FROM 
     producto
 JOIN 
@@ -379,6 +381,8 @@ LEFT JOIN
     imagen ON modelo.idModelo = imagen.idModelo
 LEFT JOIN 
     usuario ON producto.idVendedor = usuario.idUsuario
+LEFT JOIN 
+    imagen AS imagen_vendedor ON usuario.idUsuario = imagen_vendedor.idUsuario
 ORDER BY 
     producto.ventas DESC;
 
@@ -524,4 +528,3 @@ WHERE
     carrito.estado = 'exitosa'
 ORDER BY 
     carrito.fecha DESC;
-

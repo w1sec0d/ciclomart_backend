@@ -71,6 +71,52 @@ const getUsuarioById = (request, response) => {
   }
 }
 
+const getUsuarioPhoto = (request, response) => {
+  try {
+    const idUser = parseInt(request.params.id)
+
+    if (isNaN(idUser)) {
+      return response.status(400).json({
+        success: false,
+        message: 'ID de usuario inválido',
+      })
+    }
+
+    const query = 'SELECT url FROM imagen WHERE idUsuario = ?'
+
+    db.query(query, [idUser], (error, results) => {
+      if (error) {
+        console.error('Error ejecutando la consulta', error)
+        return response.status(500).json({
+          success: false,
+          message: 'Error interno del servidor',
+          error: error.message,
+        })
+      }
+
+      if (results.length === 0) {
+        return response.status(404).json({
+          success: false,
+          message: 'Foto no encontrada para el usuario especificado',
+        })
+      }
+
+      return response.status(200).json({
+        success: true,
+        message: 'Foto del usuario obtenida exitosamente',
+        photoUrl: results[0].url,
+      })
+    })
+  } catch (error) {
+    console.error('Error en el servidor', error)
+    return response.status(500).json({
+      success: false,
+      message: 'Error interno del servidor',
+      error: error.message,
+    })
+  }
+}
+
 // Registra un nuevo usuario
 const registerUsuario = async (request, response) => {
   try {
@@ -239,6 +285,7 @@ const updateUsuario = (request, response) => {
 module.exports = {
   getUsuarios,
   getUsuarioById,
+  getUsuarioPhoto,
   registerUsuario,
   updateUsuarioFoto,
   updateUsuario,

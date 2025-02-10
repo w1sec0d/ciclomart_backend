@@ -7,6 +7,7 @@ const {
   getUsuarios,
   registerUsuario,
   getUsuarioById,
+  getUsuarioPhoto,
   updateUsuarioFoto,
   updateUsuario,
 } = require('../controllers/usuario.js')
@@ -52,6 +53,7 @@ const {
 // Rutas usuarios
 router.get('/usuarios', getUsuarios)
 router.get('/usuarios/:id', getUsuarioById)
+router.get('/getUsuarioPhoto/:id', getUsuarioPhoto)
 router.post('/usuarios', registerUsuario)
 router.put('/updateUsuarioFoto/:idUsuario', updateUsuarioFoto)
 router.put('/updateUsuario/:id', updateUsuario)
