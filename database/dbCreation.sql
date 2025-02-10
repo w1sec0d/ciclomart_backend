@@ -470,8 +470,8 @@ GROUP BY
 ORDER BY 
     producto.ventas DESC;
 
-DROP VIEW IF EXISTS vista_compras_usuario;
-CREATE VIEW vista_compras_usuario AS
+DROP VIEW IF EXISTS vista_compras_pendientes;
+CREATE VIEW vista_compras_pendientes AS
 SELECT 
     usuario.idUsuario,
     usuario.nombre,
@@ -492,6 +492,32 @@ JOIN
 JOIN 
     carritoProducto ON carrito.idCarrito = carritoProducto.idCarrito
 WHERE 
-    carrito.estado = 'exitosa'
+    carrito.estado != 'exitosa'
+ORDER BY 
+    carrito.fecha DESC;
+    
+    DROP VIEW IF EXISTS vista_compras_usuario;
+CREATE VIEW vista_compras_usuario AS
+SELECT 
+    usuario.idUsuario,
+    usuario.nombre,
+    usuario.correo,
+    carrito.idCarrito,
+    carrito.fecha,
+    carrito.precioTotal,
+    carrito.metodoPago,
+    carrito.direccionEnvio,
+    carritoProducto.idCarritoProducto,
+    carritoProducto.idProducto,
+    carritoProducto.cantidad,
+    carritoProducto.precio_unitario
+FROM 
+    carrito
+JOIN 
+    usuario ON carrito.idUsuario = usuario.idUsuario
+JOIN 
+    carritoProducto ON carrito.idCarrito = carritoProducto.idCarrito
+-- WHERE 
+   -- carrito.estado = 'exitosa'
 ORDER BY 
     carrito.fecha DESC;

@@ -102,52 +102,10 @@ const checkUserPurchase = (request, response) => {
 }
 
 const addRatingProduct = (request, response) => {
-  const fields = request.body
-  const inserts = []
-  const values = []
-  const bracket = []
+  const { idProducto, comentario, idUsuarioComprador, nota, foto } = request.body
+  const query = `INSERT INTO calificacion (idProducto,comentario, idUsuarioComprador, nota, foto) VALUES (?, ?, ?, ?, ?)`
 
-  const validFields = [
-    'idUsuarioComprador',
-    'idDocumentoProducto',
-    'idUsuarioVendedor',
-    'foto',
-    'comentario',
-    'nota',
-  ]
-
-  for (const field of validFields) {
-    if (fields[field] !== undefined) {
-      inserts.push(`${field}`)
-      values.push(fields[field])
-      bracket.push('?')
-    } else if (
-      (field === 'idUsuarioComprador' && fields[field] === undefined) ||
-      (field === 'idDocumentoProducto' && fields[field] === undefined) ||
-      (field === 'idUsuarioVendedor' && fields[field] === undefined)
-    ) {
-      return response.status(400).json({
-        success: false,
-        message:
-          'Los id de usuario comprador, documento producto y vendedor son obligatorios',
-      })
-    }
-  }
-
-  if (inserts.length === 0) {
-    return response.status(400).json({
-      success: false,
-      message: 'No se proporcionaron datos para insertar',
-    })
-  }
-
-  inserts.push('fecha')
-  values.push(new Date())
-  bracket.push('?')
-
-  const query = `INSERT INTO calificacion (${inserts.join(', ')}) VALUES (${bracket.join(', ')})`
-
-  db.query(query, values, (error, results) => {
+  db.query(query, [idProducto, comentario, idUsuarioComprador, nota, foto], (error, results) => {
     if (error) {
       console.error('Error ejecutando la insercion', error)
       return response.status(500).json({
