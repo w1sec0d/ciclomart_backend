@@ -32,7 +32,7 @@ Enum "producto_estado_enum" {
 
 Enum "tipo_modelo_enum" {
   "bicicleta"
-  "repuesto"
+  "componente"
   "accesorio"
   "otro"
 }
@@ -51,13 +51,15 @@ Table "usuario" {
   "fechaRegistro" datetime [default: `current_timestamp`]
 }
 
-// Representa una 'plantilla' de los items a vender
 Table "modelo" {
   "idModelo" int [pk, not null, increment]
   "nombre" varchar(255) [not null]
   "tipo" tipo_modelo_enum [not null, default: "bicicleta"]
   "descripcion" text [not null]
-  "idMarca" int [not null]
+  "categoria" varchar(100)
+  "compatibilidad" text
+  "idBicicleta" int [ref: > bicicleta.idBicicleta]
+  "idMarca" int [not null, ref: > marca.idMarca]
   // crea indices para optimizar busquedas   
   Indexes {
     idMarca [name: "idMarca"]
@@ -67,10 +69,10 @@ Table "modelo" {
 
 Table "imagen" {
   "idImagen" int [pk, not null, increment]
+  "idUsuario" int [ref: > usuario.idUsuario]
+  "idDocumento" int [ref: > documento.idDocumento]
+  "idModelo" int [ref: > modelo.idModelo]
   "url" varchar(255)
-  "idModelo" int
-  "idDocumento" int
-  "idUsuario" int
 
   // Crea fk's y mejoran la busqueda 
   Indexes {
@@ -81,7 +83,7 @@ Table "imagen" {
 }
 
 Table "bicicleta" {
-  "idBicicleta" int [pk, not null]
+  "idBicicleta" int [pk, not null, increment, ref: - modelo.idModelo]
   "tipoBicicleta" varchar(45)
   "color" varchar(45)
   "genero" varchar(45)
@@ -97,43 +99,11 @@ Table "bicicleta" {
   "manubrio" varchar(45)
   "pesoBicicleta" float
   "pesoMaximo" float
-  "extras" varchar(100)
-  //Componentes especificos
-  "idCadena" int
-  "idRueda" int
-  "idPedalier" int
-  "idSillin" int
-  "idFreno" int
-  "idManubrio" int
-  "idCassette" int
-  Indexes {
-    idCadena [name: "modelo_ibfk_1"]
-    idRueda [name: "modelo_ibfk_2"]
-    idPedalier [name: "modelo_ibfk_3"]
-    idSillin [name: "modelo_ibfk_4"]
-    idFreno [name: "modelo_ibfk_5"]
-    idManubrio [name: "modelo_ibfk_6"]
-    idCassette [name: "modelo_ibfk_7"]
-  }
-}
-
-// Componente o repuesto de un modelo, puede crearse
-// un modelo aparte si el repuesto es comercializable
-Table "componente" {
-  "idComponente" int [pk, not null]
-  "idModelo" int 
-  "idMarca" int // Si la marca es null, se asume que es una marca generica
-  "nombre" varchar(255) [not null]
-  "categoria" varchar(255)
-  "compatibilidad" varchar(255)
-  Indexes {
-    nombre [name:"nombre"]
-    idMarca [name:"marca_ibfk_1"]
-  }
+  "extras" text
 }
 
 Table "marca" {
-  "idMarca" int [pk, not null]
+  "idMarca" int [pk, not null, increment]
   "nombre" varchar(45) [not null]
   Indexes {
     nombre [name:"nombre"]
@@ -141,8 +111,8 @@ Table "marca" {
 }
 
 Table "tienda" {
-  "idTienda" int [pk, not null]
-  "idUsuarioAdministrador" int [not null]
+  "idTienda" int [pk, not null, increment]
+  "idUsuarioAdministrador" int [not null, ref: > usuario.idUsuario]
   "nombre" varchar(255)
   "descripcion" text
   "telefono" varchar(60) 
@@ -153,13 +123,13 @@ Table "tienda" {
 
 Table "carrito" {
   "idCarrito" int [pk, not null, increment]
-  "idUsuario" int [not null]
+  "idUsuario" int [not null, ref: > usuario.idUsuario]
   "cantidadProductos" int [default: 0]
   "precioTotal" float 
   "fecha" datetime 
-  "estado" varchar(45) 
-  "metodoPago" varchar(45) 
-  "direccionEnvio" varchar(45) 
+  "estado" transaccion_estado_enum [default: "pendiente"]
+  "metodoPago" varchar(45)
+  "direccionEnvio" varchar(45)
   "descuento" float 
   Indexes {
     idUsuario [name: "idUsuario"]
@@ -168,23 +138,23 @@ Table "carrito" {
 
 Table "carritoProducto" {
   "idCarritoProducto" int [pk, not null, increment]
-  "idCarrito" int [not null]
-  "idProducto" int [not null]
+  "idProducto" int [not null, ref: > producto.idProducto]
+  "idCarrito" int [not null, ref: > carrito.idCarrito]
   "cantidad" int 
   "precio_unitario" float 
+  "fecha" datetime [default: `current_timestamp`]
+  "direccion" text
+  "estadoEnvio" varchar(45) 
 }
 
-// Representa un documento oficial de propiedad
-// sobre un producto
 Table "documento" {
   "idDocumento" int [pk, not null, increment]
-  "idModelo" int [not null]
-  "idUsuario" int
-  "tipo" varchar(60) 
+  "idModelo" int [not null, ref: > modelo.idModelo]
+  "idUsuario" int [ref: < usuario.idUsuario]
+  "tipo" varchar(60)
   "descripcion" text
-  "estado" varchar(60) 
+  "estado" varchar(60)
   "fechaCompra" date
-
   Indexes {
     idUsuario [name: "idUsuario"]
   }
@@ -192,9 +162,9 @@ Table "documento" {
 
 Table "producto" {
   "idProducto" int [pk, not null, increment]
-  "idModelo" int [not null]
-  "idTienda" int
-  "idVendedor" int
+  "idModelo" int [not null, ref: > modelo.idModelo]
+  "idVendedor" int [ref: > usuario.idUsuario]
+  "idTienda" int [ref: > tienda.idTienda]
   "precio" float
   "precioCompleto" float
   "cantidad" int [default: 0]
@@ -207,119 +177,29 @@ Table "producto" {
 
 Table "calificacion" {
   "idCalificacion" int [pk, not null, increment]
-  "idUsuarioComprador" int [not null]
-  "idProducto" int [not null]
-  "idUsuarioVendedor" int
-  "idTienda" int
+  "idUsuarioComprador" int [not null, ref: > usuario.idUsuario]
+  "idUsuarioVendedor" int [ref: > usuario.idUsuario]
+  "idProducto" int [not null, ref: > producto.idProducto]
+  "idTienda" int [ref: > tienda.idTienda]
   "foto" varchar(255)
   "comentario" text
   "nota" int 
   "fecha" datetime [default: `current_timestamp`]
-
   Indexes {
     idUsuarioComprador [name: "idUsuarioComprador"]
     idUsuarioVendedor [name: "fk_calificacion_usuario1_idx"]
   }
 }
 
-Table "transaccion" {
-  "idTransaccion" int [pk, not null, increment]
-  "idCarrito" int [not null]
-  "idComprador" int [not null]
-  "fecha" datetime 
-  "monto" float 
-  "metodoPago" varchar(45) 
-  "estado" transaccion_estado_enum
-
-  Indexes {
-    idCarrito [name: "idCarrito"]
-    idComprador [name: "fk_transaccion_usuario1_idx"]
-  }
-}
-
 Table "mensaje" {
   "idMensaje" int [pk, not null, increment]
-  "idUsuarioEmisor" int [not null]
-  "idUsuarioReceptor" int [not null]
-  "idTransaccionProducto" int [not null]
+  "idUsuarioEmisor" int [not null, ref: > usuario.idUsuario]
+  "idUsuarioReceptor" int [not null, ref: > usuario.idUsuario]
+  "idCarritoProducto" int [not null, ref: > carritoProducto.idCarritoProducto]
   "contenido" text 
   "fecha" datetime 
-
   Indexes {
     idUsuarioEmisor [name: "idUsuarioEmisor"]
     idUsuarioReceptor [name: "fk_mensaje_usuario1_idx"]
   }
 }
-
-Table "transaccionProducto" {
-  "idTransaccionProducto" int [pk, not null, increment]
-  "idTransaccion" int [not null]
-  "idProducto" int [not null]
-  "cantidad" int [not null]
-  "fecha" datetime [default: `current_timestamp`]
-  "direccion" text
-  "estadoEnvio" varchar(45) 
-  Indexes {
-    idTransaccion [name: "fk_transaccionProducto_transaccion_idx"]
-    idProducto [name: "fk_transaccionProducto_producto_idx"]
-  }
-}
-
-// Referencias de la tabla "modelo"
-Ref "idMarca": "modelo"."idMarca" - "marca"."idMarca"
-Ref "bicicleta_ibfk_1": "modelo"."idModelo" - "bicicleta"."idBicicleta"
-Ref: "modelo"."idModelo" < "componente"."idModelo"
-
-// Referencias de la tabla "bicicleta"
-Ref "modelo_ibfk_1":"bicicleta"."idCadena" - "componente"."idComponente"
-Ref "modelo_ibfk_2":"bicicleta"."idRueda" - "componente"."idComponente"
-Ref "modelo_ibfk_3":"bicicleta"."idPedalier" - "componente"."idComponente"
-Ref "modelo_ibfk_4":"bicicleta"."idSillin" - "componente"."idComponente"
-Ref "modelo_ibfk_5":"bicicleta"."idFreno" - "componente"."idComponente"
-Ref "modelo_ibfk_6":"bicicleta"."idManubrio" - "componente"."idComponente"
-Ref "modelo_ibfk_7":"bicicleta"."idCassette" - "componente"."idComponente"
-
-// Referencias de la tabla "componente"
-Ref "marca_ibfk_1":"marca"."idMarca" < "componente"."idComponente"
-
-// Referencias de la tabla "tienda"
-Ref "tienda_ibfk_1":"usuario"."idUsuario" < "tienda"."idUsuarioAdministrador" [update: cascade]
-
-// Referencias de la tabla "carrito"
-Ref "carrito_ibfk_1":"usuario"."idUsuario" < "carrito"."idUsuario" [update: cascade, delete: cascade]
-
-// Referencias de la tabla "carritoProducto"
-Ref: "carrito"."idCarrito" < "carritoProducto"."idCarrito" [update: cascade, delete: cascade]
-Ref: "producto"."idProducto" < "carritoProducto"."idProducto" [update: no action, delete: no action]
-
-// Referencias de la tabla "documento"
-Ref "documento_ibfk_1":"modelo"."idModelo" < "documento"."idModelo" [update: cascade, delete: cascade]
-Ref "documento_ibfk_2":"usuario"."idUsuario" < "documento"."idUsuario" [update: cascade, delete: cascade]
-
-// Referencias de la tabla "calificacion"
-Ref "calificacion_ibfk_1":"usuario"."idUsuario" < "calificacion"."idUsuarioComprador" [delete: cascade]
-Ref "fk_calificacion_usuario1":"usuario"."idUsuario" < "calificacion"."idUsuarioVendedor" [update: no action, delete: no action]
-Ref: "producto"."idProducto" < "calificacion"."idProducto" [update: no action, delete: no action]
-
-// Referencias de la tabla "transaccion"
-Ref "transaccion_ibfk_1":"carrito"."idCarrito" < "transaccion"."idCarrito" [delete: cascade]
-Ref "fk_transaccion_usuario1":"usuario"."idUsuario" < "transaccion"."idComprador" [update: no action, delete: no action]
-
-// Referencias de la tabla "mensaje"
-Ref "mensaje_ibfk_1":"usuario"."idUsuario" < "mensaje"."idUsuarioEmisor" [update: cascade, delete: cascade]
-Ref:"transaccionProducto"."idTransaccionProducto" < "mensaje"."idTransaccionProducto" [update: no action, delete: no action]
-Ref "fk_mensaje_usuario1":"usuario"."idUsuario" < "mensaje"."idUsuarioReceptor" [update: no action, delete: no action]
-
-// Referencias de la tabla "imagen"
-Ref "imagen_modelo": "imagen"."idModelo" > "modelo"."idModelo"
-Ref "imagen_documento": "imagen"."idDocumento" > "documento"."idDocumento"
-Ref "imagen_usuario": "imagen"."idUsuario" - "usuario"."idUsuario"
-
-// Referencias de la tabla "producto"
-Ref: "modelo"."idModelo" < "producto"."idModelo"
-Ref: "tienda"."idTienda" < "producto"."idTienda"
-Ref: "usuario"."idUsuario" < "producto"."idVendedor"
-
-// Referencias de la tabla "transaccionProducto"
-Ref: "transaccion"."idTransaccion" < "transaccionProducto"."idTransaccion"
-Ref: "transaccionProducto"."idProducto" > "producto"."idProducto"
