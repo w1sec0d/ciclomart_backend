@@ -12,7 +12,6 @@ CREATE TABLE `usuario` (
   `apellido` varchar(45) NOT NULL,
   `fechaNacimiento` date,
   `rol` ENUM ('comprador', 'cliente', 'administrador') DEFAULT 'comprador',
-  `foto` varchar(255),
   `correo` varchar(255) NOT NULL,
   `direccion` varchar(255),
   `telefono` varchar(60),

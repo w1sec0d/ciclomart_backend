@@ -1,6 +1,5 @@
 // Usa lenguaje dbml para definir la base de datos
 // Documentación: https://dbml.dbdiagram.io/docs
-// Vista de diagrama en linea: https://dbdiagram.io/d/ciclomart-67a81cb3263d6cf9a07fa11e
 
 // Relaciones en la bd:
 // uno a uno: -
@@ -44,7 +43,6 @@ Table "usuario" {
   "apellido" varchar(45) [not null]
   "fechaNacimiento" date 
   "rol" usuario_rol_enum [default:"comprador"]
-  "foto" varchar(255)
   "correo" varchar(255) [not null]
   "direccion" varchar(255)
   "telefono" varchar(60) 
