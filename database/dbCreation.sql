@@ -5,169 +5,171 @@
 DROP DATABASE IF EXISTS ciclomart2;
 CREATE DATABASE ciclomart2;
 USE ciclomart2;
+
 CREATE TABLE `usuario` (
-  `idUsuario` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `nombre` VARCHAR(45) NOT NULL,
-  `apellido` VARCHAR(45) NOT NULL,
-  `fechaNacimiento` DATE,
+  `idUsuario` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(45) NOT NULL,
+  `apellido` varchar(45) NOT NULL,
+  `fechaNacimiento` date,
   `rol` ENUM ('comprador', 'cliente', 'administrador') DEFAULT 'comprador',
-  `foto` VARCHAR(255),
-  `correo` VARCHAR(255) NOT NULL,
-  `direccion` VARCHAR(255),
-  `telefono` VARCHAR(60),
-  `username` VARCHAR(45),
-  `password` VARCHAR(64) NOT NULL,
-  `fechaRegistro` DATETIME DEFAULT (CURRENT_TIMESTAMP)
+  `foto` varchar(255),
+  `correo` varchar(255) NOT NULL,
+  `direccion` varchar(255),
+  `telefono` varchar(60),
+  `username` varchar(45),
+  `password` varchar(64) NOT NULL,
+  `fechaRegistro` datetime DEFAULT (current_timestamp)
 );
 
 CREATE TABLE `modelo` (
-  `idModelo` INT PRIMARY KEY NOT NULL,
-  `nombre` VARCHAR(255) NOT NULL,
-  `tipo` VARCHAR(45) NOT NULL,
-  `descripcion` VARCHAR(255) NOT NULL,
-  `idMarca` INT NOT NULL
+  `idModelo` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(255) NOT NULL,
+  `tipo` ENUM ('bicicleta', 'repuesto', 'accesorio', 'otro') NOT NULL DEFAULT 'bicicleta',
+  `descripcion` text NOT NULL,
+  `idMarca` int NOT NULL
 );
 
 CREATE TABLE `imagen` (
-  `idImagen` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `url` VARCHAR(255),
-  `idModelo` INT,
-  `idDocumento` INT,
-  `idUsuario` INT
+  `idImagen` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `url` varchar(255),
+  `idModelo` int,
+  `idDocumento` int,
+  `idUsuario` int
 );
 
 CREATE TABLE `bicicleta` (
-  `idBicicleta` INT PRIMARY KEY NOT NULL,
-  `tipoBicicleta` VARCHAR(45),
-  `color` VARCHAR(45),
-  `genero` VARCHAR(45),
-  `edad` VARCHAR(45),
-  `tamañoMarco` VARCHAR(45),
-  `materialMarco` VARCHAR(45),
-  `tamañoRueda` VARCHAR(45),
-  `tipoFrenos` VARCHAR(45),
-  `velocidades` VARCHAR(45),
-  `suspension` VARCHAR(45),
-  `transmision` VARCHAR(45),
-  `tipoPedales` VARCHAR(45),
-  `manubrio` VARCHAR(45),
-  `pesoBicicleta` FLOAT,
-  `pesoMaximo` FLOAT,
-  `extras` VARCHAR(100),
-  `idCadena` INT,
-  `idRueda` INT,
-  `idPedalier` INT,
-  `idSillin` INT,
-  `idFreno` INT,
-  `idManubrio` INT,
-  `idCassette` INT
+  `idBicicleta` int PRIMARY KEY NOT NULL,
+  `tipoBicicleta` varchar(45),
+  `color` varchar(45),
+  `genero` varchar(45),
+  `edad` varchar(45),
+  `tamañoMarco` varchar(45),
+  `materialMarco` varchar(45),
+  `tamañoRueda` varchar(45),
+  `tipoFrenos` varchar(45),
+  `velocidades` varchar(45),
+  `suspension` varchar(45),
+  `transmision` varchar(45),
+  `tipoPedales` varchar(45),
+  `manubrio` varchar(45),
+  `pesoBicicleta` float,
+  `pesoMaximo` float,
+  `extras` varchar(100),
+  `idCadena` int,
+  `idRueda` int,
+  `idPedalier` int,
+  `idSillin` int,
+  `idFreno` int,
+  `idManubrio` int,
+  `idCassette` int
 );
 
 CREATE TABLE `componente` (
-  `idComponente` INT PRIMARY KEY NOT NULL,
-  `idMarca` INT,
-  `nombre` VARCHAR(255) NOT NULL,
-  `categoria` VARCHAR(255),
-  `compatibilidad` VARCHAR(255)
+  `idComponente` int PRIMARY KEY NOT NULL,
+  `idModelo` int,
+  `idMarca` int,
+  `nombre` varchar(255) NOT NULL,
+  `categoria` varchar(255),
+  `compatibilidad` varchar(255)
 );
 
 CREATE TABLE `marca` (
-  `idMarca` INT PRIMARY KEY NOT NULL,
-  `nombre` VARCHAR(45) NOT NULL
+  `idMarca` int PRIMARY KEY NOT NULL,
+  `nombre` varchar(45) NOT NULL
 );
 
 CREATE TABLE `tienda` (
-  `idTienda` INT PRIMARY KEY NOT NULL,
-  `idUsuarioAdministrador` INT NOT NULL,
-  `nombre` VARCHAR(255),
+  `idTienda` int PRIMARY KEY NOT NULL,
+  `idUsuarioAdministrador` int NOT NULL,
+  `nombre` varchar(255),
   `descripcion` text,
-  `telefono` VARCHAR(60)
+  `telefono` varchar(60)
 );
 
 CREATE TABLE `carrito` (
-  `idCarrito` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `idUsuario` INT NOT NULL,
-  `cantidadProductos` INT DEFAULT 0,
-  `precioTotal` FLOAT,
-  `fecha` DATETIME,
-  `estado` VARCHAR(45),
-  `metodoPago` VARCHAR(45),
-  `direccionEnvio` VARCHAR(45),
-  `descuento` FLOAT
+  `idCarrito` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `idUsuario` int NOT NULL,
+  `cantidadProductos` int DEFAULT 0,
+  `precioTotal` float,
+  `fecha` datetime,
+  `estado` varchar(45),
+  `metodoPago` varchar(45),
+  `direccionEnvio` varchar(45),
+  `descuento` float
 );
 
 CREATE TABLE `carritoProducto` (
-  `idCarritoProducto` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `idCarrito` INT NOT NULL,
-  `idProducto` INT NOT NULL,
-  `cantidad` INT,
-  `precio_unitario` FLOAT
+  `idCarritoProducto` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `idCarrito` int NOT NULL,
+  `idProducto` int NOT NULL,
+  `cantidad` int,
+  `precio_unitario` float
 );
 
 CREATE TABLE `documento` (
-  `idDocumento` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `idModelo` INT NOT NULL,
-  `idUsuario` INT,
-  `tipo` VARCHAR(60),
-  `descripcion` TEXT,
-  `estado` VARCHAR(60),
-  `fechaCompra` DATE
+  `idDocumento` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `idModelo` int NOT NULL,
+  `idUsuario` int,
+  `tipo` varchar(60),
+  `descripcion` text,
+  `estado` varchar(60),
+  `fechaCompra` date
 );
 
 CREATE TABLE `producto` (
-  `idProducto` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `idModelo` INT NOT NULL,
-  `idTienda` INT,
-  `idVendedor` INT,
-  `precio` FLOAT,
-  `precioCompleto` FLOAT,
-  `cantidad` INT DEFAULT 0,
+  `idProducto` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `idModelo` int NOT NULL,
+  `idTienda` int,
+  `idVendedor` int,
+  `precio` float,
+  `precioCompleto` float,
+  `cantidad` int DEFAULT 0,
   `estado` ENUM ('nuevo', 'usado') DEFAULT 'nuevo',
   `disponibilidad` ENUM ('disponible', 'vendido', 'reservado') DEFAULT 'disponible',
   `costoEnvio` float NOT NULL DEFAULT 0,
-  `retiroEnTienda` BOOL NOT NULL DEFAULT true,
-  `fechaPublicacion` datetime DEFAULT (CURRENT_TIMESTAMP)
+  `retiroEnTienda` bool NOT NULL DEFAULT false,
+  `fechaPublicacion` datetime DEFAULT (current_timestamp)
 );
 
 CREATE TABLE `calificacion` (
-  `idCalificacion` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `idUsuarioComprador` INT NOT NULL,
-  `idProducto` INT NOT NULL,
-  `idUsuarioVendedor` INT,
-  `idTienda` INT,
-  `foto` VARCHAR(255),
-  `comentario` TEXT,
-  `nota` INT,
-  `fecha` DATETIME DEFAULT (CURRENT_TIMESTAMP)
+  `idCalificacion` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `idUsuarioComprador` int NOT NULL,
+  `idProducto` int NOT NULL,
+  `idUsuarioVendedor` int,
+  `idTienda` int,
+  `foto` varchar(255),
+  `comentario` text,
+  `nota` int,
+  `fecha` datetime DEFAULT (current_timestamp)
 );
 
 CREATE TABLE `transaccion` (
-  `idTransaccion` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `idCarrito` INT NOT NULL,
-  `idComprador` INT NOT NULL,
-  `fecha` DATETIME,
-  `monto` FLOAT,
-  `metodoPago` VARCHAR(45),
+  `idTransaccion` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `idCarrito` int NOT NULL,
+  `idComprador` int NOT NULL,
+  `fecha` datetime,
+  `monto` float,
+  `metodoPago` varchar(45),
   `estado` ENUM ('pendiente', 'exitosa', 'fallida')
 );
 
 CREATE TABLE `mensaje` (
-  `idMensaje` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `idUsuarioEmisor` INT NOT NULL,
-  `idUsuarioReceptor` INT NOT NULL,
-  `idTransaccionProducto` INT NOT NULL,
-  `contenido` TEXT,
-  `fecha` DATETIME
+  `idMensaje` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `idUsuarioEmisor` int NOT NULL,
+  `idUsuarioReceptor` int NOT NULL,
+  `idTransaccionProducto` int NOT NULL,
+  `contenido` text,
+  `fecha` datetime
 );
 
 CREATE TABLE `transaccionProducto` (
-  `idTransaccionProducto` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `idTransaccion` INT NOT NULL,
-  `idProducto` INT NOT NULL,
-  `cantidad` INT NOT NULL,
-  `fecha` DATETIME DEFAULT (CURRENT_TIMESTAMP),
-  `direccion` TEXT,
-  `estadoEnvio` VARCHAR(45)
+  `idTransaccionProducto` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `idTransaccion` int NOT NULL,
+  `idProducto` int NOT NULL,
+  `cantidad` int NOT NULL,
+  `fecha` datetime DEFAULT (current_timestamp),
+  `direccion` text,
+  `estadoEnvio` varchar(45)
 );
 
 CREATE INDEX `idMarca` ON `modelo` (`idMarca`);
@@ -226,7 +228,7 @@ ALTER TABLE `marca` ADD CONSTRAINT `idMarca` FOREIGN KEY (`idMarca`) REFERENCES 
 
 ALTER TABLE `bicicleta` ADD CONSTRAINT `bicicleta_ibfk_1` FOREIGN KEY (`idBicicleta`) REFERENCES `modelo` (`idModelo`);
 
-ALTER TABLE `componente` ADD CONSTRAINT `repuesto_ibfk_1` FOREIGN KEY (`idComponente`) REFERENCES `modelo` (`idModelo`);
+ALTER TABLE `componente` ADD FOREIGN KEY (`idModelo`) REFERENCES `modelo` (`idModelo`);
 
 ALTER TABLE `componente` ADD CONSTRAINT `modelo_ibfk_1` FOREIGN KEY (`idComponente`) REFERENCES `bicicleta` (`idCadena`);
 
@@ -276,15 +278,13 @@ ALTER TABLE `imagen` ADD CONSTRAINT `imagen_modelo` FOREIGN KEY (`idModelo`) REF
 
 ALTER TABLE `imagen` ADD CONSTRAINT `imagen_documento` FOREIGN KEY (`idDocumento`) REFERENCES `documento` (`idDocumento`);
 
-ALTER TABLE `usuario` ADD CONSTRAINT `imagen_usuario` FOREIGN KEY (`idUsuario`) REFERENCES `imagen` (`idUsuario`);
+ALTER TABLE `imagen` ADD CONSTRAINT `imagen_usuario` FOREIGN KEY (`idUsuario`) REFERENCES `usuario` (`idUsuario`);
 
 ALTER TABLE `producto` ADD FOREIGN KEY (`idModelo`) REFERENCES `modelo` (`idModelo`);
 
 ALTER TABLE `producto` ADD FOREIGN KEY (`idTienda`) REFERENCES `tienda` (`idTienda`);
 
 ALTER TABLE `producto` ADD FOREIGN KEY (`idVendedor`) REFERENCES `usuario` (`idUsuario`);
-
-ALTER TABLE `calificacion` ADD FOREIGN KEY (`idTienda`) REFERENCES `tienda` (`idTienda`);
 
 ALTER TABLE `transaccionProducto` ADD FOREIGN KEY (`idTransaccion`) REFERENCES `transaccion` (`idTransaccion`);
 
