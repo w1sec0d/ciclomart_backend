@@ -84,6 +84,6 @@ router.post('/createPreference', createPreference)
 router.get('/ratingProduct/:id', ratingProduct)
 router.get('/averageProductRatings/:id', averageProductRatings)
 router.post('/addRatingProduct', addRatingProduct)
-router.get('/checkUserPurchase/:idComprador/:idDocProducto', checkUserPurchase)
+router.post('/checkUserPurchase/', checkUserPurchase)
 
 module.exports = router
