@@ -41,7 +41,7 @@ const getCompras = (request, response) => {
     }
 
     db.query(
-      'SELECT * FROM transaccion WHERE idComprador = ? AND transaccion.estado = "exitosa"',
+      'SELECT * FROM vista_compras_usuario WHERE idUsuario = ?',
       [idComprador],
       (error, results) => {
         if (error) {
@@ -78,7 +78,7 @@ const getVentas = (request, response) => {
         .json({ message: 'Id de vendedor inválida', success: false })
     }
     db.query(
-      'SELECT * FROM transaccion WHERE idVendedor = ? AND transaccion.estado = "exitosa"',
+      'SELECT * FROM vista_ventas_usuario WHERE idVendedor = ? ',
       [idVendedor],
       (error, results) => {
         if (error) {
