@@ -42,7 +42,49 @@ const getUsuarioById = (request, response) => {
       })
     }
 
-    db.query('SELECT * FROM usuario WHERE id = ?', [id], (error, results) => {
+    db.query(
+      'SELECT * FROM usuario WHERE idUsuario = ?',
+      [id],
+      (error, results) => {
+        if (error) {
+          console.error('Error ejecutando la consulta', error)
+          return response.status(500).json({
+            success: false,
+            message: 'Error interno del servidor',
+            error: error.message,
+          })
+        }
+        return response.status(200).json({
+          success: true,
+          message: 'Usuario obtenido exitosamente',
+          results,
+        })
+      }
+    )
+  } catch (error) {
+    console.error('Error en el servidor', error)
+    return response.status(500).json({
+      success: false,
+      message: 'Error interno del servidor',
+      error: error.message,
+    })
+  }
+}
+
+const getUsuarioPhoto = (request, response) => {
+  try {
+    const idUser = parseInt(request.params.id)
+
+    if (isNaN(idUser)) {
+      return response.status(400).json({
+        success: false,
+        message: 'ID de usuario inválido',
+      })
+    }
+
+    const query = 'SELECT url FROM imagen WHERE idUsuario = ?'
+
+    db.query(query, [idUser], (error, results) => {
       if (error) {
         console.error('Error ejecutando la consulta', error)
         return response.status(500).json({
@@ -51,10 +93,18 @@ const getUsuarioById = (request, response) => {
           error: error.message,
         })
       }
+
+      if (results.length === 0) {
+        return response.status(404).json({
+          success: false,
+          message: 'Foto no encontrada para el usuario especificado',
+        })
+      }
+
       return response.status(200).json({
         success: true,
-        message: 'Usuario obtenido exitosamente',
-        results,
+        message: 'Foto del usuario obtenida exitosamente',
+        photoUrl: results[0].url,
       })
     })
   } catch (error) {
@@ -114,24 +164,42 @@ const updateUsuarioFoto = (request, response) => {
   try {
     const photoUrl = request.body.photoUrl
     const idUser = parseInt(request.params.idUsuario)
-    db.query(
-      'UPDATE usuario SET foto = ? WHERE idUsuario = ?',
-      [photoUrl, idUser],
-      (error, results) => {
-        if (error) {
-          console.error('Error ejecutando la consulta', error)
-          return response.status(500).json({
-            success: false,
-            message: 'Error interno del servidor',
-            error: error.message,
-          })
-        }
-        return response.status(200).json({
-          success: true,
-          message: 'Foto del usuario actualizada correctamente',
+
+    if (!photoUrl) {
+      return response.status(400).json({
+        success: false,
+        message: 'No se proporcionó una URL de la foto',
+      })
+    }
+
+    if (isNaN(idUser)) {
+      return response.status(400).json({
+        success: false,
+        message: 'ID de usuario inválido',
+      })
+    }
+
+    // Usar INSERT ... ON DUPLICATE KEY UPDATE para insertar o actualizar la URL de la foto
+    const query = `
+      INSERT INTO imagen (idUsuario, url) 
+      VALUES (?, ?)
+      ON DUPLICATE KEY UPDATE url = VALUES(url)
+    `
+
+    db.query(query, [idUser, photoUrl], (error, results) => {
+      if (error) {
+        console.error('Error ejecutando la consulta', error)
+        return response.status(500).json({
+          success: false,
+          message: 'Error interno del servidor',
+          error: error.message,
         })
       }
-    )
+      return response.status(200).json({
+        success: true,
+        message: 'Foto del usuario actualizada correctamente',
+      })
+    })
   } catch (error) {
     console.error('Error en el servidor', error)
     return response.status(500).json({
@@ -217,6 +285,7 @@ const updateUsuario = (request, response) => {
 module.exports = {
   getUsuarios,
   getUsuarioById,
+  getUsuarioPhoto,
   registerUsuario,
   updateUsuarioFoto,
   updateUsuario,
