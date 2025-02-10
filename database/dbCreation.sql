@@ -113,6 +113,7 @@ CREATE TABLE `producto` (
   `precio` float,
   `precioCompleto` float,
   `cantidad` int DEFAULT 0,
+  `ventas` int DEFAULT 0,
   `estado` ENUM ('nuevo', 'usado') DEFAULT 'nuevo',
   `disponibilidad` ENUM ('disponible', 'vendido', 'reservado') DEFAULT 'disponible',
   `costoEnvio` float NOT NULL DEFAULT 0,
@@ -238,7 +239,7 @@ VALUES
 -- Insertar imágenes de muestra
 INSERT INTO `imagen` (`idUsuario`, `idModelo`, `url`)
 VALUES 
-(1, 1, ''),
+(1, 1, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739162841/ujcopfrg2qldj855oisv.png'),
 (2, 2, ''),
 (3, 3, '');
 
@@ -283,7 +284,8 @@ VALUES
 INSERT INTO `calificacion` (`idUsuarioComprador`, `idUsuarioVendedor`, `idProducto`, `idTienda`, `foto`, `comentario`, `nota`)
 VALUES 
 (1, 2, 1, 1, '', '¡Excelente bicicleta!', 5),
-(2, 3, 2, 1, '', 'Muy satisfecho', 4);
+(2, 3, 2, 1, '', 'Muy satisfecho', 4),
+(3, 2, 2, 1, '', 'La bici es buena pero es muy pesada', 3);
 
 -- Insertar mensajes de muestra
 INSERT INTO `mensaje` (`idUsuarioEmisor`, `idUsuarioReceptor`, `idCarritoProducto`, `contenido`, `fecha`)
@@ -295,7 +297,8 @@ VALUES
 -- Vistas
 ------------------------------------------------------------
 -- Crear la vista consolidada
-CREATE VIEW vista_producto_modelo_bicicleta_marca AS
+DROP VIEW IF EXISTS vista_completa_producto;
+CREATE VIEW vista_completa_producto AS
 SELECT 
     producto.idProducto,
     producto.precio,
@@ -307,7 +310,7 @@ SELECT
     producto.retiroEnTienda,
     producto.fechaPublicacion,
     modelo.idModelo,
-    modelo.nombre AS nombreModelo,
+    modelo.nombre,
     modelo.tipo,
     modelo.descripcion AS descripcionModelo,
     modelo.categoria,
@@ -330,7 +333,9 @@ SELECT
     bicicleta.pesoMaximo,
     bicicleta.extras,
     marca.idMarca,
-    marca.nombre AS nombreMarca
+    marca.nombre AS nombreMarca,
+    imagen.idImagen,
+    imagen.url AS imagenURL
 FROM 
     producto
 JOIN 
@@ -338,4 +343,6 @@ JOIN
 LEFT JOIN 
     bicicleta ON modelo.idModelo = bicicleta.idBicicleta
 JOIN 
-    marca ON modelo.idMarca = marca.idMarca;
+    marca ON modelo.idMarca = marca.idMarca
+LEFT JOIN 
+    imagen ON modelo.idModelo = imagen.idModelo;
