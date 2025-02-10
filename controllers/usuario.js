@@ -42,21 +42,25 @@ const getUsuarioById = (request, response) => {
       })
     }
 
-    db.query('SELECT * FROM usuario WHERE id = ?', [id], (error, results) => {
-      if (error) {
-        console.error('Error ejecutando la consulta', error)
-        return response.status(500).json({
-          success: false,
-          message: 'Error interno del servidor',
-          error: error.message,
+    db.query(
+      'SELECT * FROM usuario WHERE idUsuario = ?',
+      [id],
+      (error, results) => {
+        if (error) {
+          console.error('Error ejecutando la consulta', error)
+          return response.status(500).json({
+            success: false,
+            message: 'Error interno del servidor',
+            error: error.message,
+          })
+        }
+        return response.status(200).json({
+          success: true,
+          message: 'Usuario obtenido exitosamente',
+          results,
         })
       }
-      return response.status(200).json({
-        success: true,
-        message: 'Usuario obtenido exitosamente',
-        results,
-      })
-    })
+    )
   } catch (error) {
     console.error('Error en el servidor', error)
     return response.status(500).json({
