@@ -41,7 +41,7 @@ const getCompras = (request, response) => {
     }
 
     db.query(
-      'SELECT * FROM transaccion WHERE idComprador = ? AND transaccion.estado = "exitosa"',
+      'SELECT * FROM vista_compras_usuario WHERE idUsuario = ?',
       [idComprador],
       (error, results) => {
         if (error) {
