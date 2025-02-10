@@ -28,7 +28,7 @@ CREATE TABLE `modelo` (
   `categoria` varchar(100),
   `compatibilidad` text,
   `idBicicleta` int,
-  `idMarca` int NOT NULL
+  `idMarca` int 
 );
 
 CREATE TABLE `imagen` (
@@ -242,20 +242,22 @@ VALUES
 ('Shimano 105', 'componente', 'Grupo de transmisión de 10 velocidades', 'Transmisión', 'Compatible con bicicletas de carretera', 4),
 ('Casco Bontrager Starvos', 'accesorio', 'Casco de ciclismo de carretera', 'Casco', 'Talla única', 1),
 ('Casco Specialized Propero', 'accesorio', 'Casco de ciclismo de carretera', 'Casco', 'Talla única', 2),
-('Casco Giant Rev', 'accesorio', 'Casco de ciclismo de carretera', 'Casco', 'Talla única', 3);
+('Casco Giant Rev', 'accesorio', 'Casco de ciclismo de carretera', 'Casco', 'Talla única', 3),
+('Neumático MTB rin 26', 'componente', 'Neumatico rin 25', 'Neumáticos', 'Compatible con bicicletas de montaña', null);
 
 -- Insertar imágenes de muestra
 INSERT INTO `imagen` (`idUsuario`, `idModelo`, `url`)
 VALUES 
-(1, 1, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739199906/ukc7nxqc5hm79o4utb39.png'),
-(2, 2, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739200194/qhvxoj4ggjp1qrdn1fpd.png'),
-(3, 3, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739200646/iyqe0j8piameldruninf.png'),
-(1, 4, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739201523/td7nvl10zjctewo5jgld.png'),
-(2, 5, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739201377/d10mnzoi5xp8ibs1apvm.png'),
-(3, 6, ''),
-(1, 7, ''),
-(2, 8, ''),
-(3, 9, '');
+(null, 1, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739199906/ukc7nxqc5hm79o4utb39.png'),
+(null, 2, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739200194/qhvxoj4ggjp1qrdn1fpd.png'),
+(null, 3, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739200646/iyqe0j8piameldruninf.png'),
+(null, 4, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739201523/td7nvl10zjctewo5jgld.png'),
+(null, 5, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739201377/d10mnzoi5xp8ibs1apvm.png'),
+(null, 6, ''),
+(null, 7, ''),
+(null, 8, ''),
+(null, 9, ''),
+(null, 10, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739203206/dgeumsxzyrlqv3kzqdw6.png');
 
 -- Insertar bicicletas de muestra
 INSERT INTO `bicicleta` (`tipoBicicleta`, `color`, `genero`, `edad`, `tamañoMarco`, `materialMarco`, `tamañoRueda`, `tipoFrenos`, `velocidades`, `suspension`, `transmision`, `tipoPedales`, `manubrio`, `pesoBicicleta`, `pesoMaximo`, `extras`)
@@ -278,15 +280,16 @@ VALUES
 -- Insertar productos de muestra
 INSERT INTO `producto` (`idModelo`, `idVendedor`, `idTienda`, `precio`, `precioCompleto`, `cantidad`,`ventas`, `estado`, `disponibilidad`, `costoEnvio`, `retiroEnTienda`)
 VALUES 
-(1, 1, 1, 3000000, 3300000, 10,0, 'nuevo', 'disponible', 50.00, false),
-(2, 2, 1, 2400000, 3000000, 5,2, 'nuevo', 'disponible', 0, false),
-(3, 3, 1, 11000000, null, 3,10, 'nuevo', 'disponible', 50.00, false),
-(4, 1, 1, 290000, 300000, 20,4, 'nuevo', 'disponible', 0, false),
-(5, 2, 1, 120000, null, 15,0, 'nuevo', 'disponible', 0, false),
-(6, 3, 1, 1500000, null, 5,0, 'nuevo', 'disponible', 0, false),
-(7, 1, 1, 300000, null, 10,0, 'nuevo', 'disponible', 0, false),
-(8, 2, 1, 460000, 500000, 5,0, 'nuevo', 'disponible', 0, false),
-(9, 3, 1, 60000, null, 3,0, 'nuevo', 'disponible', 0, false);
+(1, 1, null, 3000000, 3300000, 10,0, 'nuevo', 'disponible', 50.00, false),
+(2, 2, null, 2400000, 3000000, 5,2, 'nuevo', 'disponible', 0, false),
+(3, 3, null, 11000000, null, 3,10, 'nuevo', 'disponible', 50.00, false),
+(4, 1, null, 290000, 300000, 20,4, 'nuevo', 'disponible', 0, false),
+(5, 2, null, 120000, null, 15,0, 'nuevo', 'disponible', 0, false),
+(6, 3, null, 1500000, null, 5,0, 'nuevo', 'disponible', 0, false),
+(7, 1, null, 300000, null, 10,0, 'nuevo', 'disponible', 0, false),
+(8, 2, null, 460000, 500000, 5,0, 'nuevo', 'disponible', 0, false),
+(9, 3, null, 60000, null, 3,0, 'nuevo', 'disponible', 0, false),
+(10, 1, null, 9000, null, 15,9, 'nuevo', 'disponible', 0, false);
 
 -- Insertar productos del carrito de muestra
 INSERT INTO `carritoProducto` (`idProducto`, `idCarrito`, `cantidad`, `precio_unitario`, `direccion`, `estadoEnvio`)
@@ -325,6 +328,7 @@ SELECT
     producto.precio,
     producto.precioCompleto,
     producto.cantidad,
+    producto.ventas,
     producto.estado,
     producto.disponibilidad,
     producto.costoEnvio,
@@ -363,7 +367,9 @@ JOIN
     modelo ON producto.idModelo = modelo.idModelo
 LEFT JOIN 
     bicicleta ON modelo.idModelo = bicicleta.idBicicleta
-JOIN 
+LEFT JOIN 
     marca ON modelo.idMarca = marca.idMarca
 LEFT JOIN 
-    imagen ON modelo.idModelo = imagen.idModelo;
+    imagen ON modelo.idModelo = imagen.idModelo
+ORDER BY 
+    producto.ventas DESC;
