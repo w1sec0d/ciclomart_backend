@@ -289,7 +289,7 @@ VALUES
 (7, 1, null, 300000, null, 10,0, 'nuevo', 'disponible', 0, false),
 (8, 2, null, 460000, 500000, 5,0, 'nuevo', 'disponible', 0, false),
 (9, 3, null, 60000, null, 3,0, 'nuevo', 'disponible', 0, false),
-(10, 1, null, 9000, null, 15,9, 'nuevo', 'disponible', 0, false);
+(10, 1, null, 5000, null, 15,9, 'nuevo', 'disponible', 0, false);
 
 -- Insertar productos del carrito de muestra
 INSERT INTO `carritoProducto` (`idProducto`, `idCarrito`, `cantidad`, `precio_unitario`, `direccion`, `estadoEnvio`)
