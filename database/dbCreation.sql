@@ -227,27 +227,42 @@ INSERT INTO `marca` (`nombre`)
 VALUES 
 ('Trek'),
 ('Specialized'),
-('Giant');
+('Giant'),
+('Shimano'),
+('Bontrager');
 
 -- Insertar modelos de muestra
 INSERT INTO `modelo` (`nombre`, `tipo`, `descripcion`, `categoria`, `compatibilidad`, `idMarca`)
 VALUES 
 ('Trek Marlin 7', 'bicicleta', 'Bicicleta de montaña para senderos', 'MTB', 'Compatible con componentes Shimano', 1),
 ('Specialized Allez', 'bicicleta', 'Bicicleta de carretera para carreras', 'Carretera', 'Compatible con componentes Shimano', 2),
-('Giant Defy Advanced', 'bicicleta', 'Bicicleta de carretera de resistencia', 'Carretera', 'Compatible con componentes Shimano', 3);
+('Giant Defy Advanced', 'bicicleta', 'Bicicleta de carretera de resistencia', 'Carretera', 'Compatible con componentes Shimano', 3),
+('Plato Shimano Deore XT', 'componente', 'Monoplato mtb', 'Transmisión', 'Compatible con bicicletas de montaña', 4),
+('Pacha Shimano Altus', 'componente', 'Pacha altus de 8 velocidades', 'Transmisión', 'Compatible con bicicletas de carretera', 4),
+('Shimano 105', 'componente', 'Grupo de transmisión de 10 velocidades', 'Transmisión', 'Compatible con bicicletas de carretera', 4),
+('Casco Bontrager Starvos', 'accesorio', 'Casco de ciclismo de carretera', 'Casco', 'Talla única', 1),
+('Casco Specialized Propero', 'accesorio', 'Casco de ciclismo de carretera', 'Casco', 'Talla única', 2),
+('Casco Giant Rev', 'accesorio', 'Casco de ciclismo de carretera', 'Casco', 'Talla única', 3);
 
 -- Insertar imágenes de muestra
 INSERT INTO `imagen` (`idUsuario`, `idModelo`, `url`)
 VALUES 
-(1, 1, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739162841/ujcopfrg2qldj855oisv.png'),
-(2, 2, ''),
-(3, 3, '');
+(1, 1, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739199906/ukc7nxqc5hm79o4utb39.png'),
+(2, 2, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739200194/qhvxoj4ggjp1qrdn1fpd.png'),
+(3, 3, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739200646/iyqe0j8piameldruninf.png'),
+(1, 4, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739201523/td7nvl10zjctewo5jgld.png'),
+(2, 5, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739201377/d10mnzoi5xp8ibs1apvm.png'),
+(3, 6, ''),
+(1, 7, ''),
+(2, 8, ''),
+(3, 9, '');
 
 -- Insertar bicicletas de muestra
 INSERT INTO `bicicleta` (`tipoBicicleta`, `color`, `genero`, `edad`, `tamañoMarco`, `materialMarco`, `tamañoRueda`, `tipoFrenos`, `velocidades`, `suspension`, `transmision`, `tipoPedales`, `manubrio`, `pesoBicicleta`, `pesoMaximo`, `extras`)
 VALUES 
-('MTB', 'Rojo', 'Unisex', 'Adulto', 'M', 'Aluminio', '29"', 'Disco', '21', 'Delantera', 'Shimano', 'Plataforma', 'Plano', 14.5, 120, 'Portabotellas'),
-('Carretera', 'Azul', 'Unisex', 'Adulto', 'L', 'Carbono', '28"', 'Caliper', '22', 'Ninguna', 'Shimano', 'Sin clip', 'Caída', 8.5, 100, 'Ninguno');
+('MTB', 'Negra', 'Unisex', 'Adulto', 'M', 'Aluminio', '29"', 'Disco', '21', 'Delantera', 'Shimano', 'Plataforma', 'Plano', 14.5, 120, 'Portabotellas'),
+('Carretera', 'Azul', 'Unisex', 'Adulto', 'L', 'Carbono', '28"', 'Caliper', '22', 'Ninguna', 'Shimano', 'Sin clip', 'Caída', 8.5, 100, 'Ninguno'),
+('Carretera','Azul','Unisex','Adulto','M','Carbono','28"','Caliper','22','Ninguna','Shimano','Sin clip','Caída',8.5,100,'Ninguno');
 
 -- Insertar tiendas de muestra
 INSERT INTO `tienda` (`idUsuarioAdministrador`, `nombre`, `descripcion`, `telefono`)
@@ -261,11 +276,17 @@ VALUES
 (2, 1, 800.00, NOW(), 'pendiente', 'PayPal', 'Carrera 45, Medellín', 0);
 
 -- Insertar productos de muestra
-INSERT INTO `producto` (`idModelo`, `idVendedor`, `idTienda`, `precio`, `precioCompleto`, `cantidad`, `estado`, `disponibilidad`, `costoEnvio`, `retiroEnTienda`)
+INSERT INTO `producto` (`idModelo`, `idVendedor`, `idTienda`, `precio`, `precioCompleto`, `cantidad`,`ventas`, `estado`, `disponibilidad`, `costoEnvio`, `retiroEnTienda`)
 VALUES 
-(1, 1, 1, 750.00, 800.00, 10, 'nuevo', 'disponible', 50.00, false),
-(2, 2, 1, 750.00, 800.00, 5, 'nuevo', 'disponible', 50.00, false),
-(3, 3, 1, 800.00, 850.00, 3, 'nuevo', 'disponible', 50.00, false);
+(1, 1, 1, 3000000, 3300000, 10,0, 'nuevo', 'disponible', 50.00, false),
+(2, 2, 1, 2400000, 3000000, 5,2, 'nuevo', 'disponible', 0, false),
+(3, 3, 1, 11000000, null, 3,10, 'nuevo', 'disponible', 50.00, false),
+(4, 1, 1, 290000, 300000, 20,4, 'nuevo', 'disponible', 0, false),
+(5, 2, 1, 120000, null, 15,0, 'nuevo', 'disponible', 0, false),
+(6, 3, 1, 1500000, null, 5,0, 'nuevo', 'disponible', 0, false),
+(7, 1, 1, 300000, null, 10,0, 'nuevo', 'disponible', 0, false),
+(8, 2, 1, 460000, 500000, 5,0, 'nuevo', 'disponible', 0, false),
+(9, 3, 1, 60000, null, 3,0, 'nuevo', 'disponible', 0, false);
 
 -- Insertar productos del carrito de muestra
 INSERT INTO `carritoProducto` (`idProducto`, `idCarrito`, `cantidad`, `precio_unitario`, `direccion`, `estadoEnvio`)
