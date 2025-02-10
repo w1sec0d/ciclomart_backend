@@ -4,7 +4,7 @@ const { preference } = require('../utils/mercadoPago')
 
 const getProducto = async (req, res) => {
   try {
-    db.query('SELECT * FROM producto', (error, results) => {
+    db.query('SELECT * FROM vista_completa_producto', (error, results) => {
       if (error) {
         console.error('Error obteniendo productos:', error)
         return res.status(500).json({
@@ -42,7 +42,7 @@ const getProductById = async (req, res) => {
     }
 
     db.query(
-      'SELECT * FROM producto WHERE idProducto = ?',
+      'SELECT * FROM vista_completa_producto WHERE idProducto = ?',
       [id],
       (error, results) => {
         if (error) {

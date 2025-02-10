@@ -9,9 +9,9 @@ const search = (request, response) => {
     const queryParams = []
 
     if (tipo) {
-      query = `SELECT * FROM producto INNER JOIN ${tipo} ON producto.idProducto = ${tipo}.id${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`
+      query = `SELECT * FROM vista_completa_producto INNER JOIN ${tipo} ON vista_completa_producto.idProducto = ${tipo}.id${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`
     } else {
-      query = `SELECT * FROM producto WHERE 1=1`
+      query = `SELECT * FROM vista_completa_producto WHERE 1=1`
     }
 
     if (nombre) {
