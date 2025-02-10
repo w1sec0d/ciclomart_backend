@@ -313,7 +313,7 @@ Ref "fk_mensaje_usuario1":"usuario"."idUsuario" < "mensaje"."idUsuarioReceptor" 
 // Referencias de la tabla "imagen"
 Ref "imagen_modelo": "imagen"."idModelo" > "modelo"."idModelo"
 Ref "imagen_documento": "imagen"."idDocumento" > "documento"."idDocumento"
-Ref "imagen_usuario": "imagen"."idUsuario" > "usuario"."idUsuario"
+Ref "imagen_usuario": "imagen"."idUsuario" - "usuario"."idUsuario"
 
 // Referencias de la tabla "producto"
 Ref: "modelo"."idModelo" < "producto"."idModelo"

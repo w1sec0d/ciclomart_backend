@@ -277,7 +277,7 @@ ALTER TABLE `imagen` ADD CONSTRAINT `imagen_modelo` FOREIGN KEY (`idModelo`) REF
 
 ALTER TABLE `imagen` ADD CONSTRAINT `imagen_documento` FOREIGN KEY (`idDocumento`) REFERENCES `documento` (`idDocumento`);
 
-ALTER TABLE `imagen` ADD CONSTRAINT `imagen_usuario` FOREIGN KEY (`idUsuario`) REFERENCES `usuario` (`idUsuario`);
+ALTER TABLE `usuario` ADD CONSTRAINT `imagen_usuario` FOREIGN KEY (`idUsuario`) REFERENCES `imagen` (`idUsuario`);
 
 ALTER TABLE `producto` ADD FOREIGN KEY (`idModelo`) REFERENCES `modelo` (`idModelo`);
 
