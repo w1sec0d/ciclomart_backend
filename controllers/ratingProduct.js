@@ -13,7 +13,7 @@ const ratingProduct = (request, response) => {
   }
 
   db.query(
-    'SELECT * FROM VistaCalificacionesProducto WHERE idDocumentoProducto = ?',
+    'SELECT * FROM vista_producto_calificacion WHERE idProducto = ?',
     [idProducto],
     (error, results) => {
       if (error) {
@@ -40,7 +40,7 @@ const averageProductRatings = (request, response) => {
   const idProducto = parseInt(id)
 
   db.query(
-    'SELECT AVG(cal.nota) AS avg_calificacion FROM calificacion cal JOIN documentoproducto dp ON cal.idDocumentoProducto = dp.idDocumentoProducto WHERE dp.idDocumentoProducto = ?',
+    'SELECT * from vista_producto_calificacion_promedio WHERE idProducto = ?',
     [idProducto],
     (error, results) => {
       if (error) {
@@ -62,18 +62,19 @@ const averageProductRatings = (request, response) => {
 
 // Permite revisar si un usuario compro un producto. De vuelve el id vendedor
 const checkUserPurchase = (request, response) => {
-  const { idComprador, idDocProducto } = request.params
+  const { idComprador, idProducto } = request.body
+  console.log("body", request.body)
 
-  if (!idComprador || !idDocProducto) {
+  if (!idComprador || !idProducto) {
     return response.status(400).json({
       success: false,
-      message: 'El idComprador y idDocProducto deben ser obligatorios',
+      message: 'El idComprador e idProducto deben ser obligatorios',
     })
   }
 
   db.query(
-    'SELECT dp.idUsuario AS idVendedor FROM transaccion t JOIN carrito c ON t.idCarrito = c.idCarrito JOIN carritoproducto cp ON c.idCarrito = cp.idCarrito JOIN documentoproducto dp ON cp.idProducto = dp.idProducto WHERE t.estado = "exitosa" AND c.idUsuario = ? AND dp.idDocumentoProducto = ?',
-    [idComprador, idDocProducto],
+    'SELECT * from vista_compras_usuario WHERE idUsuario = ? AND idProducto = ?',
+    [idComprador, idProducto],
     (error, results) => {
       if (error) {
         console.error('Error ejecutando la validacion', error)
@@ -81,6 +82,13 @@ const checkUserPurchase = (request, response) => {
           success: false,
           message: 'Error en el servidor. Intentelo más tarde',
           error: error.message,
+        })
+      }
+
+      if (results.length === 0) {
+        return response.status(404).json({
+          success: false,
+          message: 'No se encontraron compras del usuario',
         })
       }
 

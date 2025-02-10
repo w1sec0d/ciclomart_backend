@@ -28,7 +28,7 @@ CREATE TABLE `modelo` (
   `categoria` varchar(100),
   `compatibilidad` text,
   `idBicicleta` int,
-  `idMarca` int NOT NULL
+  `idMarca` int 
 );
 
 CREATE TABLE `imagen` (
@@ -113,6 +113,7 @@ CREATE TABLE `producto` (
   `precio` float,
   `precioCompleto` float,
   `cantidad` int DEFAULT 0,
+  `ventas` int DEFAULT 0,
   `estado` ENUM ('nuevo', 'usado') DEFAULT 'nuevo',
   `disponibilidad` ENUM ('disponible', 'vendido', 'reservado') DEFAULT 'disponible',
   `costoEnvio` float NOT NULL DEFAULT 0,
@@ -226,27 +227,44 @@ INSERT INTO `marca` (`nombre`)
 VALUES 
 ('Trek'),
 ('Specialized'),
-('Giant');
+('Giant'),
+('Shimano'),
+('Bontrager');
 
 -- Insertar modelos de muestra
 INSERT INTO `modelo` (`nombre`, `tipo`, `descripcion`, `categoria`, `compatibilidad`, `idMarca`)
 VALUES 
 ('Trek Marlin 7', 'bicicleta', 'Bicicleta de montaña para senderos', 'MTB', 'Compatible con componentes Shimano', 1),
 ('Specialized Allez', 'bicicleta', 'Bicicleta de carretera para carreras', 'Carretera', 'Compatible con componentes Shimano', 2),
-('Giant Defy Advanced', 'bicicleta', 'Bicicleta de carretera de resistencia', 'Carretera', 'Compatible con componentes Shimano', 3);
+('Giant Defy Advanced', 'bicicleta', 'Bicicleta de carretera de resistencia', 'Carretera', 'Compatible con componentes Shimano', 3),
+('Plato Shimano Deore XT', 'componente', 'Monoplato mtb', 'Transmisión', 'Compatible con bicicletas de montaña', 4),
+('Pacha Shimano Altus', 'componente', 'Pacha altus de 8 velocidades', 'Transmisión', 'Compatible con bicicletas de carretera', 4),
+('Shimano 105', 'componente', 'Grupo de transmisión de 10 velocidades', 'Transmisión', 'Compatible con bicicletas de carretera', 4),
+('Casco Bontrager Starvos', 'accesorio', 'Casco de ciclismo de carretera', 'Casco', 'Talla única', 1),
+('Casco Specialized Propero', 'accesorio', 'Casco de ciclismo de carretera', 'Casco', 'Talla única', 2),
+('Casco Giant Rev', 'accesorio', 'Casco de ciclismo de carretera', 'Casco', 'Talla única', 3),
+('Neumático MTB rin 26"', 'componente', 'Neumatico rin 26"', 'Neumáticos', 'Compatible con bicicletas de montaña', null);
 
 -- Insertar imágenes de muestra
 INSERT INTO `imagen` (`idUsuario`, `idModelo`, `url`)
 VALUES 
-(1, 1, ''),
-(2, 2, ''),
-(3, 3, '');
+(null, 1, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739199906/ukc7nxqc5hm79o4utb39.png'),
+(null, 2, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739200194/qhvxoj4ggjp1qrdn1fpd.png'),
+(null, 3, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739200646/iyqe0j8piameldruninf.png'),
+(null, 4, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739201523/td7nvl10zjctewo5jgld.png'),
+(null, 5, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739201377/d10mnzoi5xp8ibs1apvm.png'),
+(null, 6, ''),
+(null, 7, ''),
+(null, 8, ''),
+(null, 9, ''),
+(null, 10, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739203206/dgeumsxzyrlqv3kzqdw6.png');
 
 -- Insertar bicicletas de muestra
 INSERT INTO `bicicleta` (`tipoBicicleta`, `color`, `genero`, `edad`, `tamañoMarco`, `materialMarco`, `tamañoRueda`, `tipoFrenos`, `velocidades`, `suspension`, `transmision`, `tipoPedales`, `manubrio`, `pesoBicicleta`, `pesoMaximo`, `extras`)
 VALUES 
-('MTB', 'Rojo', 'Unisex', 'Adulto', 'M', 'Aluminio', '29"', 'Disco', '21', 'Delantera', 'Shimano', 'Plataforma', 'Plano', 14.5, 120, 'Portabotellas'),
-('Carretera', 'Azul', 'Unisex', 'Adulto', 'L', 'Carbono', '28"', 'Caliper', '22', 'Ninguna', 'Shimano', 'Sin clip', 'Caída', 8.5, 100, 'Ninguno');
+('MTB', 'Negra', 'Unisex', 'Adulto', 'M', 'Aluminio', '29"', 'Disco', '21', 'Delantera', 'Shimano', 'Plataforma', 'Plano', 14.5, 120, 'Portabotellas'),
+('Carretera', 'Azul', 'Unisex', 'Adulto', 'L', 'Carbono', '28"', 'Caliper', '22', 'Ninguna', 'Shimano', 'Sin clip', 'Caída', 8.5, 100, 'Ninguno'),
+('Carretera','Azul','Unisex','Adulto','M','Carbono','28"','Caliper','22','Ninguna','Shimano','Sin clip','Caída',8.5,100,'Ninguno');
 
 -- Insertar tiendas de muestra
 INSERT INTO `tienda` (`idUsuarioAdministrador`, `nombre`, `descripcion`, `telefono`)
@@ -256,15 +274,22 @@ VALUES
 -- Insertar carritos de muestra
 INSERT INTO `carrito` (`idUsuario`, `cantidadProductos`, `precioTotal`, `fecha`, `estado`, `metodoPago`, `direccionEnvio`, `descuento`)
 VALUES 
-(1, 2, 1500.00, NOW(), 'pendiente', 'Tarjeta de Crédito', 'Calle 123, Bogotá', 0),
-(2, 1, 800.00, NOW(), 'pendiente', 'PayPal', 'Carrera 45, Medellín', 0);
+(1, 2, 1500.00, NOW(), 'exitosa', 'Tarjeta de Crédito', 'Calle 123, Bogotá', 0),
+(2, 1, 800.00, NOW(), 'exitosa', 'PayPal', 'Carrera 45, Medellín', 0);
 
 -- Insertar productos de muestra
-INSERT INTO `producto` (`idModelo`, `idVendedor`, `idTienda`, `precio`, `precioCompleto`, `cantidad`, `estado`, `disponibilidad`, `costoEnvio`, `retiroEnTienda`)
+INSERT INTO `producto` (`idModelo`, `idVendedor`, `idTienda`, `precio`, `precioCompleto`, `cantidad`,`ventas`, `estado`, `disponibilidad`, `costoEnvio`, `retiroEnTienda`)
 VALUES 
-(1, 1, 1, 750.00, 800.00, 10, 'nuevo', 'disponible', 50.00, false),
-(2, 2, 1, 750.00, 800.00, 5, 'nuevo', 'disponible', 50.00, false),
-(3, 3, 1, 800.00, 850.00, 3, 'nuevo', 'disponible', 50.00, false);
+(1, 1, null, 3000000, 3300000, 10,0, 'nuevo', 'disponible', 50.00, false),
+(2, 2, null, 2400000, 3000000, 5,2, 'nuevo', 'disponible', 0, false),
+(3, 3, null, 11000000, null, 3,10, 'nuevo', 'disponible', 50.00, false),
+(4, 1, null, 290000, 300000, 20,4, 'nuevo', 'disponible', 0, false),
+(5, 2, null, 120000, null, 15,0, 'nuevo', 'disponible', 0, false),
+(6, 3, null, 1500000, null, 5,0, 'nuevo', 'disponible', 0, false),
+(7, 1, null, 300000, null, 10,0, 'nuevo', 'disponible', 0, false),
+(8, 2, null, 460000, 500000, 5,0, 'nuevo', 'disponible', 0, false),
+(9, 3, null, 60000, null, 3,0, 'nuevo', 'disponible', 0, false),
+(10, 1, null, 9000, null, 15,9, 'nuevo', 'disponible', 0, false);
 
 -- Insertar productos del carrito de muestra
 INSERT INTO `carritoProducto` (`idProducto`, `idCarrito`, `cantidad`, `precio_unitario`, `direccion`, `estadoEnvio`)
@@ -283,7 +308,10 @@ VALUES
 INSERT INTO `calificacion` (`idUsuarioComprador`, `idUsuarioVendedor`, `idProducto`, `idTienda`, `foto`, `comentario`, `nota`)
 VALUES 
 (1, 2, 1, 1, '', '¡Excelente bicicleta!', 5),
-(2, 3, 2, 1, '', 'Muy satisfecho', 4);
+(2, 3, 2, 1, '', 'Muy satisfecho', 4),
+(3, 2, 2, 1, '', 'La bici es buena pero es muy pesada', 3),
+(2,1,10,null, null, 'Muy buen producto, voy tres meses y no me he pinchado', 5),
+(3,1,10,null, null, 'Muy malo, me pinche a la primera salida', 1);
 
 -- Insertar mensajes de muestra
 INSERT INTO `mensaje` (`idUsuarioEmisor`, `idUsuarioReceptor`, `idCarritoProducto`, `contenido`, `fecha`)
@@ -295,19 +323,21 @@ VALUES
 -- Vistas
 ------------------------------------------------------------
 -- Crear la vista consolidada
-CREATE VIEW vista_producto_modelo_bicicleta_marca AS
+DROP VIEW IF EXISTS vista_completa_producto;
+CREATE VIEW vista_completa_producto AS
 SELECT 
     producto.idProducto,
     producto.precio,
     producto.precioCompleto,
     producto.cantidad,
+    producto.ventas,
     producto.estado,
     producto.disponibilidad,
     producto.costoEnvio,
     producto.retiroEnTienda,
     producto.fechaPublicacion,
     modelo.idModelo,
-    modelo.nombre AS nombreModelo,
+    modelo.nombre,
     modelo.tipo,
     modelo.descripcion AS descripcionModelo,
     modelo.categoria,
@@ -330,12 +360,132 @@ SELECT
     bicicleta.pesoMaximo,
     bicicleta.extras,
     marca.idMarca,
-    marca.nombre AS nombreMarca
+    marca.nombre AS nombreMarca,
+    imagen.idImagen,
+    imagen.url AS imagenURL
 FROM 
     producto
 JOIN 
     modelo ON producto.idModelo = modelo.idModelo
 LEFT JOIN 
     bicicleta ON modelo.idModelo = bicicleta.idBicicleta
+LEFT JOIN 
+    marca ON modelo.idMarca = marca.idMarca
+LEFT JOIN 
+    imagen ON modelo.idModelo = imagen.idModelo
+ORDER BY 
+    producto.ventas DESC;
+
+DROP VIEW IF EXISTS vista_producto_calificacion;
+CREATE VIEW vista_producto_calificacion AS
+SELECT 
+    producto.idProducto,
+    producto.precio,
+    producto.precioCompleto,
+    producto.cantidad,
+    producto.ventas,
+    producto.estado,
+    producto.disponibilidad,
+    producto.costoEnvio,
+    producto.retiroEnTienda,
+    producto.fechaPublicacion,
+    modelo.idModelo,
+    modelo.nombre AS nombreModelo,
+    modelo.tipo,
+    modelo.descripcion AS descripcionModelo,
+    modelo.categoria,
+    modelo.compatibilidad,
+    marca.idMarca,
+    marca.nombre AS nombreMarca,
+    calificacion.idCalificacion,
+    calificacion.nota AS puntuacion,
+    calificacion.comentario,
+    calificacion.fecha AS fechaCalificacion
+FROM 
+    producto
 JOIN 
-    marca ON modelo.idMarca = marca.idMarca;
+    modelo ON producto.idModelo = modelo.idModelo
+LEFT JOIN 
+    marca ON modelo.idMarca = marca.idMarca
+RIGHT JOIN 
+    calificacion ON producto.idProducto = calificacion.idProducto
+ORDER BY 
+    producto.ventas DESC;
+
+DROP VIEW IF EXISTS vista_producto_calificacion_promedio;
+CREATE VIEW vista_producto_calificacion_promedio AS
+SELECT 
+    producto.idProducto,
+    producto.precio,
+    producto.precioCompleto,
+    producto.cantidad,
+    producto.ventas,
+    producto.estado,
+    producto.disponibilidad,
+    producto.costoEnvio,
+    producto.retiroEnTienda,
+    producto.fechaPublicacion,
+    modelo.idModelo,
+    modelo.nombre AS nombreModelo,
+    modelo.tipo,
+    modelo.descripcion AS descripcionModelo,
+    modelo.categoria,
+    modelo.compatibilidad,
+    marca.idMarca,
+    marca.nombre AS nombreMarca,
+    ROUND(AVG(calificacion.nota), 1) AS avg_calificacion
+FROM 
+    producto
+JOIN 
+    modelo ON producto.idModelo = modelo.idModelo
+LEFT JOIN 
+    marca ON modelo.idMarca = marca.idMarca
+LEFT JOIN 
+    calificacion ON producto.idProducto = calificacion.idProducto
+GROUP BY 
+    producto.idProducto,
+    producto.precio,
+    producto.precioCompleto,
+    producto.cantidad,
+    producto.ventas,
+    producto.estado,
+    producto.disponibilidad,
+    producto.costoEnvio,
+    producto.retiroEnTienda,
+    producto.fechaPublicacion,
+    modelo.idModelo,
+    modelo.nombre,
+    modelo.tipo,
+    modelo.descripcion,
+    modelo.categoria,
+    modelo.compatibilidad,
+    marca.idMarca,
+    marca.nombre
+ORDER BY 
+    producto.ventas DESC;
+
+DROP VIEW IF EXISTS vista_compras_usuario;
+CREATE VIEW vista_compras_usuario AS
+SELECT 
+    usuario.idUsuario,
+    usuario.nombre,
+    usuario.correo,
+    carrito.idCarrito,
+    carrito.fecha,
+    carrito.precioTotal,
+    carrito.metodoPago,
+    carrito.direccionEnvio,
+    carritoProducto.idCarritoProducto,
+    carritoProducto.idProducto,
+    carritoProducto.cantidad,
+    carritoProducto.precio_unitario
+FROM 
+    carrito
+JOIN 
+    usuario ON carrito.idUsuario = usuario.idUsuario
+JOIN 
+    carritoProducto ON carrito.idCarrito = carritoProducto.idCarrito
+WHERE 
+    carrito.estado = 'exitosa'
+ORDER BY 
+    carrito.fecha DESC;
