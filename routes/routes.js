@@ -45,12 +45,12 @@ const {
 } = require('../controllers/ratingProduct.js')
 
 // Controlador de productos
-const { 
+const {
   getProducto,
   publishProducto,
   getModels,
   getBrands,
- } = require('../controllers/producto.js')
+} = require('../controllers/producto.js')
 
 // Rutas usuarios
 router.get('/usuarios', getUsuarios)
