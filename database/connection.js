@@ -1,6 +1,6 @@
 //Coneccion a la base de datos usando variables de entorno
 require('dotenv').config()
-const mysql = require('mysql')
+const mysql = require('mysql2/promise')
 
 // Crea un pool de conexiones a la base de datos
 const db = mysql.createPool({
