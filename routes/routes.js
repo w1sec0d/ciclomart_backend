@@ -7,6 +7,7 @@ const {
   getUsuarios,
   registerUsuario,
   getUsuarioById,
+  getUsuarioPhoto,
   updateUsuarioFoto,
   updateUsuario,
 } = require('../controllers/usuario.js')
@@ -36,6 +37,11 @@ const { getTiendas } = require('../controllers/tienda.js')
 // Controlador de busqueda
 const { search } = require('../controllers/search.js')
 
+const {
+  getProducto,
+  getProductById,
+  createPreference,
+} = require('../controllers/producto.js')
 // Controladores de calificaciones de productos
 const {
   ratingProduct,
@@ -55,6 +61,7 @@ const {
 // Rutas usuarios
 router.get('/usuarios', getUsuarios)
 router.get('/usuarios/:id', getUsuarioById)
+router.get('/getUsuarioPhoto/:id', getUsuarioPhoto)
 router.post('/usuarios', registerUsuario)
 router.put('/updateUsuarioFoto/:idUsuario', updateUsuarioFoto)
 router.put('/updateUsuario/:id', updateUsuario)
@@ -82,11 +89,14 @@ router.get('/productos', getProducto)
 router.post('/addProduct', publishProducto)
 router.get('/models/:tipo/:id', getModels)
 router.get('/brands', getBrands)
+router.get('/productos/:id', getProductById)
+// Mercado Pago
+router.post('/createPreference', createPreference)
 
 //Rutas calificaciones productos
 router.get('/ratingProduct/:id', ratingProduct)
 router.get('/averageProductRatings/:id', averageProductRatings)
 router.post('/addRatingProduct', addRatingProduct)
-router.get('/checkUserPurchase/:idComprador/:idDocProducto', checkUserPurchase)
+router.post('/checkUserPurchase/', checkUserPurchase)
 
 module.exports = router

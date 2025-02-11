@@ -1,5 +1,4 @@
 const db = require('../database/connection')
-const { merge } = require('../routes/routes')
 
 // Obtiene todas las calificaciones de un producto
 const ratingProduct = (request, response) => {
@@ -14,7 +13,7 @@ const ratingProduct = (request, response) => {
   }
 
   db.query(
-    'SELECT * FROM VistaCalificacionesProducto WHERE idDocumentoProducto = ?',
+    'SELECT * FROM vista_producto_calificacion WHERE idProducto = ?',
     [idProducto],
     (error, results) => {
       if (error) {
@@ -41,7 +40,7 @@ const averageProductRatings = (request, response) => {
   const idProducto = parseInt(id)
 
   db.query(
-    'SELECT AVG(cal.nota) AS avg_calificacion FROM calificacion cal JOIN documentoproducto dp ON cal.idDocumentoProducto = dp.idDocumentoProducto WHERE dp.idDocumentoProducto = ?',
+    'SELECT * from vista_producto_calificacion_promedio WHERE idProducto = ?',
     [idProducto],
     (error, results) => {
       if (error) {
@@ -63,18 +62,19 @@ const averageProductRatings = (request, response) => {
 
 // Permite revisar si un usuario compro un producto. De vuelve el id vendedor
 const checkUserPurchase = (request, response) => {
-  const { idComprador, idDocProducto } = request.params
+  const { idComprador, idProducto } = request.body
+  console.log("body", request.body)
 
-  if (!idComprador || !idDocProducto) {
+  if (!idComprador || !idProducto) {
     return response.status(400).json({
       success: false,
-      message: 'El idComprador y idDocProducto deben ser obligatorios',
+      message: 'El idComprador e idProducto deben ser obligatorios',
     })
   }
 
   db.query(
-    'SELECT dp.idUsuario AS idVendedor FROM transaccion t JOIN carrito c ON t.idCarrito = c.idCarrito JOIN carritoproducto cp ON c.idCarrito = cp.idCarrito JOIN documentoproducto dp ON cp.idProducto = dp.idProducto WHERE t.estado = "exitosa" AND c.idUsuario = ? AND dp.idDocumentoProducto = ?',
-    [idComprador, idDocProducto],
+    'SELECT * from vista_compras_usuario WHERE idUsuario = ? AND idProducto = ?',
+    [idComprador, idProducto],
     (error, results) => {
       if (error) {
         console.error('Error ejecutando la validacion', error)
@@ -82,6 +82,13 @@ const checkUserPurchase = (request, response) => {
           success: false,
           message: 'Error en el servidor. Intentelo más tarde',
           error: error.message,
+        })
+      }
+
+      if (results.length === 0) {
+        return response.status(404).json({
+          success: false,
+          message: 'No se encontraron compras del usuario',
         })
       }
 
@@ -95,52 +102,10 @@ const checkUserPurchase = (request, response) => {
 }
 
 const addRatingProduct = (request, response) => {
-  const fields = request.body
-  const inserts = []
-  const values = []
-  const bracket = []
+  const { idProducto, comentario, idUsuarioComprador, nota, foto } = request.body
+  const query = `INSERT INTO calificacion (idProducto,comentario, idUsuarioComprador, nota, foto) VALUES (?, ?, ?, ?, ?)`
 
-  const validFields = [
-    'idUsuarioComprador',
-    'idDocumentoProducto',
-    'idUsuarioVendedor',
-    'foto',
-    'comentario',
-    'nota',
-  ]
-
-  for (const field of validFields) {
-    if (fields[field] !== undefined) {
-      inserts.push(`${field}`)
-      values.push(fields[field])
-      bracket.push('?')
-    } else if (
-      (field === 'idUsuarioComprador' && fields[field] === undefined) ||
-      (field === 'idDocumentoProducto' && fields[field] === undefined) ||
-      (field === 'idUsuarioVendedor' && fields[field] === undefined)
-    ) {
-      return response.status(400).json({
-        success: false,
-        message:
-          'Los id de usuario comprador, documento producto y vendedor son obligatorios',
-      })
-    }
-  }
-
-  if (inserts.length === 0) {
-    return response.status(400).json({
-      success: false,
-      message: 'No se proporcionaron datos para insertar',
-    })
-  }
-
-  inserts.push('fecha')
-  values.push(new Date())
-  bracket.push('?')
-
-  const query = `INSERT INTO calificacion (${inserts.join(', ')}) VALUES (${bracket.join(', ')})`
-
-  db.query(query, values, (error, results) => {
+  db.query(query, [idProducto, comentario, idUsuarioComprador, nota, foto], (error, results) => {
     if (error) {
       console.error('Error ejecutando la insercion', error)
       return response.status(500).json({
