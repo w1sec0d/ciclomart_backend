@@ -1,0 +1,205 @@
+// Usa lenguaje dbml para definir la base de datos
+// Documentación: https://dbml.dbdiagram.io/docs
+
+// Relaciones en la bd:
+// uno a uno: -
+// uno a muchos: <
+// muchos a uno: >
+
+// Posibles enums
+Enum "usuario_rol_enum" {
+  "comprador"
+  "cliente"
+  "administrador"
+}
+
+Enum "transaccion_estado_enum" {
+  "pendiente"
+  "exitosa"
+  "fallida"
+}
+
+Enum "producto_disponibilidad_enum" {
+  "disponible"
+  "vendido"
+  "reservado"
+}
+
+Enum "producto_estado_enum" {
+  "nuevo"
+  "usado"
+}
+
+Enum "tipo_modelo_enum" {
+  "bicicleta"
+  "componente"
+  "accesorio"
+  "otro"
+}
+
+Table "usuario" {
+  "idUsuario" int [pk, not null, increment]
+  "nombre" varchar(45) [not null]
+  "apellido" varchar(45) [not null]
+  "fechaNacimiento" date 
+  "rol" usuario_rol_enum [default:"comprador"]
+  "correo" varchar(255) [not null]
+  "direccion" varchar(255)
+  "telefono" varchar(60) 
+  "username" varchar(45) 
+  "password" varchar(64) [not null]
+  "fechaRegistro" datetime [default: `current_timestamp`]
+}
+
+Table "modelo" {
+  "idModelo" int [pk, not null, increment]
+  "nombre" varchar(255) [not null]
+  "tipo" tipo_modelo_enum [not null, default: "bicicleta"]
+  "descripcion" text [not null]
+  "categoria" varchar(100)
+  "compatibilidad" text
+  "idBicicleta" int [ref: > bicicleta.idBicicleta]
+  "idMarca" int [not null, ref: > marca.idMarca]
+  // crea indices para optimizar busquedas   
+  Indexes {
+    idMarca [name: "idMarca"]
+    nombre [name:"nombre"]
+  }
+}
+
+Table "imagen" {
+  "idImagen" int [pk, not null, increment]
+  "idUsuario" int [ref: > usuario.idUsuario]
+  "idDocumento" int [ref: > documento.idDocumento]
+  "idModelo" int [ref: > modelo.idModelo]
+  "url" varchar(255)
+
+  // Crea fk's y mejoran la busqueda 
+  Indexes {
+    idModelo [name: "imagen_modelo"]
+    idDocumento [name: "imagen_documento"]
+    idUsuario [name: "imagen_usuario"]
+  }
+}
+
+Table "bicicleta" {
+  "idBicicleta" int [pk, not null, increment, ref: - modelo.idModelo]
+  "tipoBicicleta" varchar(45)
+  "color" varchar(45)
+  "genero" varchar(45)
+  "edad" varchar(45)
+  "tamañoMarco" varchar(45)
+  "materialMarco" varchar(45)
+  "tamañoRueda" varchar(45)
+  "tipoFrenos" varchar(45)
+  "velocidades" varchar(45)
+  "suspension" varchar(45)
+  "transmision" varchar(45)
+  "tipoPedales" varchar(45)
+  "manubrio" varchar(45)
+  "pesoBicicleta" float
+  "pesoMaximo" float
+  "extras" text
+}
+
+Table "marca" {
+  "idMarca" int [pk, not null, increment]
+  "nombre" varchar(45) [not null]
+  Indexes {
+    nombre [name:"nombre"]
+  }
+}
+
+Table "tienda" {
+  "idTienda" int [pk, not null, increment]
+  "idUsuarioAdministrador" int [not null, ref: > usuario.idUsuario]
+  "nombre" varchar(255)
+  "descripcion" text
+  "telefono" varchar(60) 
+  Indexes {
+    nombre [name:"nombre"]
+  }
+}
+
+Table "carrito" {
+  "idCarrito" int [pk, not null, increment]
+  "idUsuario" int [not null, ref: > usuario.idUsuario]
+  "cantidadProductos" int [default: 0]
+  "precioTotal" float 
+  "fecha" datetime 
+  "estado" transaccion_estado_enum [default: "pendiente"]
+  "metodoPago" varchar(45)
+  "direccionEnvio" varchar(45)
+  "descuento" float 
+  Indexes {
+    idUsuario [name: "idUsuario"]
+  }
+}
+
+Table "carritoProducto" {
+  "idCarritoProducto" int [pk, not null, increment]
+  "idProducto" int [not null, ref: > producto.idProducto]
+  "idCarrito" int [not null, ref: > carrito.idCarrito]
+  "cantidad" int 
+  "precio_unitario" float 
+  "fecha" datetime [default: `current_timestamp`]
+  "direccion" text
+  "estadoEnvio" varchar(45) 
+}
+
+Table "documento" {
+  "idDocumento" int [pk, not null, increment]
+  "idModelo" int [not null, ref: > modelo.idModelo]
+  "idUsuario" int [ref: < usuario.idUsuario]
+  "tipo" varchar(60)
+  "descripcion" text
+  "estado" varchar(60)
+  "fechaCompra" date
+  Indexes {
+    idUsuario [name: "idUsuario"]
+  }
+}
+
+Table "producto" {
+  "idProducto" int [pk, not null, increment]
+  "idModelo" int [not null, ref: > modelo.idModelo]
+  "idVendedor" int [ref: > usuario.idUsuario]
+  "idTienda" int [ref: > tienda.idTienda]
+  "precio" float
+  "precioCompleto" float
+  "cantidad" int [default: 0]
+  "estado" producto_estado_enum [default: "nuevo"]
+  "disponibilidad" producto_disponibilidad_enum [default: "disponible"]
+  "costoEnvio" float [not null, default: 0]
+  "retiroEnTienda" bool [not null, default: false]
+  "fechaPublicacion" datetime [default: `current_timestamp`]
+}
+
+Table "calificacion" {
+  "idCalificacion" int [pk, not null, increment]
+  "idUsuarioComprador" int [not null, ref: > usuario.idUsuario]
+  "idUsuarioVendedor" int [ref: > usuario.idUsuario]
+  "idProducto" int [not null, ref: > producto.idProducto]
+  "idTienda" int [ref: > tienda.idTienda]
+  "foto" varchar(255)
+  "comentario" text
+  "nota" int 
+  "fecha" datetime [default: `current_timestamp`]
+  Indexes {
+    idUsuarioComprador [name: "idUsuarioComprador"]
+    idUsuarioVendedor [name: "fk_calificacion_usuario1_idx"]
+  }
+}
+
+Table "mensaje" {
+  "idMensaje" int [pk, not null, increment]
+  "idUsuarioEmisor" int [not null, ref: > usuario.idUsuario]
+  "idUsuarioReceptor" int [not null, ref: > usuario.idUsuario]
+  "idCarritoProducto" int [not null, ref: > carritoProducto.idCarritoProducto]
+  "contenido" text 
+  "fecha" datetime 
+  Indexes {
+    idUsuarioEmisor [name: "idUsuarioEmisor"]
+    idUsuarioReceptor [name: "fk_mensaje_usuario1_idx"]
+  }
+}

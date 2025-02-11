@@ -1,10 +1,4 @@
 -- Script generado por dbdiagram.io
--- Inicializa la base de datos ciclomart en mysql workbench 8.0
-
--- Recomiendo crear un esquema aparte para probar
-DROP DATABASE IF EXISTS ciclomart2;
-CREATE DATABASE ciclomart2;
-USE ciclomart2;
 
 CREATE TABLE `usuario` (
   `idUsuario` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
@@ -31,10 +25,9 @@ CREATE TABLE `modelo` (
   `idMarca` int 
 );
 
-
 CREATE TABLE `imagen` (
   `idImagen` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `idUsuario` int UNIQUE,
+  `idUsuario` int,
   `idDocumento` int,
   `idModelo` int,
   `url` varchar(255)
@@ -367,8 +360,7 @@ SELECT
     usuario.idUsuario AS idVendedor,
     usuario.nombre AS nombreVendedor,
     usuario.apellido AS apellidoVendedor,
-    usuario.correo AS correoVendedor,
-    imagen_vendedor.url AS fotoVendedor
+    usuario.correo AS correoVendedor
 FROM 
     producto
 JOIN 
@@ -381,8 +373,6 @@ LEFT JOIN
     imagen ON modelo.idModelo = imagen.idModelo
 LEFT JOIN 
     usuario ON producto.idVendedor = usuario.idUsuario
-LEFT JOIN 
-    imagen AS imagen_vendedor ON usuario.idUsuario = imagen_vendedor.idUsuario
 ORDER BY 
     producto.ventas DESC;
 
@@ -421,8 +411,6 @@ RIGHT JOIN
     calificacion ON producto.idProducto = calificacion.idProducto
 ORDER BY 
     producto.ventas DESC;
-
-select * from vista_completa_producto;
 
 DROP VIEW IF EXISTS vista_producto_calificacion_promedio;
 CREATE VIEW vista_producto_calificacion_promedio AS
@@ -525,32 +513,5 @@ JOIN
     carritoProducto ON carrito.idCarrito = carritoProducto.idCarrito
 -- WHERE 
    -- carrito.estado = 'exitosa'
-ORDER BY 
-    carrito.fecha DESC;
-
-DROP VIEW IF EXISTS vista_ventas_usuario;
-CREATE VIEW vista_ventas_usuario AS
-SELECT 
-    carrito.idCarrito,
-    carrito.fecha,
-    carrito.precioTotal,
-    carrito.metodoPago,
-    carrito.direccionEnvio,
-    carritoProducto.idProducto,
-    carritoProducto.precio_unitario,
-    producto.idVendedor,
-    usuario.nombre AS nombreVendedor,
-    usuario.apellido AS apellidoVendedor,
-    usuario.correo AS correoVendedor
-FROM 
-    carrito
-JOIN 
-    carritoProducto ON carrito.idCarrito = carritoProducto.idCarrito
-JOIN 
-    producto ON carritoProducto.idProducto = producto.idProducto
-JOIN 
-    usuario ON producto.idVendedor = usuario.idUsuario
-WHERE 
-    carrito.estado = 'exitosa'
 ORDER BY 
     carrito.fecha DESC;
