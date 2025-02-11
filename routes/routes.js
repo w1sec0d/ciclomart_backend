@@ -41,6 +41,9 @@ const {
   getProducto,
   getProductById,
   createPreference,
+  publishProducto,
+  getModels,
+  getBrands,
 } = require('../controllers/producto.js')
 // Controladores de calificaciones de productos
 const {
@@ -49,14 +52,6 @@ const {
   addRatingProduct,
   checkUserPurchase,
 } = require('../controllers/ratingProduct.js')
-
-// Controlador de productos
-const {
-  getProducto,
-  publishProducto,
-  getModels,
-  getBrands,
-} = require('../controllers/producto.js')
 
 // Rutas usuarios
 router.get('/usuarios', getUsuarios)
