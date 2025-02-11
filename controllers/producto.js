@@ -222,56 +222,81 @@ const publishProducto = async (req, res) => {
     const modelPlaceholders = modelColumns.map(() => '?').join(', ')
 
     const modelQuery = `INSERT INTO modelo (${modelColumns.join(', ')}) VALUES (${modelPlaceholders})`
-    const [resultModel] = await db.query(modelQuery, modelValues)
+    db.query(modelQuery, modelValues,
+      (error, results) => {
+        if (error) {
+          console.error('Error publicando producto:', error)
+          return res.status(500).json({
+            success: false,
+            message: 'Error al publicar el producto',
+          })
+        }
+        console.log('results', results)
+        const productoId = results.insertId
 
-    const productoId = resultModel.insertId
+        if (!productoId) {
+          return res.status(500).json({
+            success: false,
+            message: 'Error al obtener el id del producto',
+          })
+        }
 
-    const productoColumns = [
-      'idModelo',
-      'idVendedor',
-      'idTienda',
-      'precio',
-      'precioCompleto',
-      'cantidad',
-      'estado',
-      'disponibilidad',
-      'costoEnvio',
-      'retiroEnTienda',
-    ]
-    const productoValues = [
-      productoId,
-      idVendedor,
-      idTienda,
-      precio,
-      precioCompleto,
-      cantidad,
-      estado,
-      disponibilidad,
-      costoEnvio,
-      retiroInt,
-    ]
-    const productoPlaceholders = productoColumns.map(() => '?').join(', ')
+        const productoColumns = [
+          'idModelo',
+          'idVendedor',
+          'idTienda',
+          'precio',
+          'precioCompleto',
+          'cantidad',
+          'estado',
+          'disponibilidad',
+          'costoEnvio',
+          'retiroEnTienda',
+        ]
+        const productoValues = [
+          productoId,
+          idVendedor,
+          idTienda,
+          precio,
+          precioCompleto,
+          cantidad,
+          estado,
+          disponibilidad,
+          costoEnvio,
+          retiroInt,
+        ]
+        const productoPlaceholders = productoColumns.map(() => '?').join(', ')
 
-    const productoQuery = `INSERT INTO producto (${productoColumns.join(', ')}) VALUES (${productoPlaceholders})`
-    const [resultProduct] = await db.query(productoQuery, productoValues)
+        const productoQuery = `INSERT INTO producto (${productoColumns.join(', ')}) VALUES (${productoPlaceholders})`
+        // const [resultProduct] = await db.query(productoQuery, productoValues)
+        db.query(productoQuery, productoValues, (error, results) => {
+          try {
+            // Insertar en la tabla correspondiente
+            if (tipo === 'bicicleta') {
+              tipoData['idBicicleta'] = productoId
+              const bicicletaColumns = Object.keys(tipoData).filter(
+                (key) => tipoData[key] !== undefined
+              )
+              const bicicletaValues = bicicletaColumns.map((key) => tipoData[key])
+              const bicicletaPlaceholders = bicicletaColumns.map(() => '?').join(', ')
 
-    // Insertar en la tabla correspondiente
-    if (tipo === 'bicicleta') {
-      tipoData['idBicicleta'] = productoId
-      const bicicletaColumns = Object.keys(tipoData).filter(
-        (key) => tipoData[key] !== undefined
-      )
-      const bicicletaValues = bicicletaColumns.map((key) => tipoData[key])
-      const bicicletaPlaceholders = bicicletaColumns.map(() => '?').join(', ')
-
-      const bicicletaQuery = `INSERT INTO bicicleta (${bicicletaColumns.join(', ')}) VALUES (${bicicletaPlaceholders})`
-      await db.query(bicicletaQuery, [...bicicletaValues])
-    }
-
-    res.status(200).json({
-      success: true,
-      message: 'Producto publicado exitosamente',
-    })
+              const bicicletaQuery = `INSERT INTO bicicleta (${bicicletaColumns.join(', ')}) VALUES (${bicicletaPlaceholders})`
+              db.query(bicicletaQuery, [...bicicletaValues])
+            }
+            res.status(200).json({
+              success: true,
+              message: 'Producto publicado exitosamente',
+            })
+          } catch (error) {
+            console.error('Error publicando producto:', error)
+            return res.status(500).json({
+              success: false,
+              message: 'Error al publicar el producto',
+            })
+          }
+        })
+      }
+    )
   } catch (error) {
     console.error('Error obteniendo productos:', error)
     res.status(500).json({
