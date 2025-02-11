@@ -48,6 +48,8 @@ const {
 const { 
   getProducto,
   publishProducto,
+  getModels,
+  getBrands,
  } = require('../controllers/producto.js')
 
 // Rutas usuarios
@@ -78,6 +80,8 @@ router.get('/tiendas', getTiendas)
 router.get('/search', search)
 router.get('/productos', getProducto)
 router.post('/addProduct', publishProducto)
+router.get('/models/:tipo/:id', getModels)
+router.get('/brands', getBrands)
 
 //Rutas calificaciones productos
 router.get('/ratingProduct/:id', ratingProduct)

@@ -15,27 +15,31 @@ const publishProducto = async (req, res) => {
 
   const { 
     // Datos para la tabla producto
-    tipo, 
-    nombre, 
-    descripcion, 
-    precio,
-    precioCompleto, 
-    imagen,
     idModelo,
-    idMarca,
+    idVendedor,
+    idTienda,
+    precio,
+    precioCompleto,
+    cantidad,
+    estado,
     disponibilidad,
     costoEnvio,
-    retiroDisponible,
-    fechaPublicacion,
-    condicion } = req.body
+    retiro,
+    nombre,
+    tipo,
+    descripcion,
+    categoria,
+    compatibilidad,
+    idMarca,
+     } = req.body
 
   // Convertir valores booleanos a 0 o 1
-  const retiroDisponibleInt = retiroDisponible ? 1 : 0;
+  const retiroInt = retiro? 1 : 0;
   // Datos para la tabla del tipo correspondiente
   let tipoData = {};
   if(tipo === 'bicicleta'){
     tipoData = {
-      idBicicleta: req.body.idBicicleta,
+      idBicicleta: 0,
       tipoBicicleta: req.body.tipoBicicleta,
       color: req.body.color,
       genero: req.body.genero,
@@ -45,45 +49,38 @@ const publishProducto = async (req, res) => {
       tamañoRueda: req.body.tamañoRueda,
       tipoFrenos: req.body.tipoFrenos,
       velocidades: req.body.velocidades,
-      suspension: req.body.suspension,
+      suspension: req.body.tipoSuspension,
       transmision: req.body.transmision,
       tipoPedales: req.body.tipoPedales,
-      manubrio: req.body.manubrio,
+      manubrio: req.body.tipoManubrio,
       pesoBicicleta: req.body.pesoBicicleta,
       pesoMaximo: req.body.pesoMaximo,
       extras: req.body.extras,
-      idCadena: req.body.idCadena,
-      idRueda: req.body.idRueda,
-      idPedalier: req.body.idPedalier,
-      idSillin: req.body.idSillin,
-      idFreno: req.body.idFreno,
-      idManubrio: req.body.idManubrio,
-      idCassette: req.body.idCassette
-    };
-  }
-  else if(tipo === 'repuesto'){
-    tipoData = {
-      idComponente: req.body.idComponente,
-      idMarca: req.body.idMarca,
-      categoria: req.body.categoria,
-      modelo: req.body.modelo,
-      compatibilidad: req.body.compatibilidad
     };
   }
 
   try {
     // Insertar en la tabla producto
-    const productoColumns = ['tipo', 'nombre', 'descripcion', 'precio', 'precioCompleto', 'imagen', 'idModelo', 'idMarca', 'disponibilidad', 'costoEnvio', 'retiroDisponible', 'fechaPublicacion', 'condicion'];
-    const productoValues = [tipo, nombre, descripcion, precio, precioCompleto, imagen,idModelo, idMarca, disponibilidad, costoEnvio, retiroDisponibleInt, fechaPublicacion, condicion];
+    const modelColumns = ['nombre', 'tipo', 'descripcion', 'categoria', 'compatibilidad', 'idMarca'];
+    const modelValues = [nombre, tipo, descripcion, categoria, compatibilidad, idMarca];
+    const modelPlaceholders = modelColumns.map(() => '?').join(', ');
+
+    const modelQuery = `INSERT INTO modelo (${modelColumns.join(', ')}) VALUES (${modelPlaceholders})`;
+    const [resultModel] = await db.query(modelQuery, modelValues);
+
+    const productoId = resultModel.insertId;
+
+    const productoColumns = ['idModelo', 'idVendedor', 'idTienda', 'precio', 'precioCompleto', 'cantidad', 'estado', 'disponibilidad', 'costoEnvio', 'retiroEnTienda']; 
+    const productoValues = [ productoId, idVendedor, idTienda, precio, precioCompleto, cantidad, estado, disponibilidad, costoEnvio, retiroInt];
     const productoPlaceholders = productoColumns.map(() => '?').join(', ');
-
+    
     const productoQuery = `INSERT INTO producto (${productoColumns.join(', ')}) VALUES (${productoPlaceholders})`;
-    const [result] = await db.query(productoQuery, productoValues);
+    const [resultProduct] = await db.query(productoQuery, productoValues);
 
-    const productoId = result.insertId;
 
     // Insertar en la tabla correspondiente
     if(tipo === 'bicicleta'){
+
       tipoData['idBicicleta'] = productoId;
       const bicicletaColumns = Object.keys(tipoData).filter(key => tipoData[key] !== undefined);
       const bicicletaValues = bicicletaColumns.map(key => tipoData[key]);
@@ -91,16 +88,7 @@ const publishProducto = async (req, res) => {
 
       const bicicletaQuery = `INSERT INTO bicicleta (${bicicletaColumns.join(', ')}) VALUES (${bicicletaPlaceholders})`;
       await db.query(bicicletaQuery, [ ...bicicletaValues]);
-    
-    } else if(tipo === 'repuesto'){
-      tipoData['idComponente'] = productoId;
-      const componenteColumns = Object.keys(tipoData).filter(key => tipoData[key] !== undefined);
-      const componenteValues = componenteColumns.map(key => tipoData[key]);
-      const componentePlaceholders = componenteColumns.map(() => '?').join(', ');
-
-      const componenteQuery = `INSERT INTO componente (idProducto, ${componenteColumns.join(', ')}) VALUES (${componentePlaceholders})`;
       
-      await db.query(componenteQuery, [...componenteValues]);
     }
 
     res.status(200).json({
@@ -112,9 +100,44 @@ const publishProducto = async (req, res) => {
     console.error('Error obteniendo productos:', error)
     res.status(500).json({
       success: false,
-      message: 'Error obteniendo productos',
+      message: 'Error al publicar el producto',
     })
   }
 }
 
-module.exports = { getProducto, publishProducto }
+const getModels = async (req, res) => {
+  tipo = req.params.tipo;
+  id = req.params.id;
+  try {
+
+    const [models] = await db.query('SELECT nombre FROM modelo WHERE tipo = ? AND idMarca = ?', [tipo, id]);
+    res.status(200).json({
+      success: true,
+      models,
+    });
+  } catch (error) {
+    console.error('Error obteniendo modelos:', error)
+    res.status(500).json({
+      success: false,
+      message: 'Error obteniendo modelos',
+    })
+  }
+}
+
+const getBrands = async (req, res) => {
+  try {
+    const [brands] = await db.query('SELECT * FROM marca');
+    res.status(200).json({
+      success: true,
+      brands,
+    });
+  } catch (error) {
+    console.error('Error obteniendo marcas:', error)
+    res.status(500).json({
+      success: false,
+      message: 'Error obteniendo marcas',
+    })
+  }
+}
+
+module.exports = { getProducto, publishProducto, getModels, getBrands }
