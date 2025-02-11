@@ -303,11 +303,21 @@ const getModels = async (req, res) => {
 }
 
 const getBrands = async (req, res) => {
+
   try {
-    const [brands] = await db.query('SELECT * FROM marca')
-    res.status(200).json({
-      success: true,
-      brands,
+    db.query('SELECT * FROM marca', (error, results) => {
+      if (error) {
+        console.error('Error obteniendo marcas:', error)
+        return res.status(500).json({
+          success: false,
+          message: 'Error obteniendo marcas',
+        })
+      }
+
+      res.status(200).json({
+        success: true,
+        results,
+      })
     })
   } catch (error) {
     console.error('Error obteniendo marcas:', error)
