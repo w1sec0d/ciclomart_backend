@@ -510,6 +510,7 @@ SELECT
     usuario.correo,
     carrito.idCarrito,
     carrito.fecha,
+    carrito.estado,
     carrito.precioTotal,
     carrito.metodoPago,
     carrito.direccionEnvio,
@@ -554,3 +555,28 @@ WHERE
     carrito.estado = 'exitosa'
 ORDER BY 
     carrito.fecha DESC;
+
+------------------------------------------------
+-- Procedimientos almacenados
+------------------------------------------------
+
+DELIMITER //
+
+CREATE PROCEDURE cambiarEstadoCarrito(
+    IN p_idCarrito INT,
+    IN p_nuevoEstado ENUM('pendiente', 'exitosa', 'fallida')
+)
+BEGIN
+    -- Actualizar el estado del carrito
+    UPDATE carrito
+    SET estado = p_nuevoEstado
+    WHERE idCarrito = p_idCarrito;
+
+    -- Verificar si la actualización fue exitosa
+    IF ROW_COUNT() = 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'No se encontró el carrito o no se pudo actualizar el estado';
+    END IF;
+END //
+
+DELIMITER ;

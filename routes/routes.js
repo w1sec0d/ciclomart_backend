@@ -45,6 +45,7 @@ const {
   getModels,
   getBrands,
 } = require('../controllers/producto.js')
+
 // Controladores de calificaciones de productos
 const {
   ratingProduct,
@@ -52,6 +53,8 @@ const {
   addRatingProduct,
   checkUserPurchase,
 } = require('../controllers/ratingProduct.js')
+
+const webhookMercadoLibre = require('../controllers/webhookMercadoLibre.js')
 
 // Rutas usuarios
 router.get('/usuarios', getUsuarios)
@@ -95,9 +98,6 @@ router.post('/addRatingProduct', addRatingProduct)
 router.post('/checkUserPurchase/', checkUserPurchase)
 
 // Ruta de prueba webhook
-router.post('/webhook', (req, res) => {
-  console.log("notificacion Mercado Libre:", req.body)
-  res.status(200).send('OK')
-})
+router.post('/webhookMercadoLibre', webhookMercadoLibre)
 
 module.exports = router
