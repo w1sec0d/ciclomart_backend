@@ -53,6 +53,10 @@ const {
   checkUserPurchase,
 } = require('../controllers/ratingProduct.js')
 
+const { 
+  getRatingSeller 
+} = require('../controllers/vistaVendedor.js')
+
 // Rutas usuarios
 router.get('/usuarios', getUsuarios)
 router.get('/usuarios/:id', getUsuarioById)
@@ -93,6 +97,9 @@ router.get('/ratingProduct/:id', ratingProduct)
 router.get('/averageProductRatings/:id', averageProductRatings)
 router.post('/addRatingProduct', addRatingProduct)
 router.post('/checkUserPurchase/', checkUserPurchase)
+
+//Rutas de vista vendedor
+router.get('/ratingSeller/:id', getRatingSeller)
 
 // Ruta de prueba webhook
 router.post('/webhook', (req, res) => {
