@@ -63,7 +63,6 @@ const averageProductRatings = (request, response) => {
 // Permite revisar si un usuario compro un producto. De vuelve el id vendedor
 const checkUserPurchase = (request, response) => {
   const { idComprador, idProducto } = request.body
-  console.log("body", request.body)
 
   if (!idComprador || !idProducto) {
     return response.status(400).json({
