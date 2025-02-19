@@ -74,7 +74,6 @@ const getProductById = async (req, res) => {
 const createPreference = async (req, res) => {
   try {
     const { title, quantity, unit_price, idComprador, idProducto } = req.body
-    console.log('title', title)
 
     // Crear carrito
     const carritoQuery = `
@@ -127,8 +126,8 @@ const createPreference = async (req, res) => {
             pending: process.env.FRONTEND_URL + '/requestResult/purchasePending',
           },
           auto_return: 'approved',
+          notification_url: process.env.BACKEND_URL + '/webhookMercadoLibre',
         }
-        console.log('preferenceBody', preferenceBody)
         const result = await preference.create({
           body: preferenceBody,
         })

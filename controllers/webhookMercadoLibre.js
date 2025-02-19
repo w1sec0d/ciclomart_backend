@@ -1,4 +1,6 @@
 const webhookMercadoLibre = async (req, res) => {
+    console.log("Recibiendo webhook de Mercado Libre");
+
     try {
         const { body } = req
         console.log('Webhook de Mercado Libre:', body)
