@@ -75,6 +75,7 @@ CREATE TABLE `tienda` (
 
 CREATE TABLE `carrito` (
   `idCarrito` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `idPreferenciaPago` int UNIQUE,
   `idUsuario` int NOT NULL,
   `cantidadProductos` int DEFAULT 0,
   `precioTotal` float,
