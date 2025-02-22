@@ -484,6 +484,7 @@ SELECT
     usuario.nombre,
     usuario.correo,
     carrito.idCarrito,
+    carrito.idPreferenciaPago,
     carrito.fecha,
     carrito.precioTotal,
     carrito.metodoPago,
@@ -510,6 +511,7 @@ SELECT
     usuario.nombre,
     usuario.correo,
     carrito.idCarrito,
+    carrito.idPreferenciaPago,
     carrito.fecha,
     carrito.estado,
     carrito.precioTotal,
@@ -534,6 +536,7 @@ DROP VIEW IF EXISTS vista_ventas_usuario;
 CREATE VIEW vista_ventas_usuario AS
 SELECT 
     carrito.idCarrito,
+	carrito.idPreferenciaPago,
     carrito.fecha,
     carrito.precioTotal,
     carrito.metodoPago,

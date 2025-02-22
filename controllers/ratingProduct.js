@@ -101,24 +101,29 @@ const checkUserPurchase = (request, response) => {
 }
 
 const addRatingProduct = (request, response) => {
-  const { idProducto, comentario, idUsuarioComprador, nota, foto } = request.body
+  const { idProducto, comentario, idUsuarioComprador, nota, foto } =
+    request.body
   const query = `INSERT INTO calificacion (idProducto,comentario, idUsuarioComprador, nota, foto) VALUES (?, ?, ?, ?, ?)`
 
-  db.query(query, [idProducto, comentario, idUsuarioComprador, nota, foto], (error, results) => {
-    if (error) {
-      console.error('Error ejecutando la insercion', error)
-      return response.status(500).json({
-        success: false,
-        message: 'Error en el servidor. Intentelo más tarde',
-        error: error.message,
+  db.query(
+    query,
+    [idProducto, comentario, idUsuarioComprador, nota, foto],
+    (error, results) => {
+      if (error) {
+        console.error('Error ejecutando la insercion', error)
+        return response.status(500).json({
+          success: false,
+          message: 'Error en el servidor. Intentelo más tarde',
+          error: error.message,
+        })
+      }
+
+      return response.status(201).json({
+        success: true,
+        message: 'Comentario añadido con éxito',
       })
     }
-
-    return response.status(201).json({
-      success: true,
-      message: 'Comentario añadido con éxito',
-    })
-  })
+  )
 }
 
 module.exports = {
