@@ -413,6 +413,7 @@ SELECT
     calificacion.idCalificacion,
     calificacion.nota AS puntuacion,
     calificacion.comentario,
+    calificacion.foto,
     calificacion.fecha AS fechaCalificacion
 FROM 
     producto
