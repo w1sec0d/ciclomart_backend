@@ -1,6 +1,6 @@
 // Esta ruta se encarga de escuchar las notificaciones producidas por mercado libre
 // como las confirmaciones de los pagos realizados por los usuarios
-const db = require("../database/connection")
+const db = require('../database/connection')
 
 // Mercado Pago
 const { mercadoPagoClient } = require('../utils/mercadoPago')
@@ -18,13 +18,14 @@ const webhookMercadoLibre = async (req, res) => {
       const paymentResponse = await payment.get({ id: paymentId })
       const { status, external_reference } = paymentResponse
       if (status === 'approved') {
-        db.query("UPDATE carrito SET estado='pendiente_envio' WHERE idCarrito = ?", [external_reference], (err, result) => {
-          if (err) {
-            console.log(err)
-          } else {
-            console.log(result)
+        db.query(
+          "UPDATE carrito SET estado='pendiente_envio' WHERE idCarrito = ?",
+          [external_reference],
+          (err, result) => {
+            if (err) {
+              console.log(err)
+            }
           }
-        }
         )
       }
     }
