@@ -78,7 +78,7 @@ const createPreference = async (req, res) => {
     // Crear carrito
     const carritoQuery = `
       INSERT INTO carrito (idUsuario, cantidadProductos, precioTotal, fecha, estado, metodoPago, direccionEnvio, descuento)
-      VALUES (?, ?, ?, NOW(), 'pendiente', ?, ?, ?)
+      VALUES (?, ?, ?, NOW(), 'pendiente_pago', ?, ?, ?)
     `
     const carritoValues = [
       idComprador,
@@ -146,8 +146,8 @@ const createPreference = async (req, res) => {
             },
             auto_return: 'approved',
             notification_url: process.env.BACKEND_URL + '/webhookMercadoLibre',
+            external_reference: carritoId,
           }
-          console.log('first', process.env.BACKEND_URL + '/webhookMercadoLibre')
           const result = await preference.create({
             body: preferenceBody,
           })
