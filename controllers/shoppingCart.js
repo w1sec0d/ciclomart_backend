@@ -99,22 +99,87 @@ const addToShoppingCart = (request, response) => {
 
           // Insertar en la tabla carritoproducto
           db.query(
-            'INSERT INTO carritoproducto (idCarrito, idProducto, cantidad, precio_unitario) VALUES (?, ?, ?, ?)',
-            [idCarrito, idProducto, cantidad, producto.precio],
-            (error, results) => {
+            'SELECT * FROM carritoproducto WHERE idCarrito = ? AND idProducto = ?',
+            [idCarrito, idProducto],
+            (error, carritoproductoResults) => {
               if (error) {
                 console.error('Error realizando la consulta ', error)
                 return response.status(500).json({
                   success: false,
-                  message: 'Error agregando producto al carritoproducto',
+                  message: 'Error verificando producto en el carrito',
                   error: error.message,
                 })
               }
-              return response.status(201).json({
-                success: true,
-                message: 'Producto agregado al carritoproducto',
-                results,
-              })
+    
+              if (carritoproductoResults.length > 0) {
+                // El producto ya existe en el carrito, actualizar la cantidad
+                const nuevaCantidad = carritoproductoResults[0].cantidad + cantidad
+                db.query(
+                  'UPDATE carritoproducto SET cantidad = ? WHERE idCarrito = ? AND idProducto = ?',
+                  [nuevaCantidad, idCarrito, idProducto],
+                  (error, results) => {
+                    if (error) {
+                      console.error('Error realizando la consulta ', error)
+                      return response.status(500).json({
+                        success: false,
+                        message: 'Error actualizando cantidad del producto en el carrito',
+                        error: error.message,
+                      })
+                    }
+                    return response.status(200).json({
+                      success: true,
+                      message: 'Cantidad del producto actualizada en el carrito',
+                      results,
+                    })
+                  }
+                )
+              } else {
+                // El producto no existe en el carrito, obtener la información del producto
+                db.query(
+                  'SELECT * FROM producto WHERE idProducto = ?',
+                  [idProducto],
+                  (error, productoResults) => {
+                    if (error) {
+                      console.error('Error realizando la consulta ', error)
+                      return response.status(500).json({
+                        success: false,
+                        message: 'Error obteniendo información del producto',
+                        error: error.message,
+                      })
+                    }
+    
+                    if (productoResults.length === 0) {
+                      return response.status(404).json({
+                        success: false,
+                        message: 'Producto no encontrado',
+                      })
+                    }
+    
+                    const producto = productoResults[0]
+    
+                    // Insertar en la tabla carritoproducto
+                    db.query(
+                      'INSERT INTO carritoproducto (idCarrito, idProducto, cantidad, precio_unitario) VALUES (?, ?, ?, ?)',
+                      [idCarrito, idProducto, cantidad, producto.precio],
+                      (error, results) => {
+                        if (error) {
+                          console.error('Error realizando la consulta ', error)
+                          return response.status(500).json({
+                            success: false,
+                            message: 'Error agregando producto al carritoproducto',
+                            error: error.message,
+                          })
+                        }
+                        return response.status(201).json({
+                          success: true,
+                          message: 'Producto agregado al carritoproducto',
+                          results,
+                        })
+                      }
+                    )
+                  }
+                )
+              }
             }
           )
         }
