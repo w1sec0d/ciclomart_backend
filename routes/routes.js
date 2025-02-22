@@ -58,6 +58,7 @@ const webhookMercadoLibre = require('../controllers/webhookMercadoLibre.js')
 
 const {
   getShoppingCart,
+  addToShoppingCart
 } = require ('../controllers/shoppingCart.js')
 
 // Rutas usuarios
@@ -105,5 +106,6 @@ router.post('/checkUserPurchase/', checkUserPurchase)
 router.post('/webhookMercadoLibre', webhookMercadoLibre)
 
 router.get('/shoppingCart/:id', getShoppingCart)
+router.post('/addToShoppingCart', addToShoppingCart)
 
 module.exports = router
