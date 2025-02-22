@@ -123,4 +123,70 @@ const addToShoppingCart = (request, response) => {
   )
 }
 
-module.exports = { getShoppingCart, addToShoppingCart }
+const removeFromShoppingCart = (request, response) => {
+  const { idUsuario, idProducto } = request.params
+
+  console.log(idUsuario, idProducto)
+
+  if (isNaN(idUsuario) || isNaN(idProducto)) {
+    return response.status(400).json({
+      success: false,
+      message: 'Datos inválidos',
+    })
+  }
+
+  // Obtener el ID del carrito
+  db.query(
+    'SELECT idCarrito FROM carrito WHERE idUsuario = ?',
+    [idUsuario],
+    (error, carritoResults) => {
+      if (error) {
+        console.error('Error realizando la consulta ', error)
+        return response.status(500).json({
+          success: false,
+          message: 'Error obteniendo ID del carrito',
+          error: error.message,
+        })
+      }
+
+      if (carritoResults.length === 0) {
+        return response.status(404).json({
+          success: false,
+          message: 'Carrito no encontrado',
+        })
+      }
+
+      const idCarrito = carritoResults[0].idCarrito
+
+      // Eliminar el producto del carrito
+      db.query(
+        'DELETE FROM carritoproducto WHERE idCarrito = ? AND idProducto = ?',
+        [idCarrito, idProducto],
+        (error, results) => {
+          if (error) {
+            console.error('Error realizando la consulta ', error)
+            return response.status(500).json({
+              success: false,
+              message: 'Error eliminando producto del carrito',
+              error: error.message,
+            })
+          }
+
+          if (results.affectedRows === 0) {
+            return response.status(404).json({
+              success: false,
+              message: 'Producto no encontrado en el carrito',
+            })
+          }
+
+          return response.status(200).json({
+            success: true,
+            message: 'Producto eliminado del carrito',
+          })
+        }
+      )
+    }
+  )
+}
+
+module.exports = { getShoppingCart, addToShoppingCart, removeFromShoppingCart }
