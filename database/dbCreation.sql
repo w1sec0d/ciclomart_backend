@@ -80,7 +80,7 @@ CREATE TABLE `carrito` (
   `cantidadProductos` int DEFAULT 0,
   `precioTotal` float,
   `fecha` datetime,
-  `estado` ENUM ('pendiente', 'exitosa', 'fallida') DEFAULT 'pendiente',
+  `estado` ENUM ('pendiente_pago', 'pendiente_envio', 'enviado', 'recibido', 'fallido') DEFAULT 'pendiente_pago',
   `metodoPago` varchar(45),
   `direccionEnvio` varchar(45),
   `descuento` float
@@ -276,8 +276,8 @@ VALUES
 -- Insertar carritos de muestra
 INSERT INTO `carrito` (`idUsuario`, `cantidadProductos`, `precioTotal`, `fecha`, `estado`, `metodoPago`, `direccionEnvio`, `descuento`)
 VALUES 
-(1, 2, 1500.00, NOW(), 'exitosa', 'Tarjeta de Crédito', 'Calle 123, Bogotá', 0),
-(2, 1, 800.00, NOW(), 'exitosa', 'PayPal', 'Carrera 45, Medellín', 0);
+(1, 2, 1500.00, NOW(), 'recibido', 'Tarjeta de Crédito', 'Calle 123, Bogotá', 0),
+(2, 1, 800.00, NOW(), 'recibido', 'PayPal', 'Carrera 45, Medellín', 0);
 
 -- Insertar productos de muestra
 INSERT INTO `producto` (`idModelo`, `idVendedor`, `idTienda`, `precio`, `precioCompleto`, `cantidad`,`ventas`, `estado`, `disponibilidad`, `costoEnvio`, `retiroEnTienda`)
@@ -500,7 +500,7 @@ JOIN
 JOIN 
     carritoProducto ON carrito.idCarrito = carritoProducto.idCarrito
 WHERE 
-    carrito.estado != 'exitosa'
+    carrito.estado != 'recibido'
 ORDER BY 
     carrito.fecha DESC;
     
@@ -556,7 +556,7 @@ JOIN
 JOIN 
     usuario ON producto.idVendedor = usuario.idUsuario
 WHERE 
-    carrito.estado = 'exitosa'
+    carrito.estado = 'recibido'
 ORDER BY 
     carrito.fecha DESC;
 
