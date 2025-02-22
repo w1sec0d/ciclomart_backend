@@ -102,10 +102,10 @@ const checkUserPurchase = (request, response) => {
 }
 
 const addRatingProduct = (request, response) => {
-  const { idProducto, comentario, idUsuarioComprador, nota, foto } = request.body
-  const query = `INSERT INTO calificacion (idProducto,comentario, idUsuarioComprador, nota, foto) VALUES (?, ?, ?, ?, ?)`
+  const { idProducto, comentario, idUsuarioComprador, idUsuarioVendedor, nota, foto } = request.body
+  const query = `INSERT INTO calificacion (idProducto,comentario, idUsuarioComprador, idUsuarioVendedor, nota, foto) VALUES (?, ?, ?, ?, ?, ?)`
 
-  db.query(query, [idProducto, comentario, idUsuarioComprador, nota, foto], (error, results) => {
+  db.query(query, [idProducto, comentario, idUsuarioComprador, idUsuarioVendedor, nota, foto], (error, results) => {
     if (error) {
       console.error('Error ejecutando la insercion', error)
       return response.status(500).json({

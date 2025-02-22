@@ -505,7 +505,7 @@ WHERE
 ORDER BY 
     carrito.fecha DESC;
     
-    DROP VIEW IF EXISTS vista_compras_usuario;
+DROP VIEW IF EXISTS vista_compras_usuario;
 CREATE VIEW vista_compras_usuario AS
 SELECT 
     usuario.idUsuario,
@@ -519,13 +519,16 @@ SELECT
     carritoProducto.idCarritoProducto,
     carritoProducto.idProducto,
     carritoProducto.cantidad,
-    carritoProducto.precio_unitario
+    carritoProducto.precio_unitario,
+    producto.idVendedor 
 FROM 
     carrito
 JOIN 
     usuario ON carrito.idUsuario = usuario.idUsuario
 JOIN 
     carritoProducto ON carrito.idCarrito = carritoProducto.idCarrito
+JOIN 
+    producto ON carritoProducto.idProducto = producto.idProducto -- Haciendo JOIN con la tabla producto
 -- WHERE 
    -- carrito.estado = 'exitosa'
 ORDER BY 
