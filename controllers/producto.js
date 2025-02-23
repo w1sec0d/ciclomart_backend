@@ -213,8 +213,8 @@ const publishProducto = async (req, res) => {
       transmision: req.body.transmision,
       tipoPedales: req.body.tipoPedales,
       manubrio: req.body.tipoManubrio,
-      pesoBicicleta: req.body.pesoBicicleta,
-      pesoMaximo: req.body.pesoMaximo,
+      pesoBicicleta: req.body.pesoBicicleta != '' ? req.body.pesoBicicleta : null,
+      pesoMaximo: req.body.pesoMaximo != '' ? req.body.pesoBicicleta : null,
       extras: req.body.extras,
     }
   }
@@ -240,6 +240,7 @@ const publishProducto = async (req, res) => {
     const modelPlaceholders = modelColumns.map(() => '?').join(', ')
 
     const modelQuery = `INSERT INTO modelo (${modelColumns.join(', ')}) VALUES (${modelPlaceholders})`
+    console.log('!!!!modelQuery', modelQuery)
     db.query(modelQuery, modelValues, (error, results) => {
       if (error) {
         console.error('Error publicando producto:', error)
@@ -285,6 +286,7 @@ const publishProducto = async (req, res) => {
       const productoPlaceholders = productoColumns.map(() => '?').join(', ')
 
       const productoQuery = `INSERT INTO producto (${productoColumns.join(', ')}) VALUES (${productoPlaceholders})`
+      console.log('!!!!productoQuery', productoQuery)
       // const [resultProduct] = await db.query(productoQuery, productoValues)
       db.query(productoQuery, productoValues, (error, results) => {
         try {
@@ -300,7 +302,18 @@ const publishProducto = async (req, res) => {
               .join(', ')
 
             const bicicletaQuery = `INSERT INTO bicicleta (${bicicletaColumns.join(', ')}) VALUES (${bicicletaPlaceholders})`
-            db.query(bicicletaQuery, [...bicicletaValues])
+            console.log('bicicletaQuery', bicicletaQuery)
+            console.log('values', bicicletaValues)
+            db.query(bicicletaQuery, [...bicicletaValues], (error, results) => {
+              if (error) {
+                console.error('Error publicando producto:', error)
+                return res.status(500).json({
+                  success: false,
+                  message: 'Error al publicar el producto',
+                })
+              }
+            }
+            )
           }
           res.status(200).json({
             success: true,
