@@ -277,7 +277,7 @@ INSERT INTO `carrito` (`idUsuario`, `cantidadProductos`, `precioTotal`, `fecha`,
 VALUES 
 (1, 2, 1500.00, NOW(), 'exitosa', 'Tarjeta de Crédito', 'Calle 123, Bogotá', 0),
 (2, 1, 800.00, NOW(), 'exitosa', 'PayPal', 'Carrera 45, Medellín', 0),
-(4, 2, 1500.00, NOW(), 'exitosa', 'Tarjeta de Crédito', 'Calle 123, Bogotá', 0);
+(3, 2, 1500.00, NOW(), 'exitosa', 'Tarjeta de Crédito', 'Calle 123, Bogotá', 0);
 
 -- Insertar productos de muestra
 INSERT INTO `producto` (`idModelo`, `idVendedor`, `idTienda`, `precio`, `precioCompleto`, `cantidad`,`ventas`, `estado`, `disponibilidad`, `costoEnvio`, `retiroEnTienda`)
@@ -351,7 +351,7 @@ JOIN
 JOIN 
     carritoProducto ON carrito.idCarrito = carritoProducto.idCarrito
 JOIN 
-	producto ON producto.idProducto = carritoproducto.idProducto
+	producto ON producto.idProducto = carritoProducto.idProducto
 JOIN 
 	modelo ON modelo.idModelo = producto.idModelo
 ORDER BY 
