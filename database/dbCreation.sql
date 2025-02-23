@@ -276,7 +276,8 @@ VALUES
 INSERT INTO `carrito` (`idUsuario`, `cantidadProductos`, `precioTotal`, `fecha`, `estado`, `metodoPago`, `direccionEnvio`, `descuento`)
 VALUES 
 (1, 2, 1500.00, NOW(), 'exitosa', 'Tarjeta de Crédito', 'Calle 123, Bogotá', 0),
-(2, 1, 800.00, NOW(), 'exitosa', 'PayPal', 'Carrera 45, Medellín', 0);
+(2, 1, 800.00, NOW(), 'exitosa', 'PayPal', 'Carrera 45, Medellín', 0),
+(4, 2, 1500.00, NOW(), 'exitosa', 'Tarjeta de Crédito', 'Calle 123, Bogotá', 0);
 
 -- Insertar productos de muestra
 INSERT INTO `producto` (`idModelo`, `idVendedor`, `idTienda`, `precio`, `precioCompleto`, `cantidad`,`ventas`, `estado`, `disponibilidad`, `costoEnvio`, `retiroEnTienda`)
@@ -295,8 +296,8 @@ VALUES
 -- Insertar productos del carrito de muestra
 INSERT INTO `carritoProducto` (`idProducto`, `idCarrito`, `cantidad`, `precio_unitario`, `direccion`, `estadoEnvio`)
 VALUES 
-(1, 1, 1, 750.00, 'Calle 123, Bogotá', 'Pendiente'),
-(2, 1, 1, 750.00, 'Calle 123, Bogotá', 'Pendiente'),
+(1, 3, 1, 750.00, 'Calle 123, Bogotá', 'Pendiente'),
+(2, 2, 1, 750.00, 'Calle 123, Bogotá', 'Pendiente'),
 (3, 2, 1, 800.00, 'Carrera 45, Medellín', 'Pendiente');
 
 -- Insertar documentos de muestra
@@ -323,6 +324,40 @@ VALUES
 ------------------------------------------------------------
 -- Vistas
 ------------------------------------------------------------
+-- Vista de productos en carrito completa
+DROP VIEW IF EXISTS vista_productos_carrito_usuario;
+CREATE VIEW vista_productos_carrito_usuario AS
+SELECT 
+    usuario.idUsuario,
+    usuario.nombre as usuario,
+    usuario.correo,
+    carrito.idCarrito,
+    carrito.fecha,
+    carrito.estado,
+    carrito.precioTotal,
+    carrito.metodoPago,
+    carrito.direccionEnvio,
+    carritoProducto.idCarritoProducto,
+    carritoProducto.idProducto,
+    carritoProducto.cantidad,
+    carritoProducto.precio_unitario,
+    producto.idModelo,
+    producto.costoEnvio,
+    modelo.nombre
+FROM 
+    carrito
+JOIN 
+    usuario ON carrito.idUsuario = usuario.idUsuario
+JOIN 
+    carritoProducto ON carrito.idCarrito = carritoProducto.idCarrito
+JOIN 
+	producto ON producto.idProducto = carritoproducto.idProducto
+JOIN 
+	modelo ON modelo.idModelo = producto.idModelo
+ORDER BY 
+    carrito.fecha DESC;
+    
+
 -- Crear la vista consolidada
 DROP VIEW IF EXISTS vista_completa_producto;
 CREATE VIEW vista_completa_producto AS
