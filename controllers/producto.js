@@ -137,16 +137,12 @@ const createPreference = async (req, res) => {
               },
             ],
             back_urls: {
-              success:
-                process.env.FRONTEND_URL + '/requestResult/purchaseComplete',
-              failure:
-                process.env.FRONTEND_URL + '/requestResult/purchaseFailed',
-              pending:
-                process.env.FRONTEND_URL + '/requestResult/purchasePending',
+              success: process.env.FRONTEND_URL + '/requestResult/purchaseComplete',
+              failure: process.env.FRONTEND_URL + '/requestResult/purchaseFailed',
+              pending: process.env.FRONTEND_URL + '/requestResult/purchasePending',
             },
             auto_return: 'approved',
             notification_url: process.env.BACKEND_URL + '/webhookMercadoLibre',
-            external_reference: carritoId,
           }
           const result = await preference.create({
             body: preferenceBody,
@@ -240,7 +236,6 @@ const publishProducto = async (req, res) => {
     const modelPlaceholders = modelColumns.map(() => '?').join(', ')
 
     const modelQuery = `INSERT INTO modelo (${modelColumns.join(', ')}) VALUES (${modelPlaceholders})`
-    console.log('!!!!modelQuery', modelQuery)
     db.query(modelQuery, modelValues, (error, results) => {
       if (error) {
         console.error('Error publicando producto:', error)
@@ -286,7 +281,6 @@ const publishProducto = async (req, res) => {
       const productoPlaceholders = productoColumns.map(() => '?').join(', ')
 
       const productoQuery = `INSERT INTO producto (${productoColumns.join(', ')}) VALUES (${productoPlaceholders})`
-      console.log('!!!!productoQuery', productoQuery)
       // const [resultProduct] = await db.query(productoQuery, productoValues)
       db.query(productoQuery, productoValues, (error, results) => {
         try {
@@ -297,9 +291,7 @@ const publishProducto = async (req, res) => {
               (key) => tipoData[key] !== undefined
             )
             const bicicletaValues = bicicletaColumns.map((key) => tipoData[key])
-            const bicicletaPlaceholders = bicicletaColumns
-              .map(() => '?')
-              .join(', ')
+            const bicicletaPlaceholders = bicicletaColumns.map(() => '?').join(', ')
 
             const bicicletaQuery = `INSERT INTO bicicleta (${bicicletaColumns.join(', ')}) VALUES (${bicicletaPlaceholders})`
             console.log('bicicletaQuery', bicicletaQuery)
