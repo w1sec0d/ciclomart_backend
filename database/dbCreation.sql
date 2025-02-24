@@ -17,6 +17,7 @@ CREATE TABLE `usuario` (
   `telefono` varchar(60),
   `username` varchar(45),
   `password` varchar(64) NOT NULL,
+  `reporte` boolean DEFAULT (false),
   `fechaRegistro` datetime DEFAULT (current_timestamp)
 );
 
@@ -300,11 +301,14 @@ VALUES
 (2, 2, 1, 750.00, 'Calle 123, Bogotá', 'Pendiente'),
 (3, 2, 1, 800.00, 'Carrera 45, Medellín', 'Pendiente');
 
--- Insertar documentos de muestra
-INSERT INTO `documento` (`idModelo`, `idUsuario`, `tipo`, `descripcion`, `estado`, `fechaCompra`)
+-- Insertar calificaciones de muestra
+INSERT INTO `calificacion` (`idUsuarioComprador`, `idUsuarioVendedor`, `idProducto`, `idTienda`, `foto`, `comentario`, `nota`)
 VALUES 
-(1, 1, 'Factura', 'Compra de Trek Marlin 7', 'Completado', '2023-01-15'),
-(2, 2, 'Factura', 'Compra de Specialized Allez', 'Completado', '2023-02-20');
+(2, 1, 1, 1, '', '¡Excelente bicicleta!', 5),
+(3, 2, 2, 1, '', 'Muy satisfecho', 4),
+(1, 2, 2, 1, '', 'La bici es buena pero es muy pesada', 3),
+(2,1,10,null, null, 'Muy buen producto, voy tres meses y no me he pinchado', 5),
+(3,1,10,null, null, 'Muy malo, me pinche a la primera salida', 1);
 
 -- Insertar calificaciones de muestra
 INSERT INTO `calificacion` (`idUsuarioComprador`, `idUsuarioVendedor`, `idProducto`, `idTienda`, `foto`, `comentario`, `nota`)
@@ -445,6 +449,7 @@ SELECT
     calificacion.idCalificacion,
     calificacion.nota AS puntuacion,
     calificacion.comentario,
+    calificacion.foto,
     calificacion.fecha AS fechaCalificacion
 FROM 
     producto
@@ -537,7 +542,7 @@ WHERE
 ORDER BY 
     carrito.fecha DESC;
     
-    DROP VIEW IF EXISTS vista_compras_usuario;
+DROP VIEW IF EXISTS vista_compras_usuario;
 CREATE VIEW vista_compras_usuario AS
 SELECT 
     usuario.idUsuario,
@@ -552,13 +557,16 @@ SELECT
     carritoProducto.idCarritoProducto,
     carritoProducto.idProducto,
     carritoProducto.cantidad,
-    carritoProducto.precio_unitario
+    carritoProducto.precio_unitario,
+    producto.idVendedor 
 FROM 
     carrito
 JOIN 
     usuario ON carrito.idUsuario = usuario.idUsuario
 JOIN 
     carritoProducto ON carrito.idCarrito = carritoProducto.idCarrito
+JOIN 
+    producto ON carritoProducto.idProducto = producto.idProducto -- Haciendo JOIN con la tabla producto
 -- WHERE 
    -- carrito.estado = 'exitosa'
 ORDER BY 
@@ -591,6 +599,39 @@ WHERE
 ORDER BY 
     carrito.fecha DESC;
 
+DROP VIEW IF EXISTS vista_calificaciones_productos_vendedor;
+CREATE VIEW vista_calificaciones_productos_vendedor AS
+SELECT 
+    u.idUsuario,
+    u.nombre,
+    u.apellido,
+    u.correo,
+    u.fechaRegistro,
+    u.reporte,
+    c.idCalificacion,
+    c.idUsuarioComprador,
+    c.idUsuarioVendedor,
+    c.idProducto,
+    c.idTienda,
+    c.foto,
+    c.comentario,
+    c.nota,
+    c.fecha,
+    iv.url AS imagenVendedor,
+    ic.url AS imagenComprador,
+    cu.nombre AS nombreComprador,
+    cu.apellido AS apellidoComprador
+FROM 
+    usuario u
+LEFT JOIN 
+    calificacion c ON u.idUsuario = c.idUsuarioVendedor 
+LEFT JOIN 
+    usuario cu ON cu.idUsuario = c.idUsuarioComprador
+LEFT JOIN 
+    imagen iv ON iv.idUsuario = u.idUsuario
+LEFT JOIN 
+    imagen ic ON ic.idUsuario = c.idUsuarioComprador;
+=======
 ------------------------------------------------
 -- Procedimientos almacenados
 ------------------------------------------------
