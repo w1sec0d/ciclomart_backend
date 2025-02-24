@@ -76,11 +76,12 @@ CREATE TABLE `tienda` (
 
 CREATE TABLE `carrito` (
   `idCarrito` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `idPreferenciaPago` int UNIQUE,
   `idUsuario` int NOT NULL,
   `cantidadProductos` int DEFAULT 0,
   `precioTotal` float,
   `fecha` datetime,
-  `estado` ENUM ('pendiente', 'exitosa', 'fallida') DEFAULT 'pendiente',
+  `estado` ENUM ('pendiente_pago', 'pendiente_envio', 'enviado', 'recibido', 'fallido') DEFAULT 'pendiente_pago',
   `metodoPago` varchar(45),
   `direccionEnvio` varchar(45),
   `descuento` float
@@ -523,6 +524,7 @@ SELECT
     usuario.nombre,
     usuario.correo,
     carrito.idCarrito,
+    carrito.idPreferenciaPago,
     carrito.fecha,
     carrito.precioTotal,
     carrito.metodoPago,
@@ -538,7 +540,7 @@ JOIN
 JOIN 
     carritoProducto ON carrito.idCarrito = carritoProducto.idCarrito
 WHERE 
-    carrito.estado != 'exitosa'
+    carrito.estado != 'recibido'
 ORDER BY 
     carrito.fecha DESC;
     
@@ -549,6 +551,7 @@ SELECT
     usuario.nombre,
     usuario.correo,
     carrito.idCarrito,
+    carrito.idPreferenciaPago,
     carrito.fecha,
     carrito.estado,
     carrito.precioTotal,
@@ -576,6 +579,7 @@ DROP VIEW IF EXISTS vista_ventas_usuario;
 CREATE VIEW vista_ventas_usuario AS
 SELECT 
     carrito.idCarrito,
+	carrito.idPreferenciaPago,
     carrito.fecha,
     carrito.precioTotal,
     carrito.metodoPago,
@@ -595,7 +599,7 @@ JOIN
 JOIN 
     usuario ON producto.idVendedor = usuario.idUsuario
 WHERE 
-    carrito.estado = 'exitosa'
+    carrito.estado = 'recibido'
 ORDER BY 
     carrito.fecha DESC;
 

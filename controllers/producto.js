@@ -78,7 +78,7 @@ const createPreference = async (req, res) => {
     // Crear carrito
     const carritoQuery = `
       INSERT INTO carrito (idUsuario, cantidadProductos, precioTotal, fecha, estado, metodoPago, direccionEnvio, descuento)
-      VALUES (?, ?, ?, NOW(), 'pendiente', ?, ?, ?)
+      VALUES (?, ?, ?, NOW(), 'pendiente_pago', ?, ?, ?)
     `
     const carritoValues = [
       idComprador,
@@ -144,8 +144,6 @@ const createPreference = async (req, res) => {
             auto_return: 'approved',
             notification_url: process.env.BACKEND_URL + '/webhookMercadoLibre',
           }
-          
-          console.log('preferenceBody', preferenceBody)
           const result = await preference.create({
             body: preferenceBody,
           })
@@ -211,8 +209,8 @@ const publishProducto = async (req, res) => {
       transmision: req.body.transmision,
       tipoPedales: req.body.tipoPedales,
       manubrio: req.body.tipoManubrio,
-      pesoBicicleta: req.body.pesoBicicleta,
-      pesoMaximo: req.body.pesoMaximo,
+      pesoBicicleta: req.body.pesoBicicleta != '' ? req.body.pesoBicicleta : null,
+      pesoMaximo: req.body.pesoMaximo != '' ? req.body.pesoBicicleta : null,
       extras: req.body.extras,
     }
   }
@@ -293,12 +291,21 @@ const publishProducto = async (req, res) => {
               (key) => tipoData[key] !== undefined
             )
             const bicicletaValues = bicicletaColumns.map((key) => tipoData[key])
-            const bicicletaPlaceholders = bicicletaColumns
-              .map(() => '?')
-              .join(', ')
+            const bicicletaPlaceholders = bicicletaColumns.map(() => '?').join(', ')
 
             const bicicletaQuery = `INSERT INTO bicicleta (${bicicletaColumns.join(', ')}) VALUES (${bicicletaPlaceholders})`
-            db.query(bicicletaQuery, [...bicicletaValues])
+            console.log('bicicletaQuery', bicicletaQuery)
+            console.log('values', bicicletaValues)
+            db.query(bicicletaQuery, [...bicicletaValues], (error, results) => {
+              if (error) {
+                console.error('Error publicando producto:', error)
+                return res.status(500).json({
+                  success: false,
+                  message: 'Error al publicar el producto',
+                })
+              }
+            }
+            )
           }
           res.status(200).json({
             success: true,
