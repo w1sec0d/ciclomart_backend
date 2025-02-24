@@ -111,6 +111,7 @@ CREATE TABLE `producto` (
   `idModelo` int NOT NULL,
   `idVendedor` int,
   `idTienda` int,
+  `exposicion`int DEFAULT 0, 
   `precio` float,
   `precioCompleto` float,
   `cantidad` int DEFAULT 0,
