@@ -81,7 +81,14 @@ const createPreference = async (req, res) => {
       INSERT INTO carrito (idUsuario, cantidadProductos, precioTotal, fecha, estado, metodoPago, direccionEnvio, descuento)
       VALUES (?, ?, ?, NOW(), 'pendiente', ?, ?, ?)
     `
-    const carritoValues = [idComprador, quantity, unit_price * quantity, 'MercadoPago', 'Direccion de envio', 0]
+    const carritoValues = [
+      idComprador,
+      quantity,
+      unit_price * quantity,
+      'MercadoPago',
+      'Direccion de envio',
+      0,
+    ]
 
     db.query(carritoQuery, carritoValues, (error, carritoResults) => {
       if (error) {
@@ -100,49 +107,60 @@ const createPreference = async (req, res) => {
         INSERT INTO carritoProducto (idProducto, idCarrito, cantidad, precio_unitario, direccion, estadoEnvio)
         VALUES (?, ?, ?, ?, ?, 'Pendiente')
       `
-      const carritoProductoValues = [idProducto, carritoId, quantity, unit_price, 'Direccion de envio']
+      const carritoProductoValues = [
+        idProducto,
+        carritoId,
+        quantity,
+        unit_price,
+        'Direccion de envio',
+      ]
 
-      db.query(carritoProductoQuery, carritoProductoValues, async (error, carritoProductoResults) => {
-        if (error) {
-          console.error('Error creando carritoProducto:', error)
-          return res.status(500).json({
-            success: false,
-            message: 'Error creando carritoProducto',
-            error: error.message,
+      db.query(
+        carritoProductoQuery,
+        carritoProductoValues,
+        async (error, carritoProductoResults) => {
+          if (error) {
+            console.error('Error creando carritoProducto:', error)
+            return res.status(500).json({
+              success: false,
+              message: 'Error creando carritoProducto',
+              error: error.message,
+            })
+          }
+
+          const preferenceBody = {
+            items: [
+              {
+                title,
+                quantity: Number(quantity),
+                unit_price: Number(unit_price),
+                currency_id: 'COP',
+              },
+            ],
+            back_urls: {
+              success:
+                process.env.FRONTEND_URL + '/requestResult/purchaseComplete',
+              failure:
+                process.env.FRONTEND_URL + '/requestResult/purchaseFailed',
+              pending:
+                process.env.FRONTEND_URL + '/requestResult/purchasePending',
+            },
+            auto_return: 'approved',
+          }
+          console.log('preferenceBody', preferenceBody)
+          const result = await preference.create({
+            body: preferenceBody,
+          })
+
+          return res.status(200).json({
+            success: true,
+            message: 'Preferencia de MercadoPago creada exitosamente',
+            preferenceId: result.id,
+            paymentURL: result.init_point,
+            result,
           })
         }
-
-        const preferenceBody = {
-          items: [
-            {
-              title,
-              quantity: Number(quantity),
-              unit_price: Number(unit_price),
-              currency_id: 'COP',
-            },
-          ],
-          back_urls: {
-            success: process.env.FRONTEND_URL + '/requestResult/purchaseComplete',
-            failure: process.env.FRONTEND_URL + '/requestResult/purchaseFailed',
-            pending: process.env.FRONTEND_URL + '/requestResult/purchasePending',
-          },
-          auto_return: 'approved',
-        }
-        console.log('preferenceBody', preferenceBody)
-        const result = await preference.create({
-          body: preferenceBody,
-        })
-
-        return res.status(200).json({
-          success: true,
-          message: 'Preferencia de MercadoPago creada exitosamente',
-          preferenceId: result.id,
-          paymentURL: result.init_point,
-          result,
-        })
-
-
-      })
+      )
     })
   } catch (error) {
     console.error('Error creando preferencia de MercadoPago:', error)
@@ -222,81 +240,81 @@ const publishProducto = async (req, res) => {
     const modelPlaceholders = modelColumns.map(() => '?').join(', ')
 
     const modelQuery = `INSERT INTO modelo (${modelColumns.join(', ')}) VALUES (${modelPlaceholders})`
-    db.query(modelQuery, modelValues,
-      (error, results) => {
-        if (error) {
+    db.query(modelQuery, modelValues, (error, results) => {
+      if (error) {
+        console.error('Error publicando producto:', error)
+        return res.status(500).json({
+          success: false,
+          message: 'Error al publicar el producto',
+        })
+      }
+      console.log('results', results)
+      const productoId = results.insertId
+
+      if (!productoId) {
+        return res.status(500).json({
+          success: false,
+          message: 'Error al obtener el id del producto',
+        })
+      }
+
+      const productoColumns = [
+        'idModelo',
+        'idVendedor',
+        'idTienda',
+        'precio',
+        'precioCompleto',
+        'cantidad',
+        'estado',
+        'disponibilidad',
+        'costoEnvio',
+        'retiroEnTienda',
+      ]
+      const productoValues = [
+        productoId,
+        idVendedor,
+        idTienda,
+        precio,
+        precioCompleto,
+        cantidad,
+        estado,
+        disponibilidad,
+        costoEnvio,
+        retiroInt,
+      ]
+      const productoPlaceholders = productoColumns.map(() => '?').join(', ')
+
+      const productoQuery = `INSERT INTO producto (${productoColumns.join(', ')}) VALUES (${productoPlaceholders})`
+      // const [resultProduct] = await db.query(productoQuery, productoValues)
+      db.query(productoQuery, productoValues, (error, results) => {
+        try {
+          // Insertar en la tabla correspondiente
+          if (tipo === 'bicicleta') {
+            tipoData['idBicicleta'] = productoId
+            const bicicletaColumns = Object.keys(tipoData).filter(
+              (key) => tipoData[key] !== undefined
+            )
+            const bicicletaValues = bicicletaColumns.map((key) => tipoData[key])
+            const bicicletaPlaceholders = bicicletaColumns
+              .map(() => '?')
+              .join(', ')
+
+            const bicicletaQuery = `INSERT INTO bicicleta (${bicicletaColumns.join(', ')}) VALUES (${bicicletaPlaceholders})`
+            db.query(bicicletaQuery, [...bicicletaValues])
+          }
+          res.status(200).json({
+            success: true,
+            message: 'Producto publicado exitosamente',
+          })
+        } catch (error) {
           console.error('Error publicando producto:', error)
           return res.status(500).json({
             success: false,
             message: 'Error al publicar el producto',
           })
         }
-        console.log('results', results)
-        const productoId = results.insertId
-
-        if (!productoId) {
-          return res.status(500).json({
-            success: false,
-            message: 'Error al obtener el id del producto',
-          })
-        }
-
-        const productoColumns = [
-          'idModelo',
-          'idVendedor',
-          'idTienda',
-          'precio',
-          'precioCompleto',
-          'cantidad',
-          'estado',
-          'disponibilidad',
-          'costoEnvio',
-          'retiroEnTienda',
-        ]
-        const productoValues = [
-          productoId,
-          idVendedor,
-          idTienda,
-          precio,
-          precioCompleto,
-          cantidad,
-          estado,
-          disponibilidad,
-          costoEnvio,
-          retiroInt,
-        ]
-        const productoPlaceholders = productoColumns.map(() => '?').join(', ')
-
-        const productoQuery = `INSERT INTO producto (${productoColumns.join(', ')}) VALUES (${productoPlaceholders})`
-        // const [resultProduct] = await db.query(productoQuery, productoValues)
-        db.query(productoQuery, productoValues, (error, results) => {
-          try {
-            // Insertar en la tabla correspondiente
-            if (tipo === 'bicicleta') {
-              tipoData['idBicicleta'] = productoId
-              const bicicletaColumns = Object.keys(tipoData).filter(
-                (key) => tipoData[key] !== undefined
-              )
-              const bicicletaValues = bicicletaColumns.map((key) => tipoData[key])
-              const bicicletaPlaceholders = bicicletaColumns.map(() => '?').join(', ')
-
-              const bicicletaQuery = `INSERT INTO bicicleta (${bicicletaColumns.join(', ')}) VALUES (${bicicletaPlaceholders})`
-              db.query(bicicletaQuery, [...bicicletaValues])
-            }
-            res.status(200).json({
-              success: true,
-              message: 'Producto publicado exitosamente',
-            })
-          } catch (error) {
-            console.error('Error publicando producto:', error)
-            return res.status(500).json({
-              success: false,
-              message: 'Error al publicar el producto',
-            })
-          }
-        })
-      }
-    )
+      })
+    })
   } catch (error) {
     console.error('Error obteniendo productos:', error)
     res.status(500).json({
@@ -328,7 +346,6 @@ const getModels = async (req, res) => {
 }
 
 const getBrands = async (req, res) => {
-
   try {
     db.query('SELECT * FROM marca', (error, results) => {
       if (error) {
@@ -353,4 +370,11 @@ const getBrands = async (req, res) => {
   }
 }
 
-module.exports = { getProducto, getProductById, createPreference, publishProducto, getModels, getBrands }
+module.exports = {
+  getProducto,
+  getProductById,
+  createPreference,
+  publishProducto,
+  getModels,
+  getBrands,
+}

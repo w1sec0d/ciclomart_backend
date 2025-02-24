@@ -53,9 +53,7 @@ const {
   checkUserPurchase,
 } = require('../controllers/ratingProduct.js')
 
-const { 
-  getRatingSeller 
-} = require('../controllers/vistaVendedor.js')
+const { getRatingSeller } = require('../controllers/vistaVendedor.js')
 
 // Rutas usuarios
 router.get('/usuarios', getUsuarios)
@@ -103,7 +101,7 @@ router.get('/ratingSeller/:id', getRatingSeller)
 
 // Ruta de prueba webhook
 router.post('/webhook', (req, res) => {
-  console.log("notificacion Mercado Libre:", req.body)
+  console.log('notificacion Mercado Libre:', req.body)
   res.status(200).send('OK')
 })
 

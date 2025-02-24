@@ -63,7 +63,7 @@ const averageProductRatings = (request, response) => {
 // Permite revisar si un usuario compro un producto. De vuelve el id vendedor
 const checkUserPurchase = (request, response) => {
   const { idComprador, idProducto } = request.body
-  console.log("body", request.body)
+  console.log('body', request.body)
 
   if (!idComprador || !idProducto) {
     return response.status(400).json({
@@ -102,24 +102,35 @@ const checkUserPurchase = (request, response) => {
 }
 
 const addRatingProduct = (request, response) => {
-  const { idProducto, comentario, idUsuarioComprador, idUsuarioVendedor, nota, foto } = request.body
+  const {
+    idProducto,
+    comentario,
+    idUsuarioComprador,
+    idUsuarioVendedor,
+    nota,
+    foto,
+  } = request.body
   const query = `INSERT INTO calificacion (idProducto,comentario, idUsuarioComprador, idUsuarioVendedor, nota, foto) VALUES (?, ?, ?, ?, ?, ?)`
 
-  db.query(query, [idProducto, comentario, idUsuarioComprador, idUsuarioVendedor, nota, foto], (error, results) => {
-    if (error) {
-      console.error('Error ejecutando la insercion', error)
-      return response.status(500).json({
-        success: false,
-        message: 'Error en el servidor. Intentelo más tarde',
-        error: error.message,
+  db.query(
+    query,
+    [idProducto, comentario, idUsuarioComprador, idUsuarioVendedor, nota, foto],
+    (error, results) => {
+      if (error) {
+        console.error('Error ejecutando la insercion', error)
+        return response.status(500).json({
+          success: false,
+          message: 'Error en el servidor. Intentelo más tarde',
+          error: error.message,
+        })
+      }
+
+      return response.status(201).json({
+        success: true,
+        message: 'Comentario añadido con éxito',
       })
     }
-
-    return response.status(201).json({
-      success: true,
-      message: 'Comentario añadido con éxito',
-    })
-  })
+  )
 }
 
 module.exports = {
