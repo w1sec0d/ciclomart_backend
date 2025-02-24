@@ -143,6 +143,7 @@ const createPreference = async (req, res) => {
             },
             auto_return: 'approved',
             notification_url: process.env.BACKEND_URL + '/webhookMercadoLibre',
+            external_reference: carritoId,
           }
           const result = await preference.create({
             body: preferenceBody,
