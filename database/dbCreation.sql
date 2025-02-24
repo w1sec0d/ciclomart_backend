@@ -17,6 +17,7 @@ CREATE TABLE `usuario` (
   `telefono` varchar(60),
   `username` varchar(45),
   `password` varchar(64) NOT NULL,
+  `reporte` boolean DEFAULT (false),
   `fechaRegistro` datetime DEFAULT (current_timestamp)
 );
 
@@ -571,6 +572,7 @@ SELECT
     u.apellido,
     u.correo,
     u.fechaRegistro,
+    u.reporte,
     c.idCalificacion,
     c.idUsuarioComprador,
     c.idUsuarioVendedor,
