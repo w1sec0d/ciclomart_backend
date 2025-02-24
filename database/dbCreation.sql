@@ -279,9 +279,9 @@ VALUES
 -- Insertar carritos de muestra
 INSERT INTO `carrito` (`idUsuario`, `cantidadProductos`, `precioTotal`, `fecha`, `estado`, `metodoPago`, `direccionEnvio`, `descuento`)
 VALUES 
-(1, 2, 1500.00, NOW(), 'exitosa', 'Tarjeta de Crédito', 'Calle 123, Bogotá', 0),
-(2, 1, 800.00, NOW(), 'exitosa', 'PayPal', 'Carrera 45, Medellín', 0),
-(3, 2, 1500.00, NOW(), 'exitosa', 'Tarjeta de Crédito', 'Calle 123, Bogotá', 0);
+(1, 2, 1500.00, NOW(), 'enviado', 'Tarjeta de Crédito', 'Calle 123, Bogotá', 0),
+(2, 1, 800.00, NOW(), 'enviado', 'PayPal', 'Carrera 45, Medellín', 0),
+(3, 2, 1500.00, NOW(), 'enviado', 'Tarjeta de Crédito', 'Calle 123, Bogotá', 0);
 
 -- Insertar productos de muestra
 INSERT INTO `producto` (`idModelo`, `idVendedor`, `idTienda`, `precio`, `precioCompleto`, `cantidad`,`ventas`, `estado`, `disponibilidad`, `costoEnvio`, `retiroEnTienda`)

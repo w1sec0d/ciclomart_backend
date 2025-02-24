@@ -17,6 +17,7 @@ const webhookMercadoLibre = async (req, res) => {
       const paymentId = body.resource
       const paymentResponse = await payment.get({ id: paymentId })
       const { status, external_reference } = paymentResponse
+      console.log('external_reference', external_reference)
       if (status === 'approved') {
         db.query(
           "UPDATE carrito SET estado='pendiente_envio' WHERE idCarrito = ?",
