@@ -54,7 +54,14 @@ const {
   checkUserPurchase,
 } = require('../controllers/ratingProduct.js')
 
+const { getRatingSeller } = require('../controllers/vistaVendedor.js')
 const webhookMercadoLibre = require('../controllers/webhookMercadoLibre.js')
+
+const {
+  getShoppingCart,
+  addToShoppingCart,
+  removeFromShoppingCart
+} = require ('../controllers/shoppingCart.js')
 
 // Rutas usuarios
 router.get('/usuarios', getUsuarios)
@@ -97,7 +104,15 @@ router.get('/averageProductRatings/:id', averageProductRatings)
 router.post('/addRatingProduct', addRatingProduct)
 router.post('/checkUserPurchase/', checkUserPurchase)
 
+//Rutas de vista vendedor
+router.get('/ratingSeller/:id', getRatingSeller)
+
 // Ruta de prueba webhook
+
 router.post('/webhookMercadoLibre', webhookMercadoLibre)
+
+router.get('/shoppingCart/:id', getShoppingCart)
+router.post('/addToShoppingCart', addToShoppingCart)
+router.delete('/removeFromShoppingCart/:idUsuario/:idProducto', removeFromShoppingCart)
 
 module.exports = router
