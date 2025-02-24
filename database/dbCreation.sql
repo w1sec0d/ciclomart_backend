@@ -246,7 +246,8 @@ VALUES
 ('Casco Bontrager Starvos', 'accesorio', 'Casco de ciclismo de carretera', 'Casco', 'Talla única', 1),
 ('Casco Specialized Propero', 'accesorio', 'Casco de ciclismo de carretera', 'Casco', 'Talla única', 2),
 ('Casco Giant Rev', 'accesorio', 'Casco de ciclismo de carretera', 'Casco', 'Talla única', 3),
-('Neumático MTB rin 26"', 'componente', 'Neumatico rin 26"', 'Neumáticos', 'Compatible con bicicletas de montaña', null);
+('Neumático MTB rin 26"', 'componente', 'Neumatico rin 26"', 'Neumáticos', 'Compatible con bicicletas de montaña', null),
+('Zapatas de freno Genéricas', 'componente', 'Zapatas para cualquier bicicleta de frenos en herradura', 'Frenos', 'Compatible con cualquier bicicleta', null);
 
 -- Insertar imágenes de muestra
 INSERT INTO `imagen` (`idUsuario`, `idModelo`, `url`)
@@ -260,7 +261,8 @@ VALUES
 (null, 7, ''),
 (null, 8, ''),
 (null, 9, ''),
-(null, 10, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739203206/dgeumsxzyrlqv3kzqdw6.png');
+(null, 10, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739203206/dgeumsxzyrlqv3kzqdw6.png'),
+(null, 11, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1740430801/pxjassqtrzvnbrpovqur.png');
 
 -- Insertar bicicletas de muestra
 INSERT INTO `bicicleta` (`tipoBicicleta`, `color`, `genero`, `edad`, `tamañoMarco`, `materialMarco`, `tamañoRueda`, `tipoFrenos`, `velocidades`, `suspension`, `transmision`, `tipoPedales`, `manubrio`, `pesoBicicleta`, `pesoMaximo`, `extras`)
@@ -293,7 +295,8 @@ VALUES
 (7, 1, null, 300000, null, 10,0, 'nuevo', 'disponible', 0, false),
 (8, 2, null, 460000, 500000, 5,0, 'nuevo', 'disponible', 0, false),
 (9, 3, null, 60000, null, 3,0, 'nuevo', 'disponible', 0, false),
-(10, 1, null, 5000, null, 15,9, 'nuevo', 'disponible', 0, false);
+(10, 1, null, 5000, null, 15,9, 'nuevo', 'disponible', 0, false),
+(11, 1, null, 10000, 20000, 10,6, 'nuevo', 'disponible', 0, false);
 
 -- Insertar productos del carrito de muestra
 INSERT INTO `carritoProducto` (`idProducto`, `idCarrito`, `cantidad`, `precio_unitario`, `direccion`, `estadoEnvio`)
