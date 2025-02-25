@@ -149,6 +149,18 @@ const createPreference = async (req, res) => {
             body: preferenceBody,
           })
 
+          // Actualizar carrito con el id de la preferencia
+          db.query('UPDATE carrito SET idPreferenciaPago = ? WHERE idCarrito = ?', [result.id, carritoId], (error, results) => {
+            if (error) {
+              console.error('Error actualizando carrito:', error)
+              return res.status(500).json({
+                success: false,
+                message: 'Error actualizando carrito',
+                error: error.message,
+              })
+            }
+          })
+
           return res.status(200).json({
             success: true,
             message: 'Preferencia de MercadoPago creada exitosamente',
