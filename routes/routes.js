@@ -60,13 +60,13 @@ const webhookMercadoLibre = require('../controllers/webhookMercadoLibre.js')
 const {
   getShoppingCart,
   addToShoppingCart,
-  removeFromShoppingCart
+  removeFromShoppingCart,
 } = require('../controllers/shoppingCart.js')
 
 const {
   getPurchasesById,
   confirmShipment,
-  cancelPurchase
+  cancelPurchase,
 } = require('../controllers/purchases.js')
 
 // Rutas usuarios
@@ -119,7 +119,10 @@ router.post('/webhookMercadoLibre', webhookMercadoLibre)
 
 router.get('/shoppingCart/:id', getShoppingCart)
 router.post('/addToShoppingCart', addToShoppingCart)
-router.delete('/removeFromShoppingCart/:idUsuario/:idProducto', removeFromShoppingCart)
+router.delete(
+  '/removeFromShoppingCart/:idUsuario/:idProducto',
+  removeFromShoppingCart
+)
 
 // compras
 router.get('/purchases/:idComprador', getPurchasesById)
