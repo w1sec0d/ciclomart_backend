@@ -76,7 +76,7 @@ CREATE TABLE `tienda` (
 
 CREATE TABLE `carrito` (
   `idCarrito` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `idPreferenciaPago` int UNIQUE,
+  `idPreferenciaPago` varchar(100),
   `idUsuario` int NOT NULL,
   `cantidadProductos` int DEFAULT 0,
   `precioTotal` float,
@@ -564,7 +564,22 @@ SELECT
     carritoProducto.idProducto,
     carritoProducto.cantidad,
     carritoProducto.precio_unitario,
-    producto.idVendedor 
+    producto.idVendedor,
+    producto.precio,
+    producto.precioCompleto,
+    producto.cantidad AS cantidadProducto,
+    producto.ventas,
+    producto.estado AS estadoProducto,
+    producto.disponibilidad,
+    producto.costoEnvio,
+    producto.retiroEnTienda,
+    producto.fechaPublicacion,
+    modelo.nombre AS nombreModelo,
+    modelo.tipo AS tipoModelo,
+    modelo.descripcion AS descripcionModelo,
+    modelo.categoria AS categoriaModelo,
+    modelo.compatibilidad AS compatibilidadModelo,
+    marca.nombre AS nombreMarca
 FROM 
     carrito
 JOIN 
@@ -572,9 +587,11 @@ JOIN
 JOIN 
     carritoProducto ON carrito.idCarrito = carritoProducto.idCarrito
 JOIN 
-    producto ON carritoProducto.idProducto = producto.idProducto -- Haciendo JOIN con la tabla producto
--- WHERE 
-   -- carrito.estado = 'exitosa'
+    producto ON carritoProducto.idProducto = producto.idProducto
+JOIN 
+    modelo ON producto.idModelo = modelo.idModelo
+LEFT JOIN 
+    marca ON modelo.idMarca = marca.idMarca
 ORDER BY 
     carrito.fecha DESC;
 
