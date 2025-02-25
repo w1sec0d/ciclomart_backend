@@ -7,7 +7,7 @@ const createExposurePreference = async (req, res) => {
     const preferenceBody = {
       items: [
         {
-          title: `Grade ${grade}`,
+          title: `Exposure grade ${grade}`,
           unit_price: Number(price),
           quantity: Number(quantity),
           currency_id: 'COP',
