@@ -249,9 +249,9 @@ const publishProducto = async (req, res) => {
         })
       }
       console.log('results', results)
-      const productoId = results.insertId
+      const modeloId = results.insertId
 
-      if (!productoId) {
+      if (!modeloId) {
         return res.status(500).json({
           success: false,
           message: 'Error al obtener el id del producto',
@@ -272,7 +272,7 @@ const publishProducto = async (req, res) => {
         'retiroEnTienda',
       ]
       const productoValues = [
-        productoId,
+        modeloId,
         idVendedor,
         idTienda,
         exposicion,
@@ -292,7 +292,7 @@ const publishProducto = async (req, res) => {
         try {
           // Insertar en la tabla correspondiente
           if (tipo === 'bicicleta') {
-            tipoData['idBicicleta'] = productoId
+            tipoData['idBicicleta'] = modeloId
             const bicicletaColumns = Object.keys(tipoData).filter(
               (key) => tipoData[key] !== undefined
             )
@@ -304,9 +304,11 @@ const publishProducto = async (req, res) => {
             const bicicletaQuery = `INSERT INTO bicicleta (${bicicletaColumns.join(', ')}) VALUES (${bicicletaPlaceholders})`
             db.query(bicicletaQuery, [...bicicletaValues])
           }
+          const idProducto = results.insertId
           res.status(200).json({
             success: true,
             message: 'Producto publicado exitosamente',
+            idProducto: idProducto,
           })
         } catch (error) {
           console.error('Error publicando producto:', error)
