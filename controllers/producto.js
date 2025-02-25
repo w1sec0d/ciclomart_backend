@@ -137,16 +137,36 @@ const createPreference = async (req, res) => {
               },
             ],
             back_urls: {
-              success: process.env.FRONTEND_URL + '/requestResult/purchaseComplete',
-              failure: process.env.FRONTEND_URL + '/requestResult/purchaseFailed',
-              pending: process.env.FRONTEND_URL + '/requestResult/purchasePending',
+              success:
+                process.env.FRONTEND_URL + '/requestResult/purchaseComplete',
+              failure:
+                process.env.FRONTEND_URL + '/requestResult/purchaseFailed',
+              pending:
+                process.env.FRONTEND_URL + '/requestResult/purchasePending',
             },
             auto_return: 'approved',
             notification_url: process.env.BACKEND_URL + '/webhookMercadoLibre',
+            external_reference: carritoId,
           }
           const result = await preference.create({
             body: preferenceBody,
           })
+
+          // Actualizar carrito con el id de la preferencia
+          db.query(
+            'UPDATE carrito SET idPreferenciaPago = ? WHERE idCarrito = ?',
+            [result.id, carritoId],
+            (error, results) => {
+              if (error) {
+                console.error('Error actualizando carrito:', error)
+                return res.status(500).json({
+                  success: false,
+                  message: 'Error actualizando carrito',
+                  error: error.message,
+                })
+              }
+            }
+          )
 
           return res.status(200).json({
             success: true,
@@ -209,7 +229,8 @@ const publishProducto = async (req, res) => {
       transmision: req.body.transmision,
       tipoPedales: req.body.tipoPedales,
       manubrio: req.body.tipoManubrio,
-      pesoBicicleta: req.body.pesoBicicleta != '' ? req.body.pesoBicicleta : null,
+      pesoBicicleta:
+        req.body.pesoBicicleta != '' ? req.body.pesoBicicleta : null,
       pesoMaximo: req.body.pesoMaximo != '' ? req.body.pesoBicicleta : null,
       extras: req.body.extras,
     }
@@ -291,7 +312,9 @@ const publishProducto = async (req, res) => {
               (key) => tipoData[key] !== undefined
             )
             const bicicletaValues = bicicletaColumns.map((key) => tipoData[key])
-            const bicicletaPlaceholders = bicicletaColumns.map(() => '?').join(', ')
+            const bicicletaPlaceholders = bicicletaColumns
+              .map(() => '?')
+              .join(', ')
 
             const bicicletaQuery = `INSERT INTO bicicleta (${bicicletaColumns.join(', ')}) VALUES (${bicicletaPlaceholders})`
             console.log('bicicletaQuery', bicicletaQuery)
@@ -304,8 +327,7 @@ const publishProducto = async (req, res) => {
                   message: 'Error al publicar el producto',
                 })
               }
-            }
-            )
+            })
           }
           res.status(200).json({
             success: true,

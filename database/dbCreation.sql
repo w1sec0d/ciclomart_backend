@@ -76,7 +76,7 @@ CREATE TABLE `tienda` (
 
 CREATE TABLE `carrito` (
   `idCarrito` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `idPreferenciaPago` int UNIQUE,
+  `idPreferenciaPago` varchar(100),
   `idUsuario` int NOT NULL,
   `cantidadProductos` int DEFAULT 0,
   `precioTotal` float,
@@ -246,7 +246,8 @@ VALUES
 ('Casco Bontrager Starvos', 'accesorio', 'Casco de ciclismo de carretera', 'Casco', 'Talla única', 1),
 ('Casco Specialized Propero', 'accesorio', 'Casco de ciclismo de carretera', 'Casco', 'Talla única', 2),
 ('Casco Giant Rev', 'accesorio', 'Casco de ciclismo de carretera', 'Casco', 'Talla única', 3),
-('Neumático MTB rin 26"', 'componente', 'Neumatico rin 26"', 'Neumáticos', 'Compatible con bicicletas de montaña', null);
+('Neumático MTB rin 26"', 'componente', 'Neumatico rin 26"', 'Neumáticos', 'Compatible con bicicletas de montaña', null),
+('Zapatas de freno Genéricas', 'componente', 'Zapatas para cualquier bicicleta de frenos en herradura', 'Frenos', 'Compatible con cualquier bicicleta', null);
 
 -- Insertar imágenes de muestra
 INSERT INTO `imagen` (`idUsuario`, `idModelo`, `url`)
@@ -260,7 +261,8 @@ VALUES
 (null, 7, ''),
 (null, 8, ''),
 (null, 9, ''),
-(null, 10, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739203206/dgeumsxzyrlqv3kzqdw6.png');
+(null, 10, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739203206/dgeumsxzyrlqv3kzqdw6.png'),
+(null, 11, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1740430801/pxjassqtrzvnbrpovqur.png');
 
 -- Insertar bicicletas de muestra
 INSERT INTO `bicicleta` (`tipoBicicleta`, `color`, `genero`, `edad`, `tamañoMarco`, `materialMarco`, `tamañoRueda`, `tipoFrenos`, `velocidades`, `suspension`, `transmision`, `tipoPedales`, `manubrio`, `pesoBicicleta`, `pesoMaximo`, `extras`)
@@ -277,9 +279,9 @@ VALUES
 -- Insertar carritos de muestra
 INSERT INTO `carrito` (`idUsuario`, `cantidadProductos`, `precioTotal`, `fecha`, `estado`, `metodoPago`, `direccionEnvio`, `descuento`)
 VALUES 
-(1, 2, 1500.00, NOW(), 'exitosa', 'Tarjeta de Crédito', 'Calle 123, Bogotá', 0),
-(2, 1, 800.00, NOW(), 'exitosa', 'PayPal', 'Carrera 45, Medellín', 0),
-(3, 2, 1500.00, NOW(), 'exitosa', 'Tarjeta de Crédito', 'Calle 123, Bogotá', 0);
+(1, 2, 1500.00, NOW(), 'enviado', 'Tarjeta de Crédito', 'Calle 123, Bogotá', 0),
+(2, 1, 800.00, NOW(), 'enviado', 'PayPal', 'Carrera 45, Medellín', 0),
+(3, 2, 1500.00, NOW(), 'enviado', 'Tarjeta de Crédito', 'Calle 123, Bogotá', 0);
 
 -- Insertar productos de muestra
 INSERT INTO `producto` (`idModelo`, `idVendedor`, `idTienda`, `precio`, `precioCompleto`, `cantidad`,`ventas`, `estado`, `disponibilidad`, `costoEnvio`, `retiroEnTienda`)
@@ -293,7 +295,8 @@ VALUES
 (7, 1, null, 300000, null, 10,0, 'nuevo', 'disponible', 0, false),
 (8, 2, null, 460000, 500000, 5,0, 'nuevo', 'disponible', 0, false),
 (9, 3, null, 60000, null, 3,0, 'nuevo', 'disponible', 0, false),
-(10, 1, null, 5000, null, 15,9, 'nuevo', 'disponible', 0, false);
+(10, 1, null, 5000, null, 15,9, 'nuevo', 'disponible', 0, false),
+(11, 1, null, 10000, 20000, 10,6, 'nuevo', 'disponible', 0, false);
 
 -- Insertar productos del carrito de muestra
 INSERT INTO `carritoProducto` (`idProducto`, `idCarrito`, `cantidad`, `precio_unitario`, `direccion`, `estadoEnvio`)
@@ -561,7 +564,22 @@ SELECT
     carritoProducto.idProducto,
     carritoProducto.cantidad,
     carritoProducto.precio_unitario,
-    producto.idVendedor 
+    producto.idVendedor,
+    producto.precio,
+    producto.precioCompleto,
+    producto.cantidad AS cantidadProducto,
+    producto.ventas,
+    producto.estado AS estadoProducto,
+    producto.disponibilidad,
+    producto.costoEnvio,
+    producto.retiroEnTienda,
+    producto.fechaPublicacion,
+    modelo.nombre AS nombreModelo,
+    modelo.tipo AS tipoModelo,
+    modelo.descripcion AS descripcionModelo,
+    modelo.categoria AS categoriaModelo,
+    modelo.compatibilidad AS compatibilidadModelo,
+    marca.nombre AS nombreMarca
 FROM 
     carrito
 JOIN 
@@ -569,9 +587,11 @@ JOIN
 JOIN 
     carritoProducto ON carrito.idCarrito = carritoProducto.idCarrito
 JOIN 
-    producto ON carritoProducto.idProducto = producto.idProducto -- Haciendo JOIN con la tabla producto
--- WHERE 
-   -- carrito.estado = 'exitosa'
+    producto ON carritoProducto.idProducto = producto.idProducto
+JOIN 
+    modelo ON producto.idModelo = modelo.idModelo
+LEFT JOIN 
+    marca ON modelo.idMarca = marca.idMarca
 ORDER BY 
     carrito.fecha DESC;
 

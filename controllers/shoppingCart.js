@@ -12,33 +12,35 @@ const getShoppingCart = (request, response) => {
     })
   }
 
-  try{
+  try {
     db.query(
-        'SELECT * FROM vista_productos_carrito_usuario WHERE idUsuario = ?',
-        [idUsuario],
-        (error, results) => {
-          if (error) {
-            console.error('Error realizando la consulta ', error)
-            return response.status(500).json({
-              success: false,
-              message: 'Error obteniendo carrito',
-              error: error.message,
-            })
-          }
-          return response.status(200).json({
-            success: true,
-            message: 'Carrito obtenido con exito',
-            results,
+      'SELECT * FROM vista_productos_carrito_usuario WHERE idUsuario = ?',
+      [idUsuario],
+      (error, results) => {
+        if (error) {
+          console.error('Error realizando la consulta ', error)
+          return response.status(500).json({
+            success: false,
+            message: 'Error obteniendo carrito',
+            error: error.message,
           })
         }
-      )
-  } catch{(error) => {
-    return response.status(500).json({
-      success: false,
-      message: 'Error obteniendo carrito',
-      error: error.message,
-    })
-  }}
+        return response.status(200).json({
+          success: true,
+          message: 'Carrito obtenido con exito',
+          results,
+        })
+      }
+    )
+  } catch {
+    ;(error) => {
+      return response.status(500).json({
+        success: false,
+        message: 'Error obteniendo carrito',
+        error: error.message,
+      })
+    }
+  }
 }
 
 const addToShoppingCart = (request, response) => {
@@ -110,10 +112,11 @@ const addToShoppingCart = (request, response) => {
                   error: error.message,
                 })
               }
-    
+
               if (carritoproductoResults.length > 0) {
                 // El producto ya existe en el carrito, actualizar la cantidad
-                const nuevaCantidad = carritoproductoResults[0].cantidad + cantidad
+                const nuevaCantidad =
+                  carritoproductoResults[0].cantidad + cantidad
                 db.query(
                   'UPDATE carritoproducto SET cantidad = ? WHERE idCarrito = ? AND idProducto = ?',
                   [nuevaCantidad, idCarrito, idProducto],
@@ -122,13 +125,15 @@ const addToShoppingCart = (request, response) => {
                       console.error('Error realizando la consulta ', error)
                       return response.status(500).json({
                         success: false,
-                        message: 'Error actualizando cantidad del producto en el carrito',
+                        message:
+                          'Error actualizando cantidad del producto en el carrito',
                         error: error.message,
                       })
                     }
                     return response.status(200).json({
                       success: true,
-                      message: 'Cantidad del producto actualizada en el carrito',
+                      message:
+                        'Cantidad del producto actualizada en el carrito',
                       results,
                     })
                   }
@@ -147,16 +152,16 @@ const addToShoppingCart = (request, response) => {
                         error: error.message,
                       })
                     }
-    
+
                     if (productoResults.length === 0) {
                       return response.status(404).json({
                         success: false,
                         message: 'Producto no encontrado',
                       })
                     }
-    
+
                     const producto = productoResults[0]
-    
+
                     // Insertar en la tabla carritoproducto
                     db.query(
                       'INSERT INTO carritoproducto (idCarrito, idProducto, cantidad, precio_unitario) VALUES (?, ?, ?, ?)',
@@ -166,7 +171,8 @@ const addToShoppingCart = (request, response) => {
                           console.error('Error realizando la consulta ', error)
                           return response.status(500).json({
                             success: false,
-                            message: 'Error agregando producto al carritoproducto',
+                            message:
+                              'Error agregando producto al carritoproducto',
                             error: error.message,
                           })
                         }
