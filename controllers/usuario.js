@@ -143,10 +143,27 @@ const registerUsuario = async (request, response) => {
             error: error.message,
           })
         }
-        return response.status(201).json({
-          success: true,
-          message: 'Usuario añadido satisfactoriamente',
-        })
+
+        const idUsuario = results.insertId
+
+        db.query(
+          'INSERT INTO carrito (idUsuario) VALUES (?)',
+          [idUsuario],
+          (error, results) => {
+            if (error) {
+              console.error('Error ejecutando la consulta', error)
+              return response.status(500).json({
+                success: false,
+                message: 'Error en el servidor, intentalo más tarde',
+                error: error.message,
+              })
+            }
+            return response.status(201).json({
+              success: true,
+              message: 'Usuario añadido satisfactoriamente',
+            })
+          }
+        )
       }
     )
   } catch (error) {
