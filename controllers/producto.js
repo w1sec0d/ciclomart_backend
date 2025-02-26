@@ -148,12 +148,10 @@ const createPreference = async (req, res) => {
             notification_url: process.env.BACKEND_URL + '/webhookMercadoLibre',
 
             external_reference: carritoId,
-
           }
           const result = await preference.create({
             body: preferenceBody,
           })
-
 
           // Actualizar carrito con el id de la preferencia
           db.query(
@@ -170,7 +168,6 @@ const createPreference = async (req, res) => {
               }
             }
           )
-
 
           return res.status(200).json({
             success: true,
@@ -341,7 +338,7 @@ const publishProducto = async (req, res) => {
           res.status(200).json({
             success: true,
             message: 'Producto publicado exitosamente',
-            dProducto: idProducto,
+            idProducto: idProducto,
           })
         } catch (error) {
           console.error('Error publicando producto:', error)
