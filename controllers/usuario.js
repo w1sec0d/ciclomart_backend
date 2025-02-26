@@ -143,7 +143,7 @@ const registerUsuario = async (request, response) => {
             error: error.message,
           })
         }
-      
+
         const idUsuario = results.insertId
 
         db.query(
@@ -164,7 +164,7 @@ const registerUsuario = async (request, response) => {
             })
           }
         )
-      }   
+      }
     )
   } catch (error) {
     console.error('Error en el servidor', error)

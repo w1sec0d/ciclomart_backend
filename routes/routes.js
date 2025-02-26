@@ -46,6 +46,8 @@ const {
   getBrands,
 } = require('../controllers/producto.js')
 
+const { createExposurePreference } = require('../controllers/exposicion.js')
+
 // Controladores de calificaciones de productos
 const {
   ratingProduct,
@@ -54,13 +56,20 @@ const {
   checkUserPurchase,
 } = require('../controllers/ratingProduct.js')
 
+const { getRatingSeller } = require('../controllers/vistaVendedor.js')
 const webhookMercadoLibre = require('../controllers/webhookMercadoLibre.js')
 
 const {
   getShoppingCart,
   addToShoppingCart,
-  removeFromShoppingCart
-} = require ('../controllers/shoppingCart.js')
+  removeFromShoppingCart,
+} = require('../controllers/shoppingCart.js')
+
+const {
+  getPurchasesById,
+  confirmShipment,
+  cancelPurchase,
+} = require('../controllers/purchases.js')
 
 const {
   getQuestions,
@@ -101,6 +110,7 @@ router.get('/brands', getBrands)
 router.get('/productos/:id', getProductById)
 // Mercado Pago
 router.post('/createPreference', createPreference)
+router.post('/createExposurePreference', createExposurePreference)
 
 //Rutas calificaciones productos
 router.get('/ratingProduct/:id', ratingProduct)
@@ -108,12 +118,24 @@ router.get('/averageProductRatings/:id', averageProductRatings)
 router.post('/addRatingProduct', addRatingProduct)
 router.post('/checkUserPurchase/', checkUserPurchase)
 
+//Rutas de vista vendedor
+router.get('/ratingSeller/:id', getRatingSeller)
+
 // Ruta de prueba webhook
+
 router.post('/webhookMercadoLibre', webhookMercadoLibre)
 
 router.get('/shoppingCart/:id', getShoppingCart)
 router.post('/addToShoppingCart', addToShoppingCart)
-router.delete('/removeFromShoppingCart/:idUsuario/:idProducto', removeFromShoppingCart)
+router.delete(
+  '/removeFromShoppingCart/:idUsuario/:idProducto',
+  removeFromShoppingCart
+)
+
+// compras
+router.get('/purchases/:idComprador', getPurchasesById)
+router.post('/confirmShipment/:idCarrito', confirmShipment)
+router.post('/cancelPurchase/:idCarrito', cancelPurchase)
 
 router.get('/questions/:idProducto', getQuestions)
 router.post('/addQuestion', addQuestion)
