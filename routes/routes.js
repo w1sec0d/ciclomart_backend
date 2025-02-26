@@ -62,6 +62,11 @@ const {
   removeFromShoppingCart
 } = require ('../controllers/shoppingCart.js')
 
+const {
+  getQuestions,
+  addQuestion
+} = require('../controllers/questions.js')
+
 // Rutas usuarios
 router.get('/usuarios', getUsuarios)
 router.get('/usuarios/:id', getUsuarioById)
@@ -109,5 +114,8 @@ router.post('/webhookMercadoLibre', webhookMercadoLibre)
 router.get('/shoppingCart/:id', getShoppingCart)
 router.post('/addToShoppingCart', addToShoppingCart)
 router.delete('/removeFromShoppingCart/:idUsuario/:idProducto', removeFromShoppingCart)
+
+router.get('/questions/:idProducto', getQuestions)
+router.post('/addQuestion', addQuestion)
 
 module.exports = router
