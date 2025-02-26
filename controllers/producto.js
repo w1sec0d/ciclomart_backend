@@ -78,7 +78,7 @@ const createPreference = async (req, res) => {
     // Crear carrito
     const carritoQuery = `
       INSERT INTO carrito (idUsuario, cantidadProductos, precioTotal, fecha, estado, metodoPago, direccionEnvio, descuento)
-      VALUES (?, ?, ?, NOW(), 'pendiente', ?, ?, ?)
+      VALUES (?, ?, ?, NOW(), 'pendiente_pago', ?, ?, ?)
     `
     const carritoValues = [
       idComprador,
@@ -146,10 +146,31 @@ const createPreference = async (req, res) => {
             },
             auto_return: 'approved',
             notification_url: process.env.BACKEND_URL + '/webhookMercadoLibre',
+
+            external_reference: carritoId,
+
           }
           const result = await preference.create({
             body: preferenceBody,
           })
+
+
+          // Actualizar carrito con el id de la preferencia
+          db.query(
+            'UPDATE carrito SET idPreferenciaPago = ? WHERE idCarrito = ?',
+            [result.id, carritoId],
+            (error, results) => {
+              if (error) {
+                console.error('Error actualizando carrito:', error)
+                return res.status(500).json({
+                  success: false,
+                  message: 'Error actualizando carrito',
+                  error: error.message,
+                })
+              }
+            }
+          )
+
 
           return res.status(200).json({
             success: true,
@@ -213,8 +234,9 @@ const publishProducto = async (req, res) => {
       transmision: req.body.transmision,
       tipoPedales: req.body.tipoPedales,
       manubrio: req.body.tipoManubrio,
-      pesoBicicleta: req.body.pesoBicicleta,
-      pesoMaximo: req.body.pesoMaximo,
+      pesoBicicleta:
+        req.body.pesoBicicleta != '' ? req.body.pesoBicicleta : null,
+      pesoMaximo: req.body.pesoMaximo != '' ? req.body.pesoBicicleta : null,
       extras: req.body.extras,
     }
   }
@@ -302,13 +324,24 @@ const publishProducto = async (req, res) => {
               .join(', ')
 
             const bicicletaQuery = `INSERT INTO bicicleta (${bicicletaColumns.join(', ')}) VALUES (${bicicletaPlaceholders})`
-            db.query(bicicletaQuery, [...bicicletaValues])
+
+            console.log('bicicletaQuery', bicicletaQuery)
+            console.log('values', bicicletaValues)
+            db.query(bicicletaQuery, [...bicicletaValues], (error, results) => {
+              if (error) {
+                console.error('Error publicando producto:', error)
+                return res.status(500).json({
+                  success: false,
+                  message: 'Error al publicar el producto',
+                })
+              }
+            })
           }
           const idProducto = results.insertId
           res.status(200).json({
             success: true,
             message: 'Producto publicado exitosamente',
-            idProducto: idProducto,
+            dProducto: idProducto,
           })
         } catch (error) {
           console.error('Error publicando producto:', error)
