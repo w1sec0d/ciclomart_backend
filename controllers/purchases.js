@@ -102,6 +102,7 @@ const cancelPurchase = async (req, res) => {
     }
 
     const idPago = results[0].idPago;
+    console.log('idPago', idPago)
     if (idPago) {
       try {
         const refundResponse = await refund.create({ payment_id: idPago });
