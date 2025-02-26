@@ -44,6 +44,7 @@ const {
   publishProducto,
   getModels,
   getBrands,
+  getBicicletas,
 } = require('../controllers/producto.js')
 
 const { createExposurePreference } = require('../controllers/exposicion.js')
@@ -71,10 +72,7 @@ const {
   cancelPurchase,
 } = require('../controllers/purchases.js')
 
-const {
-  getQuestions,
-  addQuestion
-} = require('../controllers/questions.js')
+const { getQuestions, addQuestion } = require('../controllers/questions.js')
 
 // Rutas usuarios
 router.get('/usuarios', getUsuarios)
@@ -104,6 +102,7 @@ router.get('/tiendas', getTiendas)
 // Rutas de productos
 router.get('/search', search)
 router.get('/productos', getProducto)
+router.get('/bicicletas', getBicicletas)
 router.post('/addProduct', publishProducto)
 router.get('/models/:tipo/:id', getModels)
 router.get('/brands', getBrands)
