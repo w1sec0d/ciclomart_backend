@@ -122,6 +122,14 @@ CREATE TABLE `producto` (
   `fechaPublicacion` datetime DEFAULT (current_timestamp)
 );
 
+CREATE TABLE `pregunta` (
+  `idPregunta` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `idProducto` int NOT NULL,
+  `idUsuario` int NOT NULL,
+  `descripcion` varchar(255) NOT NULL,
+  `respuesta` varchar(255)
+);
+
 CREATE TABLE `calificacion` (
   `idCalificacion` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `idUsuarioComprador` int NOT NULL,
@@ -160,6 +168,10 @@ CREATE INDEX `nombre` ON `tienda` (`nombre`);
 CREATE INDEX `idUsuario` ON `carrito` (`idUsuario`);
 
 CREATE INDEX `idUsuario` ON `documento` (`idUsuario`);
+
+CREATE INDEX `idProducto` ON `pregunta` (`idProducto`);
+
+CREATE INDEX `idUsuario` ON `pregunta` (`idUsuario`);
 
 CREATE INDEX `idUsuarioComprador` ON `calificacion` (`idUsuarioComprador`);
 
@@ -212,6 +224,10 @@ ALTER TABLE `mensaje` ADD FOREIGN KEY (`idUsuarioEmisor`) REFERENCES `usuario` (
 ALTER TABLE `mensaje` ADD FOREIGN KEY (`idUsuarioReceptor`) REFERENCES `usuario` (`idUsuario`);
 
 ALTER TABLE `mensaje` ADD FOREIGN KEY (`idCarritoProducto`) REFERENCES `carritoProducto` (`idCarritoProducto`);
+
+ALTER TABLE `pregunta` ADD FOREIGN KEY (`idProducto`) REFERENCES `producto`(`idProducto`);
+
+ALTER TABLE `pregunta` ADD FOREIGN KEY (`idUsuario`) REFERENCES `usuario`(`idUsuario`);
 
 ------------------------------------------------------------
 -- Inserts
