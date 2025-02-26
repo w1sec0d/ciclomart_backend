@@ -46,6 +46,8 @@ const {
   getBrands,
 } = require('../controllers/producto.js')
 
+const { createExposurePreference } = require('../controllers/exposicion.js')
+
 // Controladores de calificaciones de productos
 const {
   ratingProduct,
@@ -103,6 +105,7 @@ router.get('/brands', getBrands)
 router.get('/productos/:id', getProductById)
 // Mercado Pago
 router.post('/createPreference', createPreference)
+router.post('/createExposurePreference', createExposurePreference)
 
 //Rutas calificaciones productos
 router.get('/ratingProduct/:id', ratingProduct)
