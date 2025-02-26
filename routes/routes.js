@@ -76,6 +76,8 @@ const {
   addQuestion
 } = require('../controllers/questions.js')
 
+const { oauthCallback } = require('../controllers/oauth.js')
+
 // Rutas usuarios
 router.get('/usuarios', getUsuarios)
 router.get('/usuarios/:id', getUsuarioById)
@@ -139,5 +141,8 @@ router.post('/cancelPurchase/:idCarrito', cancelPurchase)
 
 router.get('/questions/:idProducto', getQuestions)
 router.post('/addQuestion', addQuestion)
+
+// Autenticación oauth
+router.get('/oauth/callback', oauthCallback)
 
 module.exports = router
