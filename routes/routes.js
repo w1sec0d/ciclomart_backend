@@ -46,6 +46,8 @@ const {
   getBrands,
 } = require('../controllers/producto.js')
 
+const { createExposurePreference } = require('../controllers/exposicion.js')
+
 // Controladores de calificaciones de productos
 const {
   ratingProduct,
@@ -68,6 +70,11 @@ const {
   confirmShipment,
   cancelPurchase,
 } = require('../controllers/purchases.js')
+
+const {
+  getQuestions,
+  addQuestion
+} = require('../controllers/questions.js')
 
 // Rutas usuarios
 router.get('/usuarios', getUsuarios)
@@ -103,6 +110,7 @@ router.get('/brands', getBrands)
 router.get('/productos/:id', getProductById)
 // Mercado Pago
 router.post('/createPreference', createPreference)
+router.post('/createExposurePreference', createExposurePreference)
 
 //Rutas calificaciones productos
 router.get('/ratingProduct/:id', ratingProduct)
@@ -128,5 +136,8 @@ router.delete(
 router.get('/purchases/:idComprador', getPurchasesById)
 router.post('/confirmShipment/:idCarrito', confirmShipment)
 router.post('/cancelPurchase/:idCarrito', cancelPurchase)
+
+router.get('/questions/:idProducto', getQuestions)
+router.post('/addQuestion', addQuestion)
 
 module.exports = router
