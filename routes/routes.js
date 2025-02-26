@@ -71,6 +71,11 @@ const {
   cancelPurchase,
 } = require('../controllers/purchases.js')
 
+const {
+  getQuestions,
+  addQuestion
+} = require('../controllers/questions.js')
+
 // Rutas usuarios
 router.get('/usuarios', getUsuarios)
 router.get('/usuarios/:id', getUsuarioById)
@@ -131,5 +136,8 @@ router.delete(
 router.get('/purchases/:idComprador', getPurchasesById)
 router.post('/confirmShipment/:idCarrito', confirmShipment)
 router.post('/cancelPurchase/:idCarrito', cancelPurchase)
+
+router.get('/questions/:idProducto', getQuestions)
+router.post('/addQuestion', addQuestion)
 
 module.exports = router
