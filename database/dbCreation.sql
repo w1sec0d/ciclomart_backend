@@ -11,14 +11,18 @@ CREATE TABLE `usuario` (
   `nombre` varchar(45) NOT NULL,
   `apellido` varchar(45) NOT NULL,
   `fechaNacimiento` date,
-  `rol` ENUM ('comprador', 'cliente', 'administrador') DEFAULT 'comprador',
+  `rol` ENUM ('comprador', 'vendedor', 'administrador') DEFAULT 'comprador',
   `correo` varchar(255) NOT NULL,
   `direccion` varchar(255),
   `telefono` varchar(60),
   `username` varchar(45),
   `password` varchar(64) NOT NULL,
   `reporte` boolean DEFAULT (false),
-  `fechaRegistro` datetime DEFAULT (current_timestamp)
+  `fechaRegistro` datetime DEFAULT (current_timestamp),
+  `mp_user_id` varchar(100),
+  `mp_access_token` varchar(100),
+  `mp_refresh_token` varchar(100),
+  `mp_public_key` varchar(100)
 );
 
 CREATE TABLE `modelo` (
@@ -240,8 +244,8 @@ ALTER TABLE `pregunta` ADD FOREIGN KEY (`idUsuario`) REFERENCES `usuario`(`idUsu
 INSERT INTO `usuario` (`nombre`, `apellido`, `fechaNacimiento`, `rol`, `correo`, `direccion`, `telefono`, `username`, `password`)
 VALUES 
 ('Juan', 'Perez', '1985-05-15', 'comprador', 'juan.perez@ejemplo.com', 'Calle 123, Bogotá', '3001234567', 'juanp', 'contrasena123'),
-('Maria', 'Gomez', '1990-08-22', 'cliente', 'maria.gomez@ejemplo.com', 'Carrera 45, Medellín', '3107654321', 'mariag', 'contrasena123'),
-('Carlos', 'Lopez', '1978-11-30', 'administrador', 'carlos.lopez@ejemplo.com', 'Avenida 10, Cali', '3209876543', 'carlosl', 'contrasena123'),
+('Maria', 'Gomez', '1990-08-22', 'comprador', 'maria.gomez@ejemplo.com', 'Carrera 45, Medellín', '3107654321', 'mariag', 'contrasena123'),
+('Carlos', 'Lopez', '1978-11-30', 'comprador', 'carlos.lopez@ejemplo.com', 'Avenida 10, Cali', '3209876543', 'carlosl', 'contrasena123'),
 ('Carlos', 'Ramírez', '2003-07-15','comprador', 'cadavid4003@gmail.com', NULL, NULL, NULL, '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.');
 
 -- Insertar marcas de muestra
