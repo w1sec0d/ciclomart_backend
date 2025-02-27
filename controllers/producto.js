@@ -1,6 +1,5 @@
+const { MercadoPagoConfig, Preference } = require('mercadopago')
 const db = require('../database/connection')
-// importa mercadoPagoClient
-const { preference } = require('../utils/mercadoPago')
 
 const getProducto = async (req, res) => {
   try {
@@ -73,7 +72,45 @@ const getProductById = async (req, res) => {
 
 const createPreference = async (req, res) => {
   try {
-    const { title, quantity, unit_price, idComprador, idProducto } = req.body
+    const { title, quantity, unit_price, idComprador, idProducto, idVendedor } = req.body
+
+    // Obtener las credenciales del vendedor desde la base de datos
+    const vendedorQuery = 'SELECT mp_access_token, mp_public_key FROM usuario WHERE idUsuario = ?'
+    console.log('vendedorQuery', vendedorQuery)
+    console.log('idVendedor', idVendedor)
+    const [vendedor] = await new Promise((resolve, reject) => {
+      db.query(vendedorQuery, [idVendedor], (error, results) => {
+        if (error) {
+          console.error('Error obteniendo vendedor:', error)
+          return reject({
+            success: false,
+            message: 'Error obteniendo vendedor',
+            error: error.message,
+          })
+        }
+        console.log('results', results)
+        resolve(results)
+      })
+    })
+
+    if (!vendedor || vendedor.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Vendedor no encontrado',
+      })
+    }
+
+    const { mp_access_token: access_token } = vendedor
+
+    // Configurar el cliente de MercadoPago con el access_token del vendedor
+    const mercadoPagoClient = new MercadoPagoConfig({
+      accessToken: access_token,
+      options: {
+        idempotencyKey: Math.random().toString(36).substring(2) + Date.now().toString(36),
+      },
+    })
+
+    const preference = new Preference(mercadoPagoClient)
 
     // Crear carrito
     const carritoQuery = `
@@ -146,10 +183,10 @@ const createPreference = async (req, res) => {
             },
             auto_return: 'approved',
             notification_url: process.env.BACKEND_URL + '/webhookMercadoLibre',
-
             external_reference: carritoId,
-
           }
+
+          console.log('preferenceBody', preferenceBody)
           const result = await preference.create({
             body: preferenceBody,
           })
