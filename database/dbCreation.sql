@@ -11,7 +11,7 @@ CREATE TABLE `usuario` (
   `nombre` varchar(45) NOT NULL,
   `apellido` varchar(45) NOT NULL,
   `fechaNacimiento` date,
-  `rol` ENUM ('comprador', 'cliente', 'administrador') DEFAULT 'comprador',
+  `rol` ENUM ('comprador', 'vendedor', 'administrador') DEFAULT 'comprador',
   `correo` varchar(255) NOT NULL,
   `direccion` varchar(255),
   `telefono` varchar(60),
@@ -58,7 +58,8 @@ CREATE TABLE `bicicleta` (
   `manubrio` varchar(45),
   `pesoBicicleta` float,
   `pesoMaximo` float,
-  `extras` text
+  `extras` text,
+  `tarjeta` varchar(255)
 );
 
 CREATE TABLE `marca` (
@@ -239,7 +240,7 @@ ALTER TABLE `pregunta` ADD FOREIGN KEY (`idUsuario`) REFERENCES `usuario`(`idUsu
 INSERT INTO `usuario` (`nombre`, `apellido`, `fechaNacimiento`, `rol`, `correo`, `direccion`, `telefono`, `username`, `password`)
 VALUES 
 ('Juan', 'Perez', '1985-05-15', 'comprador', 'juan.perez@ejemplo.com', 'Calle 123, Bogotá', '3001234567', 'juanp', 'contrasena123'),
-('Maria', 'Gomez', '1990-08-22', 'cliente', 'maria.gomez@ejemplo.com', 'Carrera 45, Medellín', '3107654321', 'mariag', 'contrasena123'),
+('Maria', 'Gomez', '1990-08-22', 'vendedor', 'maria.gomez@ejemplo.com', 'Carrera 45, Medellín', '3107654321', 'mariag', 'contrasena123'),
 ('Carlos', 'Lopez', '1978-11-30', 'administrador', 'carlos.lopez@ejemplo.com', 'Avenida 10, Cali', '3209876543', 'carlosl', 'contrasena123');
 
 -- Insertar marcas de muestra
