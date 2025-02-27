@@ -92,6 +92,37 @@ const getComponentes = async (req, res) => {
   }
 }
 
+const getProductosOferta = async (req, res) => {
+  try {
+    db.query(
+      'SELECT * FROM vista_completa_producto WHERE  precioCompleto IS NOT NULL',
+      (error, results) => {
+        if (error) {
+          console.error('Error obteniendo componentes:', error)
+          return res.status(500).json({
+            success: false,
+            message: 'Error obteniendo componentes',
+            error: error.message,
+          })
+        }
+
+        res.status(200).json({
+          success: true,
+          message: 'Componentes obtenidos exitosamente',
+          results,
+        })
+      }
+    )
+  } catch (error) {
+    console.error('Error obteniendo componentes:', error)
+    res.status(500).json({
+      success: false,
+      message: 'Error obteniendo componentes',
+      error: error.message,
+    })
+  }
+}
+
 const getProductById = async (req, res) => {
   try {
     const id = parseInt(req.params.id)
@@ -470,6 +501,7 @@ module.exports = {
   getProducto,
   getBicicletas,
   getComponentes,
+  getProductosOferta,
   getProductById,
   createPreference,
   publishProducto,
