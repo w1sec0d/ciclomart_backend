@@ -14,13 +14,11 @@ const getPurchasesById = async (req, res) => {
       (error, results) => {
         if (error) {
           console.error('Error ejecutando la consulta', error)
-          return res
-            .status(500)
-            .json({
-              success: false,
-              message: 'Error interno del servidor',
-              error: error.message,
-            })
+          return res.status(500).json({
+            success: false,
+            message: 'Error interno del servidor',
+            error: error.message,
+          })
         }
         return res.status(200).json({
           success: true,
@@ -48,13 +46,11 @@ const confirmShipment = async (req, res) => {
       (error, results) => {
         if (error) {
           console.error('Error ejecutando la consulta', error)
-          return res
-            .status(500)
-            .json({
-              success: false,
-              message: 'Error interno del servidor',
-              error: error.message,
-            })
+          return res.status(500).json({
+            success: false,
+            message: 'Error interno del servidor',
+            error: error.message,
+          })
         }
         return res.status(200).json({
           success: true,
@@ -81,13 +77,11 @@ const cancelPurchase = async (req, res) => {
       (error, results) => {
         if (error) {
           console.error('Error ejecutando la consulta', error)
-          return res
-            .status(500)
-            .json({
-              success: false,
-              message: 'Error interno del servidor',
-              error: error.message,
-            })
+          return res.status(500).json({
+            success: false,
+            message: 'Error interno del servidor',
+            error: error.message,
+          })
         }
         return res.status(200).json({
           success: true,
