@@ -1,25 +1,25 @@
-const db = require('../database/connection');
-const { refund } = require('../utils/mercadoPago');
+const db = require('../database/connection')
+const { refund } = require('../utils/mercadoPago')
 
 const query = (sql, params) => {
   return new Promise((resolve, reject) => {
     db.query(sql, params, (error, results) => {
       if (error) {
-        return reject(error);
+        return reject(error)
       }
-      resolve(results);
-    });
-  });
-};
+      resolve(results)
+    })
+  })
+}
 
 const handleError = (res, error, message) => {
-  console.error(message, error);
+  console.error(message, error)
   res.status(500).json({
     success: false,
     message: 'Error interno del servidor',
     error: error.message,
-  });
-};
+  })
+}
 
 const getPurchasesById = async (req, res) => {
   const { idComprador } = req.params
@@ -35,13 +35,11 @@ const getPurchasesById = async (req, res) => {
       (error, results) => {
         if (error) {
           console.error('Error ejecutando la consulta', error)
-          return res
-            .status(500)
-            .json({
-              success: false,
-              message: 'Error interno del servidor',
-              error: error.message,
-            })
+          return res.status(500).json({
+            success: false,
+            message: 'Error interno del servidor',
+            error: error.message,
+          })
         }
         return res.status(200).json({
           success: true,
@@ -69,13 +67,11 @@ const confirmShipment = async (req, res) => {
       (error, results) => {
         if (error) {
           console.error('Error ejecutando la consulta', error)
-          return res
-            .status(500)
-            .json({
-              success: false,
-              message: 'Error interno del servidor',
-              error: error.message,
-            })
+          return res.status(500).json({
+            success: false,
+            message: 'Error interno del servidor',
+            error: error.message,
+          })
         }
         return res.status(200).json({
           success: true,
@@ -89,42 +85,51 @@ const confirmShipment = async (req, res) => {
 }
 
 const cancelPurchase = async (req, res) => {
-  const { idCarrito } = req.params;
+  const { idCarrito } = req.params
   if (!idCarrito) {
-    return res.status(400).json({ success: false, message: 'Falta el id del carrito' });
+    return res
+      .status(400)
+      .json({ success: false, message: 'Falta el id del carrito' })
   }
 
   try {
     // Obtiene el id del pago para cancelarlo
-    const results = await query('SELECT idPago FROM carrito WHERE idCarrito = ?', [idCarrito]);
+    const results = await query(
+      'SELECT idPago FROM carrito WHERE idCarrito = ?',
+      [idCarrito]
+    )
     if (results.length === 0) {
-      return res.status(404).json({ success: false, message: 'Compra no encontrada' });
+      return res
+        .status(404)
+        .json({ success: false, message: 'Compra no encontrada' })
     }
 
-    const idPago = results[0].idPago;
+    const idPago = results[0].idPago
     console.log('idPago', idPago)
     if (idPago) {
       try {
-        const refundResponse = await refund.create({ payment_id: idPago });
+        const refundResponse = await refund.create({ payment_id: idPago })
         console.log('refundResponse', refundResponse)
       } catch (error) {
-        return handleError(res, error, 'Error al cancelar el pago');
+        return handleError(res, error, 'Error al cancelar el pago')
       }
     }
 
     // Actualiza el estado del carrito a fallido
-    await query('UPDATE carrito SET estado = "fallido" WHERE idCarrito = ?', [idCarrito]);
+    await query('UPDATE carrito SET estado = "fallido" WHERE idCarrito = ?', [
+      idCarrito,
+    ])
     res.status(200).json({
       success: true,
       message: 'Compra cancelada exitosamente',
-    });
+    })
   } catch (error) {
-    handleError(res, error, 'Error ejecutando la consulta');
+    handleError(res, error, 'Error ejecutando la consulta')
   }
-};
+}
 
 module.exports = {
   getPurchasesById,
   cancelPurchase,
   confirmShipment,
-};
+}

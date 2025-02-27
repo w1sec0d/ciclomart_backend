@@ -30,6 +30,99 @@ const getProducto = async (req, res) => {
   }
 }
 
+const getBicicletas = async (req, res) => {
+  try {
+    db.query(
+      'SELECT * FROM vista_completa_producto WHERE tipo = "bicicleta"',
+      (error, results) => {
+        if (error) {
+          console.error('Error obteniendo bicicletas:', error)
+          return res.status(500).json({
+            success: false,
+            message: 'Error obteniendo bicicletas',
+            error: error.message,
+          })
+        }
+
+        res.status(200).json({
+          success: true,
+          message: 'Bicicletas obtenidas exitosamente',
+          results,
+        })
+      }
+    )
+  } catch (error) {
+    console.error('Error obteniendo bicicletas:', error)
+    res.status(500).json({
+      success: false,
+      message: 'Error obteniendo bicicletas',
+      error: error.message,
+    })
+  }
+}
+
+const getComponentes = async (req, res) => {
+  try {
+    db.query(
+      'SELECT * FROM vista_completa_producto WHERE tipo = "componente"',
+      (error, results) => {
+        if (error) {
+          console.error('Error obteniendo bicicletas:', error)
+          return res.status(500).json({
+            success: false,
+            message: 'Error obteniendo bicicletas',
+            error: error.message,
+          })
+        }
+
+        res.status(200).json({
+          success: true,
+          message: 'Bicicletas obtenidas exitosamente',
+          results,
+        })
+      }
+    )
+  } catch (error) {
+    console.error('Error obteniendo bicicletas:', error)
+    res.status(500).json({
+      success: false,
+      message: 'Error obteniendo bicicletas',
+      error: error.message,
+    })
+  }
+}
+
+const getProductosOferta = async (req, res) => {
+  try {
+    db.query(
+      'SELECT * FROM vista_completa_producto WHERE  precioCompleto IS NOT NULL',
+      (error, results) => {
+        if (error) {
+          console.error('Error obteniendo componentes:', error)
+          return res.status(500).json({
+            success: false,
+            message: 'Error obteniendo componentes',
+            error: error.message,
+          })
+        }
+
+        res.status(200).json({
+          success: true,
+          message: 'Componentes obtenidos exitosamente',
+          results,
+        })
+      }
+    )
+  } catch (error) {
+    console.error('Error obteniendo componentes:', error)
+    res.status(500).json({
+      success: false,
+      message: 'Error obteniendo componentes',
+      error: error.message,
+    })
+  }
+}
+
 const getProductById = async (req, res) => {
   try {
     const id = parseInt(req.params.id)
@@ -148,12 +241,10 @@ const createPreference = async (req, res) => {
             notification_url: process.env.BACKEND_URL + '/webhookMercadoLibre',
 
             external_reference: carritoId,
-
           }
           const result = await preference.create({
             body: preferenceBody,
           })
-
 
           // Actualizar carrito con el id de la preferencia
           db.query(
@@ -170,7 +261,6 @@ const createPreference = async (req, res) => {
               }
             }
           )
-
 
           return res.status(200).json({
             success: true,
@@ -341,7 +431,7 @@ const publishProducto = async (req, res) => {
           res.status(200).json({
             success: true,
             message: 'Producto publicado exitosamente',
-            dProducto: idProducto,
+            idProducto: idProducto,
           })
         } catch (error) {
           console.error('Error publicando producto:', error)
@@ -409,6 +499,9 @@ const getBrands = async (req, res) => {
 
 module.exports = {
   getProducto,
+  getBicicletas,
+  getComponentes,
+  getProductosOferta,
   getProductById,
   createPreference,
   publishProducto,
