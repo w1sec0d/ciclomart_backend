@@ -44,6 +44,8 @@ const {
   publishProducto,
   getModels,
   getBrands,
+  uploadImage,
+  getImages
 } = require('../controllers/producto.js')
 
 const { createExposurePreference } = require('../controllers/exposicion.js')
@@ -108,6 +110,8 @@ router.post('/addProduct', publishProducto)
 router.get('/models/:tipo/:id', getModels)
 router.get('/brands', getBrands)
 router.get('/productos/:id', getProductById)
+router.post('/uploadImage', uploadImage)
+router.get('/images/:id', getImages)
 // Mercado Pago
 router.post('/createPreference', createPreference)
 router.post('/createExposurePreference', createExposurePreference)
