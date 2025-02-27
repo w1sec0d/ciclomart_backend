@@ -45,6 +45,7 @@ const {
   getModels,
   getBrands,
   getBicicletas,
+  getComponentes,
 } = require('../controllers/producto.js')
 
 const { createExposurePreference } = require('../controllers/exposicion.js')
@@ -103,6 +104,7 @@ router.get('/tiendas', getTiendas)
 router.get('/search', search)
 router.get('/productos', getProducto)
 router.get('/bicicletas', getBicicletas)
+router.get('/componentes', getComponentes)
 router.post('/addProduct', publishProducto)
 router.get('/models/:tipo/:id', getModels)
 router.get('/brands', getBrands)
