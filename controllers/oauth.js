@@ -1,21 +1,50 @@
-const oauthCallback = async (req, res) => {
-    const { code } = req.query;
+const axios = require('axios');
+const db = require('../database/connection');
 
+const oauthCallback = async (req, res) => {
+    const { code, state } = req.query;
     try {
-        const response = await axios.post('https://api.mercadopago.com/oauth/token', {
-            client_id: process.env.MP_CLIENT_ID,
-            client_secret: process.env.MP_CLIENT_SECRET,
-            grant_type: 'authorization_code',
-            code,
-            redirect_uri: 'https://your-backend-url.com/oauth/callback',
+        // Descomponer el state para obtener el randomId y el idUsuario
+        const [randomId, idUsuario] = decodeURIComponent(state).split(',');
+
+        const oauthBody = {
+            'client_secret': process.env.MP_CLIENT_SECRET,
+            'client_id': process.env.MP_CLIENT_ID,
+            'code': code,
+            'redirect_uri': process.env.MP_REDIRECT_URL,
+            'test_token': true,
+            'grant_type': 'authorization_code'
+        }
+        // Enviar la solicitud a la API de MercadoPago usando axios
+        const oauthResponse = await axios.post('https://api.mercadopago.com/oauth/token', oauthBody, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
         });
 
-        const { access_token, public_key, refresh_token, user_id } = response.data;
+        console.log('oauthResponse', oauthResponse.data);
 
-        // Guarda los tokens y el user_id en tu base de datos
-        await db.query('INSERT INTO vendedores (user_id, access_token, public_key, refresh_token) VALUES (?, ?, ?, ?)', [user_id, access_token, public_key, refresh_token]);
+        // Guardar los tokens y el user_id en la base de datos
+        const { access_token, public_key, refresh_token, user_id } = oauthResponse.data;
 
-        res.status(200).json({ success: true, message: 'Vendedor conectado exitosamente' });
+        await db.query(
+            'UPDATE usuario SET mp_access_token = ?, mp_refresh_token = ?, mp_user_id = ?, mp_public_key = ?, rol = "vendedor" WHERE idUsuario = ?',
+            [access_token, refresh_token, user_id, public_key, idUsuario],
+            (error, results) => {
+                if (error) {
+                    console.error('Error actualizando el usuario', error);
+                    return res.status(500).json({ success: false, message: 'Error interno del servidor', error: error.message });
+                }
+            }
+        );
+
+        res.status(200).json({
+            success: true,
+            message: 'Tokens guardados correctamente, usuario registrado como vendedor',
+            results: oauthResponse.data
+        });
+
+
     } catch (error) {
         console.error('Error obteniendo el access_token', error);
         res.status(500).json({ success: false, message: 'Error interno del servidor', error: error.message });
