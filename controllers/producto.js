@@ -130,6 +130,12 @@ const createPreference = async (req, res) => {
       },
     });
     const preference = new Preference(mercadoPagoClient);
+
+    const freeShippingBody =
+      Number(producto.costoEnvio) === 0 ?
+        [{ id: 73328 }]
+        : [];
+
     const preferenceBody = {
       items: [
         {
@@ -155,27 +161,40 @@ const createPreference = async (req, res) => {
         //   type: 'CC',
         //   number: comprador.cedula,
         // }
+        address: {
+          zip_code: comprador.codigoPostal,
+          street_name: comprador.direccionNombre,
+          street_number: comprador.direccionNumero,
+        }
+      },
+      payment_methods: {
+        default_installments: 1,
+      },
+      shipments: {
+        mode: 'me2',
+        local_pickup: false,
+        dimensions: producto.dimensiones ?? '30x30x30,500',
+        free_methods: freeShippingBody,
+        cost: Number(producto.costoEnvio),
+        reciever_address: {
+          zip_code: comprador.codigoPostal ?? '1234',
+          street_name: comprador.direccionNombre ?? 'Calle Prueba',
+          street_number: comprador.direccionNumero ?? '48 #29-20 Sur',
+          floor: comprador.dirrecionPiso ?? '3',
+          apartment: comprador.direccionApartamento ?? 'C',
+          city_name: comprador.direccionCiudad ?? 'Bogotá',
+          country_name: 'Colombia',
+        },
       },
       back_urls: {
         success: process.env.FRONTEND_URL + '/requestResult/purchaseComplete',
         failure: process.env.FRONTEND_URL + '/requestResult/purchaseFailed',
         pending: process.env.FRONTEND_URL + '/requestResult/purchasePending',
       },
-      auto_return: 'approved',
       notification_url: process.env.BACKEND_URL + '/webhookMercadoLibre',
+      statement_descriptor: 'Compra CicloMart',
+      auto_return: 'approved',
       external_reference: carritoId,
-      shipments: {
-        mode: 'me2',
-        local_pickup: false,
-        dimensions: '30x30x30,500',
-        reciever_address: {
-          zip_code: '1700',
-          street_name: 'Calle',
-          street_number: 123,
-          floor: 4,
-          apartment: 'C',
-        },
-      },
     };
 
     const preferenceResult = await preference.create({ body: preferenceBody });
