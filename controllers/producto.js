@@ -72,51 +72,122 @@ const getProductById = async (req, res) => {
 
 const createPreference = async (req, res) => {
   try {
-    const { title, quantity, unit_price, idComprador, idProducto, idVendedor } = req.body
+    const { producto, cantidad, idComprador } = req.body;
 
-    // Obtener las credenciales del vendedor desde la base de datos
-    const vendedorQuery = 'SELECT mp_access_token, mp_public_key FROM usuario WHERE idUsuario = ?'
-    console.log('vendedorQuery', vendedorQuery)
-    console.log('idVendedor', idVendedor)
+    // OBTENCION DE DATOS DE VENDEDOR Y COMPRADOR
+
+    // Obtener información del vendedor
+    const vendedorQuery = 'SELECT * FROM usuario WHERE idUsuario = ?';
     const [vendedor] = await new Promise((resolve, reject) => {
-      db.query(vendedorQuery, [idVendedor], (error, results) => {
+      db.query(vendedorQuery, [producto.idVendedor], (error, results) => {
         if (error) {
-          console.error('Error obteniendo vendedor:', error)
+          console.error('Error obteniendo vendedor:', error);
           return reject({
             success: false,
             message: 'Error obteniendo vendedor',
             error: error.message,
-          })
+          });
         }
-        console.log('results', results)
-        resolve(results)
-      })
-    })
-
+        resolve(results);
+      });
+    });
     if (!vendedor || vendedor.length === 0) {
       return res.status(404).json({
         success: false,
         message: 'Vendedor no encontrado',
-      })
+      });
     }
 
-    const { mp_access_token: access_token } = vendedor
+    // Obtener información del comprador
+    const compradorQuery = 'SELECT * FROM usuario WHERE idUsuario = ?';
+    const [comprador] = await new Promise((resolve, reject) => {
+      db.query(compradorQuery, [idComprador], (error, results) => {
+        if (error) {
+          console.error('Error obteniendo comprador:', error);
+          return reject({
+            success: false,
+            message: 'Error obteniendo comprador',
+            error: error.message,
+          });
+        }
+        resolve(results);
+      });
+    });
+    if (!comprador || comprador.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Comprador no encontrado',
+      });
+    }
+
+    // CREACION DE PREFERENCIA DE MERCADOPAGO
 
     // Configurar el cliente de MercadoPago con el access_token del vendedor
     const mercadoPagoClient = new MercadoPagoConfig({
-      accessToken: access_token,
+      accessToken: vendedor.mp_access_token,
       options: {
         idempotencyKey: Math.random().toString(36).substring(2) + Date.now().toString(36),
       },
-    })
+    });
+    const preference = new Preference(mercadoPagoClient);
+    const preferenceBody = {
+      items: [
+        {
+          id: producto.idProducto,
+          title: producto.nombre,
+          description: producto.descripcionModelo,
+          picture_url: producto.imagenURL,
+          category_id: producto.tipo,
+          quantity: Number(cantidad),
+          currency_id: 'COP',
+          unit_price: Number(producto.precio),
+        },
+      ],
+      payer: {
+        name: comprador.nombre,
+        surname: comprador.apellido,
+        email: comprador.correo,
+        phone: {
+          area_code: '57',
+          number: comprador.telefono,
+        },
+        // identification: {
+        //   type: 'CC',
+        //   number: comprador.cedula,
+        // }
+      },
+      back_urls: {
+        success: process.env.FRONTEND_URL + '/requestResult/purchaseComplete',
+        failure: process.env.FRONTEND_URL + '/requestResult/purchaseFailed',
+        pending: process.env.FRONTEND_URL + '/requestResult/purchasePending',
+      },
+      auto_return: 'approved',
+      notification_url: process.env.BACKEND_URL + '/webhookMercadoLibre',
+      external_reference: carritoId,
+      shipments: {
+        mode: 'me2',
+        local_pickup: false,
+        dimensions: '30x30x30,500',
+        reciever_address: {
+          zip_code: '1700',
+          street_name: 'Calle',
+          street_number: 123,
+          floor: 4,
+          apartment: 'C',
+        },
+      },
+    };
 
-    const preference = new Preference(mercadoPagoClient)
+    const preferenceResult = await preference.create({ body: preferenceBody });
+    const idPreferenciaPago = preferenceResult.id;
+
+    // REGISTRO DE PREFERENCIA DE MERCADOPAGO EN LA BASE DE DATOS
 
     // Crear carrito
     const carritoQuery = `
       INSERT INTO carrito (idUsuario, cantidadProductos, precioTotal, fecha, estado, metodoPago, direccionEnvio, descuento)
       VALUES (?, ?, ?, NOW(), 'pendiente_pago', ?, ?, ?)
-    `
+    `;
     const carritoValues = [
       idComprador,
       quantity,
@@ -124,110 +195,81 @@ const createPreference = async (req, res) => {
       'MercadoPago',
       'Direccion de envio',
       0,
-    ]
+    ];
 
-    db.query(carritoQuery, carritoValues, (error, carritoResults) => {
-      if (error) {
-        console.error('Error creando carrito:', error)
-        return res.status(500).json({
-          success: false,
-          message: 'Error creando carrito',
-          error: error.message,
-        })
-      }
-
-      const carritoId = carritoResults.insertId
-
-      // Crear carritoProducto
-      const carritoProductoQuery = `
-        INSERT INTO carritoProducto (idProducto, idCarrito, cantidad, precio_unitario, direccion, estadoEnvio)
-        VALUES (?, ?, ?, ?, ?, 'Pendiente')
-      `
-      const carritoProductoValues = [
-        idProducto,
-        carritoId,
-        quantity,
-        unit_price,
-        'Direccion de envio',
-      ]
-
-      db.query(
-        carritoProductoQuery,
-        carritoProductoValues,
-        async (error, carritoProductoResults) => {
-          if (error) {
-            console.error('Error creando carritoProducto:', error)
-            return res.status(500).json({
-              success: false,
-              message: 'Error creando carritoProducto',
-              error: error.message,
-            })
-          }
-
-          const preferenceBody = {
-            items: [
-              {
-                title,
-                quantity: Number(quantity),
-                unit_price: Number(unit_price),
-                currency_id: 'COP',
-              },
-            ],
-            back_urls: {
-              success:
-                process.env.FRONTEND_URL + '/requestResult/purchaseComplete',
-              failure:
-                process.env.FRONTEND_URL + '/requestResult/purchaseFailed',
-              pending:
-                process.env.FRONTEND_URL + '/requestResult/purchasePending',
-            },
-            auto_return: 'approved',
-            notification_url: process.env.BACKEND_URL + '/webhookMercadoLibre',
-            external_reference: carritoId,
-          }
-
-          console.log('preferenceBody', preferenceBody)
-          const result = await preference.create({
-            body: preferenceBody,
-          })
-
-
-          // Actualizar carrito con el id de la preferencia
-          db.query(
-            'UPDATE carrito SET idPreferenciaPago = ? WHERE idCarrito = ?',
-            [result.id, carritoId],
-            (error, results) => {
-              if (error) {
-                console.error('Error actualizando carrito:', error)
-                return res.status(500).json({
-                  success: false,
-                  message: 'Error actualizando carrito',
-                  error: error.message,
-                })
-              }
-            }
-          )
-
-
-          return res.status(200).json({
-            success: true,
-            message: 'Preferencia de MercadoPago creada exitosamente',
-            preferenceId: result.id,
-            paymentURL: result.init_point,
-            result,
-          })
+    const carritoResults = await new Promise((resolve, reject) => {
+      db.query(carritoQuery, carritoValues, (error, results) => {
+        if (error) {
+          console.error('Error creando carrito:', error);
+          return reject({
+            success: false,
+            message: 'Error creando carrito',
+            error: error.message,
+          });
         }
-      )
-    })
+        resolve(results);
+      });
+    });
+
+    const carritoId = carritoResults.insertId;
+    // Actualizar carrito con el id de la preferencia
+    await new Promise((resolve, reject) => {
+      db.query('UPDATE carrito SET idPreferenciaPago = ? WHERE idCarrito = ?', [idPreferenciaPago, carritoId], (error, results) => {
+        if (error) {
+          console.error('Error actualizando carrito:', error);
+          return reject({
+            success: false,
+            message: 'Error actualizando carrito',
+            error: error.message,
+          });
+        }
+        resolve(results);
+      });
+    });
+
+    // Crear carritoProducto
+    const carritoProductoQuery = `
+      INSERT INTO carritoProducto (idProducto, idCarrito, cantidad, precio_unitario, direccion, estadoEnvio)
+      VALUES (?, ?, ?, ?, ?, 'Pendiente')
+    `;
+    const carritoProductoValues = [
+      idProducto,
+      carritoId,
+      quantity,
+      unit_price,
+      'Direccion de envio',
+    ];
+
+    await new Promise((resolve, reject) => {
+      db.query(carritoProductoQuery, carritoProductoValues, (error, results) => {
+        if (error) {
+          console.error('Error creando carritoProducto:', error);
+          return reject({
+            success: false,
+            message: 'Error creando carritoProducto',
+            error: error.message,
+          });
+        }
+        resolve(results);
+      });
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Preferencia de MercadoPago creada exitosamente',
+      preferenceId: preferenceResult.id,
+      paymentURL: preferenceResult.init_point,
+      preferenceResult,
+    });
   } catch (error) {
-    console.error('Error creando preferencia de MercadoPago:', error)
+    console.error('Error creando preferencia de MercadoPago:', error);
     res.status(500).json({
       success: false,
       message: 'Error creando preferencia de MercadoPago',
       error: error.message,
-    })
+    });
   }
-}
+};
 
 const publishProducto = async (req, res) => {
   const {

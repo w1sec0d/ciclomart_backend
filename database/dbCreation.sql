@@ -13,7 +13,11 @@ CREATE TABLE `usuario` (
   `fechaNacimiento` date,
   `rol` ENUM ('comprador', 'vendedor', 'administrador') DEFAULT 'comprador',
   `correo` varchar(255) NOT NULL,
-  `direccion` varchar(255),
+  `direccionNombre` varchar(255),
+  `direccionNumero` varchar(255),
+  `direccionApartamento` varchar(30),
+  `direccionPiso` varchar(30),
+  `codigoPostal` varchar(30),
   `telefono` varchar(60),
   `username` varchar(45),
   `password` varchar(64) NOT NULL,
@@ -241,12 +245,12 @@ ALTER TABLE `pregunta` ADD FOREIGN KEY (`idUsuario`) REFERENCES `usuario`(`idUsu
 -- Inserts
 ------------------------------------------------------------
 -- Insertar usuarios de muestra
-INSERT INTO `usuario` (`nombre`, `apellido`, `fechaNacimiento`, `rol`, `correo`, `direccion`, `telefono`, `username`, `password`)
+INSERT INTO `usuario` (`nombre`, `apellido`, `fechaNacimiento`, `rol`, `correo`, `telefono`, `username`, `password`)
 VALUES 
-('Juan', 'Perez', '1985-05-15', 'comprador', 'juan.perez@ejemplo.com', 'Calle 123, Bogotá', '3001234567', 'juanp', 'contrasena123'),
-('Maria', 'Gomez', '1990-08-22', 'comprador', 'maria.gomez@ejemplo.com', 'Carrera 45, Medellín', '3107654321', 'mariag', 'contrasena123'),
-('Carlos', 'Lopez', '1978-11-30', 'comprador', 'carlos.lopez@ejemplo.com', 'Avenida 10, Cali', '3209876543', 'carlosl', 'contrasena123'),
-('Carlos', 'Ramírez', '2003-07-15','comprador', 'cadavid4003@gmail.com', NULL, NULL, NULL, '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.');
+('Juan', 'Perez', '1985-05-15', 'comprador', 'juan.perez@ejemplo.com', '3001234567', 'juanp', 'contrasena123'),
+('Maria', 'Gomez', '1990-08-22', 'comprador', 'maria.gomez@ejemplo.com', '3107654321', 'mariag', 'contrasena123'),
+('Carlos', 'Lopez', '1978-11-30', 'comprador', 'carlos.lopez@ejemplo.com', '3209876543', 'carlosl', 'contrasena123'),
+('Carlos', 'Ramírez', '2003-07-15','comprador', 'cadavid4003@gmail.com', NULL, NULL, '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.');
 
 -- Insertar marcas de muestra
 INSERT INTO `marca` (`nombre`)
