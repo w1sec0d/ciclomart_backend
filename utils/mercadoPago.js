@@ -1,5 +1,5 @@
 // Objetos de configuración de MercadoPago
-const { MercadoPagoConfig, Preference, PaymentRefund } = require('mercadopago')
+const { MercadoPagoConfig, Preference, PaymentRefund, OAuth } = require('mercadopago')
 
 const mercadoPagoClient = new MercadoPagoConfig({
   accessToken: process.env.MP_ACCESS_TOKEN,
@@ -10,5 +10,6 @@ const mercadoPagoClient = new MercadoPagoConfig({
 
 const preference = new Preference(mercadoPagoClient)
 const refund = new PaymentRefund(mercadoPagoClient)
+const oauth = new OAuth(mercadoPagoClient)
 
-module.exports = { mercadoPagoClient, preference, refund }
+module.exports = { mercadoPagoClient, preference, refund, oauth }
