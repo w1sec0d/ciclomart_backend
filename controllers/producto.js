@@ -1,5 +1,6 @@
 const { MercadoPagoConfig, Preference } = require('mercadopago')
 const db = require('../database/connection')
+const calculateFee = require('../utils/calculateFee')
 
 const getProducto = async (req, res) => {
   try {
@@ -195,6 +196,7 @@ const createPreference = async (req, res) => {
       statement_descriptor: 'Compra CicloMart',
       auto_return: 'approved',
       external_reference: carritoId,
+      marketplace_fee: calculateFee(producto.tipo, producto.precio),
     };
 
     const preferenceResult = await preference.create({ body: preferenceBody });
