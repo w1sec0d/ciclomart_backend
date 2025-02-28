@@ -214,6 +214,38 @@ const createPreference = async (req, res) => {
       });
     }
 
+    // REGISTRO DE PREFERENCIA DE MERCADOPAGO EN LA BASE DE DATOS
+
+    // Crear carrito
+    const carritoQuery = `
+      INSERT INTO carrito (idUsuario, cantidadProductos, precioTotal, fecha, estado, metodoPago, direccionEnvio, descuento)
+      VALUES (?, ?, ?, NOW(), 'pendiente_pago', ?, ?, ?)
+    `;
+    const carritoValues = [
+      idComprador,
+      quantity,
+      unit_price * quantity,
+      'MercadoPago',
+      'Direccion de envio',
+      0,
+    ];
+
+    const carritoResults = await new Promise((resolve, reject) => {
+      db.query(carritoQuery, carritoValues, (error, results) => {
+        if (error) {
+          console.error('Error creando carrito:', error);
+          return reject({
+            success: false,
+            message: 'Error creando carrito',
+            error: error.message,
+          });
+        }
+        resolve(results);
+      });
+    });
+
+    const carritoId = carritoResults.insertId;
+
     // CREACION DE PREFERENCIA DE MERCADOPAGO
 
     // Configurar el cliente de MercadoPago con el access_token del vendedor
@@ -295,37 +327,6 @@ const createPreference = async (req, res) => {
     const preferenceResult = await preference.create({ body: preferenceBody });
     const idPreferenciaPago = preferenceResult.id;
 
-    // REGISTRO DE PREFERENCIA DE MERCADOPAGO EN LA BASE DE DATOS
-
-    // Crear carrito
-    const carritoQuery = `
-      INSERT INTO carrito (idUsuario, cantidadProductos, precioTotal, fecha, estado, metodoPago, direccionEnvio, descuento)
-      VALUES (?, ?, ?, NOW(), 'pendiente_pago', ?, ?, ?)
-    `;
-    const carritoValues = [
-      idComprador,
-      quantity,
-      unit_price * quantity,
-      'MercadoPago',
-      'Direccion de envio',
-      0,
-    ];
-
-    const carritoResults = await new Promise((resolve, reject) => {
-      db.query(carritoQuery, carritoValues, (error, results) => {
-        if (error) {
-          console.error('Error creando carrito:', error);
-          return reject({
-            success: false,
-            message: 'Error creando carrito',
-            error: error.message,
-          });
-        }
-        resolve(results);
-      });
-    });
-
-    const carritoId = carritoResults.insertId;
     // Actualizar carrito con el id de la preferencia
     await new Promise((resolve, reject) => {
       db.query('UPDATE carrito SET idPreferenciaPago = ? WHERE idCarrito = ?', [idPreferenciaPago, carritoId], (error, results) => {
