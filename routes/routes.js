@@ -45,7 +45,10 @@ const {
   getModels,
   getBrands,
   uploadImage,
-  getImages
+  getImages,
+  getBicicletas,
+  getComponentes,
+  getProductosOferta,
 } = require('../controllers/producto.js')
 
 const { createExposurePreference } = require('../controllers/exposicion.js')
@@ -73,10 +76,9 @@ const {
   cancelPurchase,
 } = require('../controllers/purchases.js')
 
-const {
-  getQuestions,
-  addQuestion
-} = require('../controllers/questions.js')
+const { getQuestions, addQuestion } = require('../controllers/questions.js')
+
+const { oauthCallback } = require('../controllers/oauth.js')
 
 // Rutas usuarios
 router.get('/usuarios', getUsuarios)
@@ -106,6 +108,9 @@ router.get('/tiendas', getTiendas)
 // Rutas de productos
 router.get('/search', search)
 router.get('/productos', getProducto)
+router.get('/bicicletas', getBicicletas)
+router.get('/componentes', getComponentes)
+router.get('/ofertas', getProductosOferta)
 router.post('/addProduct', publishProducto)
 router.get('/models/:tipo/:id', getModels)
 router.get('/brands', getBrands)
@@ -143,5 +148,8 @@ router.post('/cancelPurchase/:idCarrito', cancelPurchase)
 
 router.get('/questions/:idProducto', getQuestions)
 router.post('/addQuestion', addQuestion)
+
+// Autenticación oauth
+router.get('/oauth/callback', oauthCallback)
 
 module.exports = router

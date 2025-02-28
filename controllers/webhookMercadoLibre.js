@@ -13,22 +13,23 @@ const webhookMercadoLibre = async (req, res) => {
     console.log('Webhook de Mercado Libre:', body)
 
     // se recibe una notificacion de confirmacion de pago
-    if (body.topic === 'payment') {
-      const paymentId = body.resource
+    if (body.action === 'payment.created') {
+      const paymentId = body.data.id
       const paymentResponse = await payment.get({ id: paymentId })
       const { status, external_reference } = paymentResponse
-      console.log('external_reference', external_reference)
+      console.log('paymentResponse', paymentResponse)
       if (status === 'approved') {
         db.query(
-          "UPDATE carrito SET estado='pendiente_envio' WHERE idCarrito = ?",
-          [external_reference],
+          "UPDATE carrito SET estado='pendiente_envio', idPago = ? WHERE idCarrito = ?",
+          [paymentId, external_reference],
           (err, result) => {
             if (err) {
-              console.log(err)
+              console.error(err)
             }
           }
         )
       }
+
     }
     res.status(200).json({ success: true, message: 'Webhook recibido', body })
   } catch (error) {
