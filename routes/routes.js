@@ -10,6 +10,7 @@ const {
   getUsuarioPhoto,
   updateUsuarioFoto,
   updateUsuario,
+  updateUsuarioDireccion,
 } = require('../controllers/usuario.js')
 
 const { userInfo } = require('../controllers/userInfo.js')
@@ -85,6 +86,7 @@ router.get('/getUsuarioPhoto/:id', getUsuarioPhoto)
 router.post('/usuarios', registerUsuario)
 router.put('/updateUsuarioFoto/:idUsuario', updateUsuarioFoto)
 router.put('/updateUsuario/:id', updateUsuario)
+router.put('/updateUsuarioDireccion/:idUsuario', updateUsuarioDireccion)
 
 // Rutas de autenticación
 router.post('/login', login)
