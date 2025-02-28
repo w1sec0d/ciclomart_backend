@@ -600,6 +600,84 @@ const getBrands = async (req, res) => {
   }
 }
 
+const uploadImage = async(req, res) => {
+  try {
+    
+    const { idProducto, file } = req.body
+    console.log(idProducto, file)
+
+
+    if (!file) {
+      return res.status(400).json({
+        success: false,
+        message: 'No se proporcionó una imagen',
+      })
+    }
+
+    const imageQuery = `
+      INSERT INTO imagen (idModelo, url)
+      VALUES (?, ?)
+    `
+    const imageValues = [
+      idProducto,
+      file,
+    ]
+
+    db.query(imageQuery, imageValues, (error, results) => {
+      if (error) {
+        console.error('Error subiendo imagen:', error)
+        return res.status(500).json({
+          success: false,
+          message: 'Error subiendo imagen',
+          error: error.message,
+        })
+      }
+
+      res.status(200).json({
+        success: true,
+        message: 'Imagen subida exitosamente',
+        results,
+      })
+    })
+  } catch (error) {
+    console.error('Error subiendo imagen:', error)
+    res.status(500).json({
+      success: false,
+      message: 'Error subiendo imagen',
+      error: error.message,
+    })
+  }
+}
+
+const getImages = async(req, res) => {
+  try {
+    const { idProducto } = req.params
+    db.query('SELECT * FROM imagen WHERE idModelo = ?', [idProducto], (error, results) => {
+      if (error) {
+        console.error('Error obteniendo imagenes:', error)
+        return res.status(500).json({
+          success: false,
+          message: 'Error obteniendo imagenes',
+          error: error.message,
+        })
+      }
+
+      res.status(200).json({
+        success: true,
+        message: 'Imagenes obtenidas exitosamente',
+        results,
+      })
+    })
+  } catch (error) {
+    console.error('Error obteniendo imagenes:', error)
+    res.status(500).json({
+      success: false,
+      message: 'Error obteniendo imagenes',
+      error: error.message,
+    })
+  }
+}
+
 module.exports = {
   getProducto,
   getBicicletas,
@@ -610,4 +688,6 @@ module.exports = {
   publishProducto,
   getModels,
   getBrands,
+  uploadImage,
+  getImages
 }
