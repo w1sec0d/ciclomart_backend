@@ -335,10 +335,18 @@ const updateUsuarioDireccion = async (req, res) => {
           error: error.message,
         })
       }
-
+      console.log('results', results)
       res.status(200).json({
         success: true,
         message: 'Dirección actualizada exitosamente',
+        data: {
+          direccionNombre,
+          direccionNumero,
+          codigoPostal,
+          direccionCiudad,
+          direccionApartamento,
+          direccionPiso,
+        },
         results,
       })
     })
