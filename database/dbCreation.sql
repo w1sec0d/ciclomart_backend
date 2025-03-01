@@ -251,7 +251,7 @@ VALUES
 
 ('Juan', 'Perez', '1985-05-15', 'comprador', 'juan.perez@ejemplo.com', 'Calle 123, Bogotá', '3001234567', 'juanp', 'contrasena123'),
 ('Maria', 'Gomez', '1990-08-22', 'vendedor', 'maria.gomez@ejemplo.com', 'Carrera 45, Medellín', '3107654321', 'mariag', 'contrasena123'),
-('Carlos', 'Lopez', '1978-11-30', 'administrador', 'carlos.lopez@ejemplo.com', 'Avenida 10, Cali', '3209876543', 'carlosl', 'contrasena123');
+('Carlos', 'Lopez', '1978-11-30', 'administrador', 'carlos.lopez@ejemplo.com', 'Avenida 10, Cali', '3209876543', 'carlosl', 'contrasena123'),
 ('Carlos', 'Ramírez', '2003-07-15','comprador', 'cadavid4003@gmail.com', NULL, NULL, NULL, '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.');
 
 
@@ -433,6 +433,7 @@ SELECT
     bicicleta.pesoBicicleta,
     bicicleta.pesoMaximo,
     bicicleta.extras,
+    bicicleta.tarjeta,
     marca.idMarca,
     marca.nombre AS nombreMarca,
     imagen.idImagen,
