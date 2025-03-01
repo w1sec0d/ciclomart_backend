@@ -49,6 +49,7 @@ const {
   getBicicletas,
   getComponentes,
   getProductosOferta,
+  addBrand
 } = require('../controllers/producto.js')
 
 const { createExposurePreference } = require('../controllers/exposicion.js')
@@ -121,6 +122,7 @@ router.get('/brands', getBrands)
 router.get('/productos/:id', getProductById)
 router.post('/uploadImage', uploadImage)
 router.get('/images/:id', getImages)
+router.post('/addBrand', addBrand)
 // Mercado Pago
 router.post('/createPreference', createPreference)
 router.post('/createExposurePreference', createExposurePreference)
