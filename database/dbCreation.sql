@@ -30,26 +30,6 @@ CREATE TABLE `usuario` (
   `mp_public_key` varchar(100)
 );
 
-CREATE TABLE `modelo` (
-  `idModelo` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(255) NOT NULL,
-  `tipo` ENUM ('bicicleta', 'componente', 'accesorio', 'otro') NOT NULL DEFAULT 'bicicleta',
-  `descripcion` text NOT NULL,
-  `categoria` varchar(100),
-  `compatibilidad` text,
-  `idBicicleta` int,
-  `idMarca` int 
-);
-
-
-CREATE TABLE `imagen` (
-  `idImagen` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `idUsuario` int UNIQUE,
-  `idDocumento` int,
-  `idModelo` int,
-  `url` varchar(255)
-);
-
 CREATE TABLE `bicicleta` (
   `idBicicleta` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `tipoBicicleta` varchar(45),
@@ -67,13 +47,28 @@ CREATE TABLE `bicicleta` (
   `manubrio` varchar(45),
   `pesoBicicleta` float,
   `pesoMaximo` float,
-  `extras` text,
-  `tarjeta` varchar(255)
+  `extras` text
 );
 
 CREATE TABLE `marca` (
   `idMarca` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(45) NOT NULL
+  `nombre` varchar(45) NOT NULL,
+  INDEX `nombre` (`nombre`)
+);
+
+CREATE TABLE `modelo` (
+  `idModelo` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(255) NOT NULL,
+  `tipo` ENUM ('bicicleta', 'componente', 'accesorio', 'otro') NOT NULL DEFAULT 'bicicleta',
+  `descripcion` text NOT NULL,
+  `categoria` varchar(100),
+  `compatibilidad` text,
+  `idBicicleta` int,
+  `idMarca` int,
+  FOREIGN KEY (`idBicicleta`) REFERENCES `bicicleta` (`idBicicleta`),
+  FOREIGN KEY (`idMarca`) REFERENCES `marca` (`idMarca`),
+  INDEX `idMarca` (`idMarca`),
+  INDEX `nombre` (`nombre`)
 );
 
 CREATE TABLE `tienda` (
@@ -81,7 +76,9 @@ CREATE TABLE `tienda` (
   `idUsuarioAdministrador` int NOT NULL,
   `nombre` varchar(255),
   `descripcion` text,
-  `telefono` varchar(60)
+  `telefono` varchar(60),
+  FOREIGN KEY (`idUsuarioAdministrador`) REFERENCES `usuario` (`idUsuario`),
+  INDEX `nombre` (`nombre`)
 );
 
 CREATE TABLE `carrito` (
@@ -90,21 +87,9 @@ CREATE TABLE `carrito` (
   `cantidadProductos` int DEFAULT 0,
   `precioTotal` float,
   `fecha` datetime,
-  `estado` ENUM ('pendiente_pago', 'pendiente_envio', 'enviado', 'recibido', 'fallido', 'reembolsado') DEFAULT 'pendiente_pago',
-  `metodoPago` varchar(45),
-  `direccionEnvio` varchar(255),
-  `descuento` float
-);
-
-CREATE TABLE `carritoProducto` (
-  `idCarritoProducto` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `idProducto` int NOT NULL,
-  `idCarrito` int NOT NULL,
-  `cantidad` int,
-  `precio_unitario` float,
-  `fecha` datetime DEFAULT (current_timestamp),
-  `direccion` text,
-  `estadoEnvio` varchar(45)
+  `descuento` float,
+  FOREIGN KEY (`idUsuario`) REFERENCES `usuario` (`idUsuario`),
+  INDEX `idUsuario` (`idUsuario`)
 );
 
 CREATE TABLE `documento` (
@@ -114,7 +99,10 @@ CREATE TABLE `documento` (
   `tipo` varchar(60),
   `descripcion` text,
   `estado` varchar(60),
-  `fechaCompra` date
+  `fechaCompra` date,
+  FOREIGN KEY (`idModelo`) REFERENCES `modelo` (`idModelo`),
+  FOREIGN KEY (`idUsuario`) REFERENCES `usuario` (`idUsuario`),
+  INDEX `idUsuario` (`idUsuario`)
 );
 
 CREATE TABLE `producto` (
@@ -122,7 +110,7 @@ CREATE TABLE `producto` (
   `idModelo` int NOT NULL,
   `idVendedor` int,
   `idTienda` int,
-  `exposicion`int DEFAULT 0, 
+  `exposicion` int DEFAULT 0,
   `precio` float,
   `precioCompleto` float,
   `cantidad` int DEFAULT 0,
@@ -132,7 +120,52 @@ CREATE TABLE `producto` (
   `disponibilidad` ENUM ('disponible', 'vendido', 'reservado') DEFAULT 'disponible',
   `costoEnvio` float NOT NULL DEFAULT 0,
   `retiroEnTienda` bool NOT NULL DEFAULT false,
-  `fechaPublicacion` datetime DEFAULT (current_timestamp)
+  `fechaPublicacion` datetime DEFAULT (current_timestamp),
+  FOREIGN KEY (`idModelo`) REFERENCES `modelo` (`idModelo`),
+  FOREIGN KEY (`idVendedor`) REFERENCES `usuario` (`idUsuario`),
+  FOREIGN KEY (`idTienda`) REFERENCES `tienda` (`idTienda`)
+);  
+
+CREATE TABLE `subpago` (
+  `idSubpago` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `idPreferencia` int,
+  `idPago` int,
+  `idVendedor` int NOT NULL,
+  `idCarrito` int NOT NULL,
+  `estado` ENUM('pendiente_pago', 'pendiente_envio', 'enviado', 'recibido', 'fallido', 'reembolsado') DEFAULT 'pendiente_pago',
+  `metodoPago` varchar(45),
+  `precioTotal` float,
+  `fecha` datetime DEFAULT (current_timestamp),
+  `direccionEnvio` varchar(255),
+  FOREIGN KEY (`idVendedor`) REFERENCES `usuario`(`idUsuario`),
+  FOREIGN KEY (`idCarrito`) REFERENCES `carrito`(`idCarrito`),
+  INDEX (`idPreferencia`)
+);
+
+CREATE TABLE `imagen` (
+  `idImagen` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `idUsuario` int UNIQUE,
+  `idDocumento` int,
+  `idModelo` int,
+  `url` varchar(255),
+  FOREIGN KEY (`idUsuario`) REFERENCES `usuario` (`idUsuario`),
+  FOREIGN KEY (`idDocumento`) REFERENCES `documento` (`idDocumento`),
+  FOREIGN KEY (`idModelo`) REFERENCES `modelo` (`idModelo`),
+  INDEX `imagen_modelo` (`idModelo`),
+  INDEX `imagen_documento` (`idDocumento`),
+  INDEX `imagen_usuario` (`idUsuario`)
+);
+
+CREATE TABLE `carritoProducto` (
+  `idCarritoProducto` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `idPreferencia` int,
+  `idSubpago` int NOT NULL,
+  `idProducto` int NOT NULL,
+  `cantidad` int,
+  `fecha` datetime DEFAULT (current_timestamp),
+  FOREIGN KEY (`idProducto`) REFERENCES `producto` (`idProducto`),
+  FOREIGN KEY (`idSubpago`) REFERENCES `subpago` (`idSubpago`),
+  FOREIGN KEY (`idPreferencia`) REFERENCES `subpago` (`idPreferencia`)
 );
 
 CREATE TABLE `pregunta` (
@@ -140,7 +173,11 @@ CREATE TABLE `pregunta` (
   `idProducto` int NOT NULL,
   `idUsuario` int NOT NULL,
   `descripcion` varchar(255) NOT NULL,
-  `respuesta` varchar(255)
+  `respuesta` varchar(255),
+  FOREIGN KEY (`idProducto`) REFERENCES `producto` (`idProducto`),
+  FOREIGN KEY (`idUsuario`) REFERENCES `usuario` (`idUsuario`),
+  INDEX `idProducto` (`idProducto`),
+  INDEX `idUsuario` (`idUsuario`)
 );
 
 CREATE TABLE `calificacion` (
@@ -152,7 +189,13 @@ CREATE TABLE `calificacion` (
   `foto` varchar(255),
   `comentario` text,
   `nota` int,
-  `fecha` datetime DEFAULT (current_timestamp)
+  `fecha` datetime DEFAULT (current_timestamp),
+  FOREIGN KEY (`idUsuarioComprador`) REFERENCES `usuario` (`idUsuario`),
+  FOREIGN KEY (`idUsuarioVendedor`) REFERENCES `usuario` (`idUsuario`),
+  FOREIGN KEY (`idProducto`) REFERENCES `producto` (`idProducto`),
+  FOREIGN KEY (`idTienda`) REFERENCES `tienda` (`idTienda`),
+  INDEX `idUsuarioComprador` (`idUsuarioComprador`),
+  INDEX `fk_calificacion_usuario1_idx` (`idUsuarioVendedor`)
 );
 
 CREATE TABLE `mensaje` (
@@ -161,86 +204,13 @@ CREATE TABLE `mensaje` (
   `idUsuarioReceptor` int NOT NULL,
   `idCarritoProducto` int NOT NULL,
   `contenido` text,
-  `fecha` datetime
+  `fecha` datetime,
+  FOREIGN KEY (`idUsuarioEmisor`) REFERENCES `usuario` (`idUsuario`),
+  FOREIGN KEY (`idUsuarioReceptor`) REFERENCES `usuario` (`idUsuario`),
+  FOREIGN KEY (`idCarritoProducto`) REFERENCES `carritoProducto` (`idCarritoProducto`),
+  INDEX `idUsuarioEmisor` (`idUsuarioEmisor`),
+  INDEX `fk_mensaje_usuario1_idx` (`idUsuarioReceptor`)
 );
-
-CREATE INDEX `idMarca` ON `modelo` (`idMarca`);
-
-CREATE INDEX `nombre` ON `modelo` (`nombre`);
-
-CREATE INDEX `imagen_modelo` ON `imagen` (`idModelo`);
-
-CREATE INDEX `imagen_documento` ON `imagen` (`idDocumento`);
-
-CREATE INDEX `imagen_usuario` ON `imagen` (`idUsuario`);
-
-CREATE INDEX `nombre` ON `marca` (`nombre`);
-
-CREATE INDEX `nombre` ON `tienda` (`nombre`);
-
-CREATE INDEX `idUsuario` ON `carrito` (`idUsuario`);
-
-CREATE INDEX `idUsuario` ON `documento` (`idUsuario`);
-
-CREATE INDEX `idProducto` ON `pregunta` (`idProducto`);
-
-CREATE INDEX `idUsuario` ON `pregunta` (`idUsuario`);
-
-CREATE INDEX `idUsuarioComprador` ON `calificacion` (`idUsuarioComprador`);
-
-CREATE INDEX `fk_calificacion_usuario1_idx` ON `calificacion` (`idUsuarioVendedor`);
-
-CREATE INDEX `idUsuarioEmisor` ON `mensaje` (`idUsuarioEmisor`);
-
-CREATE INDEX `fk_mensaje_usuario1_idx` ON `mensaje` (`idUsuarioReceptor`);
-
-ALTER TABLE `modelo` ADD FOREIGN KEY (`idBicicleta`) REFERENCES `bicicleta` (`idBicicleta`);
-
-ALTER TABLE `modelo` ADD FOREIGN KEY (`idMarca`) REFERENCES `marca` (`idMarca`);
-
-ALTER TABLE `imagen` ADD FOREIGN KEY (`idUsuario`) REFERENCES `usuario` (`idUsuario`);
-
-ALTER TABLE `imagen` ADD FOREIGN KEY (`idDocumento`) REFERENCES `documento` (`idDocumento`);
-
-ALTER TABLE `imagen` ADD FOREIGN KEY (`idModelo`) REFERENCES `modelo` (`idModelo`);
-
-ALTER TABLE `bicicleta` ADD FOREIGN KEY (`idBicicleta`) REFERENCES `modelo` (`idModelo`);
-
-ALTER TABLE `tienda` ADD FOREIGN KEY (`idUsuarioAdministrador`) REFERENCES `usuario` (`idUsuario`);
-
-ALTER TABLE `carrito` ADD FOREIGN KEY (`idUsuario`) REFERENCES `usuario` (`idUsuario`);
-
-ALTER TABLE `carritoProducto` ADD FOREIGN KEY (`idProducto`) REFERENCES `producto` (`idProducto`);
-
-ALTER TABLE `carritoProducto` ADD FOREIGN KEY (`idCarrito`) REFERENCES `carrito` (`idCarrito`);
-
-ALTER TABLE `documento` ADD FOREIGN KEY (`idModelo`) REFERENCES `modelo` (`idModelo`);
-
-ALTER TABLE `documento` ADD FOREIGN KEY (`idUsuario`) REFERENCES `usuario` (`idUsuario`);
-
-ALTER TABLE `producto` ADD FOREIGN KEY (`idModelo`) REFERENCES `modelo` (`idModelo`);
-
-ALTER TABLE `producto` ADD FOREIGN KEY (`idVendedor`) REFERENCES `usuario` (`idUsuario`);
-
-ALTER TABLE `producto` ADD FOREIGN KEY (`idTienda`) REFERENCES `tienda` (`idTienda`);
-
-ALTER TABLE `calificacion` ADD FOREIGN KEY (`idUsuarioComprador`) REFERENCES `usuario` (`idUsuario`);
-
-ALTER TABLE `calificacion` ADD FOREIGN KEY (`idUsuarioVendedor`) REFERENCES `usuario` (`idUsuario`);
-
-ALTER TABLE `calificacion` ADD FOREIGN KEY (`idProducto`) REFERENCES `producto` (`idProducto`);
-
-ALTER TABLE `calificacion` ADD FOREIGN KEY (`idTienda`) REFERENCES `tienda` (`idTienda`);
-
-ALTER TABLE `mensaje` ADD FOREIGN KEY (`idUsuarioEmisor`) REFERENCES `usuario` (`idUsuario`);
-
-ALTER TABLE `mensaje` ADD FOREIGN KEY (`idUsuarioReceptor`) REFERENCES `usuario` (`idUsuario`);
-
-ALTER TABLE `mensaje` ADD FOREIGN KEY (`idCarritoProducto`) REFERENCES `carritoProducto` (`idCarritoProducto`);
-
-ALTER TABLE `pregunta` ADD FOREIGN KEY (`idProducto`) REFERENCES `producto`(`idProducto`);
-
-ALTER TABLE `pregunta` ADD FOREIGN KEY (`idUsuario`) REFERENCES `usuario`(`idUsuario`);
 
 ------------------------------------------------------------
 -- Inserts
@@ -379,6 +349,7 @@ SELECT
     carritoProducto.idProducto,
     carritoProducto.cantidad,
     carritoProducto.precio_unitario,
+    carritoProducto.idVendedor,
     producto.idModelo,
     producto.costoEnvio,
     modelo.nombre
@@ -389,12 +360,11 @@ JOIN
 JOIN 
     carritoProducto ON carrito.idCarrito = carritoProducto.idCarrito
 JOIN 
-	producto ON producto.idProducto = carritoProducto.idProducto
+    producto ON producto.idProducto = carritoProducto.idProducto
 JOIN 
-	modelo ON modelo.idModelo = producto.idModelo
+    modelo ON modelo.idModelo = producto.idModelo
 ORDER BY 
     carrito.fecha DESC;
-    
 
 -- Crear la vista consolidada
 DROP VIEW IF EXISTS vista_completa_producto;
@@ -594,7 +564,7 @@ SELECT
     carritoProducto.idProducto,
     carritoProducto.cantidad,
     carritoProducto.precio_unitario,
-    producto.idVendedor,
+    carritoProducto.idVendedor, 
     producto.precio,
     producto.precioCompleto,
     producto.cantidad AS cantidadProducto,
@@ -688,7 +658,7 @@ LEFT JOIN
     imagen iv ON iv.idUsuario = u.idUsuario
 LEFT JOIN 
     imagen ic ON ic.idUsuario = c.idUsuarioComprador;
-=======
+
 ------------------------------------------------
 -- Procedimientos almacenados
 ------------------------------------------------
