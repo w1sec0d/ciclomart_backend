@@ -366,10 +366,11 @@ JOIN
     producto ON producto.idProducto = carritoProducto.idProducto
 JOIN 
     modelo ON modelo.idModelo = producto.idModelo
-ORDER BY 
-    carrito.fecha DESC
 WHERE  
-    carrito.estado = 'pendiente_pago';
+    carrito.estado = 'pendiente_pago'
+ORDER BY 
+    carrito.fecha DESC;
+
 
 -- Crear la vista consolidada
 DROP VIEW IF EXISTS vista_completa_producto;
