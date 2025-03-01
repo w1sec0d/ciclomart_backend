@@ -215,7 +215,7 @@ VALUES
 
 INSERT INTO `usuario` VALUES
 ('4', 'Ronald', 'Ramírez', '2003-07-15', 'vendedor', 'vendedor@gmail.com', '110881', 'Calle 324', '48-50 Sur', '', '', 'Bogota', NULL, NULL, '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.', '0', '2025-03-01 14:51:26', '1025146485', 'TEST-7255018865819969-030116-23eb1d70ba61f02f9cee879c5752771d-1025146485', 'TG-67c367cb78aa6200011e1699-1025146485', 'TEST-46820db6-ac0c-42bd-9eac-b09db1a04d81'),
-('5', 'Johan', 'Madrid', NULL, 'comprador', 'comprador@unal.edu.co', '110881', 'Calle 324', '48-50 Sur', '', '', 'Bogota', NULL, NULL, '$2b$10$7/xaDQ2udFej9pWBhNmemeNXUAAl5fiOMapdBDRYvDHXIDIhXtQzq', '0', '2025-03-01 15:13:31', NULL, NULL, NULL, NULL);
+('5', 'Johan', 'Madrid', NULL, 'comprador', 'comprador@gmail.com', '110881', 'Calle 324', '48-50 Sur', '', '', 'Bogota', NULL, NULL, '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.', '0', '2025-03-01 15:13:31', NULL, NULL, NULL, NULL);
 
 -- Insertar marcas de muestra
 INSERT INTO `marca` (`nombre`)
@@ -581,7 +581,7 @@ FROM
 JOIN 
     carrito ON usuario.idUsuario = carrito.idComprador
 JOIN 
-    carritoProducto ON carrito.idPago = carritoProducto.idPago
+    carritoProducto ON carrito.idCarrito = carritoProducto.idCarrito
 JOIN 
     producto ON carritoProducto.idProducto = producto.idProducto
 JOIN 
