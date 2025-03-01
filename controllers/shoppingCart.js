@@ -26,7 +26,7 @@ const getShoppingCart = async (request, response) => {
 
   try {
     const results = await executeQuery(
-      'SELECT * FROM vista_productos_carrito_usuario WHERE idUsuario = ?',
+      'SELECT * FROM vista_productos_carrito WHERE id_comprador = ?',
       [idUsuario]
     )
     return response.status(200).json({
