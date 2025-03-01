@@ -131,8 +131,8 @@ CREATE TABLE `imagen` (
 
 CREATE TABLE `carrito` (
   `idCarrito` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `idPreferencia` int UNIQUE,
-  `idPago` int UNIQUE,
+  `idPreferencia` varchar(255) UNIQUE,
+  `idPago` varchar(255) UNIQUE,
   `idVendedor` int NOT NULL,
   `idComprador` int NOT NULL,
   `estado` ENUM('pendiente_pago', 'pendiente_envio', 'enviado', 'recibido', 'fallido', 'reembolsado') DEFAULT 'pendiente_pago',
@@ -147,14 +147,16 @@ CREATE TABLE `carrito` (
 
 CREATE TABLE `carritoProducto` (
   `idCarritoProducto` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `idPago` int NOT NULL,
+  `idCarrito` int NOT NULL,
+  `idPago` varchar(255) NOT NULL,
+  `idPreferencia` varchar(255),
   `idProducto` int NOT NULL,
-  `idPreferencia` int,
   `cantidad` int,
   `fecha` datetime DEFAULT (current_timestamp),
-  FOREIGN KEY (`idProducto`) REFERENCES `producto` (`idProducto`),
+  FOREIGN KEY (`idCarrito`) REFERENCES `carrito` (`idCarrito`),
   FOREIGN KEY (`idPago`) REFERENCES `carrito` (`idPago`),
-  FOREIGN KEY (`idPreferencia`) REFERENCES `carrito` (`idPreferencia`)
+  FOREIGN KEY (`idPreferencia`) REFERENCES `carrito` (`idPreferencia`),
+  FOREIGN KEY (`idProducto`) REFERENCES `producto` (`idProducto`)
 );
 
 CREATE TABLE `pregunta` (
@@ -209,8 +211,10 @@ INSERT INTO `usuario` (`nombre`, `apellido`, `fechaNacimiento`, `rol`, `correo`,
 VALUES 
 ('Juan', 'Perez', '1985-05-15', 'comprador', 'juan.perez@ejemplo.com', 'Calle 123, Bogotá', '3001234567', 'juanp', '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.'),
 ('Maria', 'Gomez', '1990-08-22', 'vendedor', 'maria.gomez@ejemplo.com', 'Carrera 45, Medellín', '3107654321', 'mariag', '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.'),
-('Carlos', 'Lopez', '1978-11-30', 'administrador', 'carlos.lopez@ejemplo.com', 'Avenida 10, Cali', '3209876543', 'carlosl', '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.'),
-('Carlos', 'Ramírez', '2003-07-15','comprador', 'cadavid4003@gmail.com', NULL, NULL, NULL, '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.');
+('Carlos', 'Lopez', '1978-11-30', 'administrador', 'carlos.lopez@ejemplo.com', 'Avenida 10, Cali', '3209876543', 'carlosl', '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.');
+
+INSERT INTO `usuario` VALUES ('4', 'Carlos', 'Ramírez', '2003-07-15', 'vendedor', 'cadavid4003@gmail.com', '110881', 'Calle 324', '48-50 Sur', '', '', 'Bogota', NULL, NULL, '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.', '0', '2025-03-01 14:51:26', '1025146485', 'TEST-7255018865819969-030116-23eb1d70ba61f02f9cee879c5752771d-1025146485', 'TG-67c367cb78aa6200011e1699-1025146485', 'TEST-46820db6-ac0c-42bd-9eac-b09db1a04d81');
+
 
 
 -- Insertar marcas de muestra
@@ -267,17 +271,17 @@ VALUES
 -- Insertar productos de muestra
 INSERT INTO `producto` (`idModelo`, `idVendedor`, `idTienda`, `precio`, `precioCompleto`, `cantidad`,`ventas`, `estado`, `disponibilidad`, `costoEnvio`, `retiroEnTienda`)
 VALUES 
-(1, 1, null, 3000000, 3300000, 10,0, 'nuevo', 'disponible', 50.00, false),
-(2, 2, null, 2400000, 3000000, 5,2, 'nuevo', 'disponible', 0, false),
-(3, 3, null, 11000000, null, 3,10, 'nuevo', 'disponible', 50.00, false),
-(4, 1, null, 290000, 300000, 20,4, 'nuevo', 'disponible', 0, false),
-(5, 2, null, 120000, null, 15,0, 'nuevo', 'disponible', 0, false),
-(6, 3, null, 1500000, null, 5,0, 'nuevo', 'disponible', 0, false),
-(7, 1, null, 300000, null, 10,0, 'nuevo', 'disponible', 0, false),
-(8, 2, null, 460000, 500000, 5,0, 'nuevo', 'disponible', 0, false),
-(9, 3, null, 60000, null, 3,0, 'nuevo', 'disponible', 0, false),
-(10, 1, null, 5000, null, 15,9, 'nuevo', 'disponible', 0, false),
-(11, 1, null, 10000, 20000, 10,6, 'nuevo', 'disponible', 0, false);
+(1, 4, null, 3000000, 3300000, 10,0, 'nuevo', 'disponible', 50.00, false),
+(2, 4, null, 2400000, 3000000, 5,2, 'nuevo', 'disponible', 0, false),
+(3, 4, null, 11000000, null, 3,10, 'nuevo', 'disponible', 50.00, false),
+(4, 4, null, 290000, 300000, 20,4, 'nuevo', 'disponible', 0, false),
+(5, 4, null, 120000, null, 15,0, 'nuevo', 'disponible', 0, false),
+(6, 4, null, 1500000, null, 5,0, 'nuevo', 'disponible', 0, false),
+(7, 4, null, 300000, null, 10,0, 'nuevo', 'disponible', 0, false),
+(8, 4, null, 460000, 500000, 5,0, 'nuevo', 'disponible', 0, false),
+(9, 4, null, 60000, null, 3,0, 'nuevo', 'disponible', 0, false),
+(10, 4, null, 5000, null, 15,9, 'nuevo', 'disponible', 0, false),
+(11, 4, null, 10000, 20000, 10,6, 'nuevo', 'disponible', 0, false);
 
 -- Insertar pagos de muestra
 INSERT INTO `carrito` (`idPreferencia`, `idPago`, `idVendedor`, `idComprador`, `estado`, `metodoPago`, `precioTotal`, `fecha`, `direccionEnvio`)
@@ -294,18 +298,18 @@ VALUES
 (10, 10, 2, 1, 'pendiente_pago', 'Tarjeta de Crédito', 1500.00, NOW(), 'Calle 123, Bogotá');
 
 -- Insertar productos del carrito de muestra
-INSERT INTO `carritoProducto` (`idPago`, `idProducto`, `idPreferencia`, `cantidad`, `fecha`)
+INSERT INTO `carritoProducto` (`idCarrito`,`idPago`, `idProducto`, `idPreferencia`, `cantidad`, `fecha`)
 VALUES 
-(1, 1, 1, 2, NOW()),
-(2, 2, 2, 1, NOW()),
-(3, 3, 3, 1, NOW()),
-(4, 4, 4, 3, NOW()),
-(5, 5, 5, 2, NOW()),
-(6, 6, 6, 1, NOW()),
-(7, 7, 7, 2, NOW()),
-(8, 8, 8, 1, NOW()),
-(9, 9, 9, 1, NOW()),
-(10, 10, 10, 3, NOW());
+(1, 1, 1, 1, 2, NOW()),
+(1, 2, 2, 2, 1, NOW()),
+(1, 3, 3, 3, 1, NOW()),
+(1, 4, 4, 4, 3, NOW()),
+(1, 5, 5, 5, 2, NOW()),
+(1, 6, 6, 6, 1, NOW()),
+(1, 7, 7, 7, 2, NOW()),
+(1, 8, 8, 8, 1, NOW()),
+(1, 9, 9, 9, 1, NOW()),
+(1, 10, 10, 10, 3, NOW());
 
 -- Insertar calificaciones de muestra
 INSERT INTO `calificacion` (`idUsuarioComprador`, `idUsuarioVendedor`, `idProducto`, `idTienda`, `foto`, `comentario`, `nota`)
