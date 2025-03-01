@@ -361,15 +361,13 @@ SELECT
     usuario.correo,
     carrito.idCarrito,
     carrito.fecha,
-    carrito.estado,
     carrito.precioTotal,
-    carrito.metodoPago,
     carrito.direccionEnvio,
     carritoProducto.idCarritoProducto,
     carritoProducto.idProducto,
     carritoProducto.cantidad,
-    carritoProducto.precio_unitario,
-    carritoProducto.idVendedor,
+    carritoProducto.idSubpago,
+    carritoProducto.idPreferencia,
     producto.idModelo,
     producto.costoEnvio,
     modelo.nombre
@@ -547,14 +545,14 @@ SELECT
     usuario.nombre,
     usuario.correo,
     carrito.idCarrito,
-    carrito.idPreferenciaPago,
     carrito.fecha,
     carrito.precioTotal,
-    carrito.metodoPago,
     carrito.direccionEnvio,
     carritoProducto.idCarritoProducto,
     carritoProducto.idProducto,
     carritoProducto.cantidad,
+    carritoProducto.idSubpago,
+    carritoProducto.idPreferencia,
     carritoProducto.precio_unitario
 FROM 
     carrito
@@ -568,23 +566,21 @@ ORDER BY
     carrito.fecha DESC;
     
 DROP VIEW IF EXISTS vista_compras_usuario;
+DROP VIEW IF EXISTS vista_compras_usuario;
 CREATE VIEW vista_compras_usuario AS
 SELECT 
     usuario.idUsuario,
     usuario.nombre,
     usuario.correo,
     carrito.idCarrito,
-    carrito.idPreferenciaPago,
     carrito.fecha,
-    carrito.estado,
     carrito.precioTotal,
-    carrito.metodoPago,
     carrito.direccionEnvio,
     carritoProducto.idCarritoProducto,
     carritoProducto.idProducto,
     carritoProducto.cantidad,
-    carritoProducto.precio_unitario,
-    carritoProducto.idVendedor, 
+    carritoProducto.idSubpago,
+    carritoProducto.idPreferencia,
     producto.precio,
     producto.precioCompleto,
     producto.cantidad AS cantidadProducto,
@@ -622,13 +618,13 @@ DROP VIEW IF EXISTS vista_ventas_usuario;
 CREATE VIEW vista_ventas_usuario AS
 SELECT 
     carrito.idCarrito,
-	carrito.idPreferenciaPago,
     carrito.fecha,
     carrito.precioTotal,
-    carrito.metodoPago,
     carrito.direccionEnvio,
     carritoProducto.idProducto,
     carritoProducto.precio_unitario,
+    carritoProducto.idSubpago,
+    carritoProducto.idPreferencia,
     producto.idVendedor,
     usuario.nombre AS nombreVendedor,
     usuario.apellido AS apellidoVendedor,
@@ -641,8 +637,6 @@ JOIN
     producto ON carritoProducto.idProducto = producto.idProducto
 JOIN 
     usuario ON producto.idVendedor = usuario.idUsuario
-WHERE 
-    carrito.estado = 'recibido'
 ORDER BY 
     carrito.fecha DESC;
 
