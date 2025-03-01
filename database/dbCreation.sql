@@ -158,9 +158,9 @@ CREATE TABLE `imagen` (
 
 CREATE TABLE `carritoProducto` (
   `idCarritoProducto` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `idPreferencia` int,
   `idSubpago` int NOT NULL,
   `idProducto` int NOT NULL,
+  `idPreferencia` int,
   `cantidad` int,
   `fecha` datetime DEFAULT (current_timestamp),
   FOREIGN KEY (`idProducto`) REFERENCES `producto` (`idProducto`),
@@ -218,10 +218,9 @@ CREATE TABLE `mensaje` (
 -- Insertar usuarios de muestra
 INSERT INTO `usuario` (`nombre`, `apellido`, `fechaNacimiento`, `rol`, `correo`, `direccionNombre`,`telefono`, `username`, `password`)
 VALUES 
-
-('Juan', 'Perez', '1985-05-15', 'comprador', 'juan.perez@ejemplo.com', 'Calle 123, Bogotá', '3001234567', 'juanp', 'contrasena123'),
-('Maria', 'Gomez', '1990-08-22', 'vendedor', 'maria.gomez@ejemplo.com', 'Carrera 45, Medellín', '3107654321', 'mariag', 'contrasena123'),
-('Carlos', 'Lopez', '1978-11-30', 'administrador', 'carlos.lopez@ejemplo.com', 'Avenida 10, Cali', '3209876543', 'carlosl', 'contrasena123');
+('Juan', 'Perez', '1985-05-15', 'comprador', 'juan.perez@ejemplo.com', 'Calle 123, Bogotá', '3001234567', 'juanp', '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.'),
+('Maria', 'Gomez', '1990-08-22', 'vendedor', 'maria.gomez@ejemplo.com', 'Carrera 45, Medellín', '3107654321', 'mariag', '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.'),
+('Carlos', 'Lopez', '1978-11-30', 'administrador', 'carlos.lopez@ejemplo.com', 'Avenida 10, Cali', '3209876543', 'carlosl', '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.'),
 ('Carlos', 'Ramírez', '2003-07-15','comprador', 'cadavid4003@gmail.com', NULL, NULL, NULL, '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.');
 
 
@@ -277,11 +276,11 @@ VALUES
 (3, 'Tienda de Bicis Bogotá', 'La mejor tienda de bicicletas en Bogotá', '3001234567');
 
 -- Insertar carritos de muestra
-INSERT INTO `carrito` (`idUsuario`, `cantidadProductos`, `precioTotal`, `fecha`, `estado`, `metodoPago`, `direccionEnvio`, `descuento`)
+INSERT INTO `carrito` (`idUsuario`, `cantidadProductos`, `precioTotal`, `fecha`,`descuento`)
 VALUES 
-(1, 2, 1500.00, NOW(), 'enviado', 'Tarjeta de Crédito', 'Calle 123, Bogotá', 0),
-(2, 1, 800.00, NOW(), 'enviado', 'PayPal', 'Carrera 45, Medellín', 0),
-(3, 2, 1500.00, NOW(), 'enviado', 'Tarjeta de Crédito', 'Calle 123, Bogotá', 0);
+(1, 2, 1500.00, NOW(), 0),
+(2, 1, 800.00, NOW(), 0),
+(3, 2, 1500.00, NOW(), 0);
 
 -- Insertar productos de muestra
 INSERT INTO `producto` (`idModelo`, `idVendedor`, `idTienda`, `precio`, `precioCompleto`, `cantidad`,`ventas`, `estado`, `disponibilidad`, `costoEnvio`, `retiroEnTienda`)
@@ -298,12 +297,33 @@ VALUES
 (10, 1, null, 5000, null, 15,9, 'nuevo', 'disponible', 0, false),
 (11, 1, null, 10000, 20000, 10,6, 'nuevo', 'disponible', 0, false);
 
--- Insertar productos del carrito de muestra
-INSERT INTO `carritoProducto` (`idProducto`, `idCarrito`, `cantidad`, `precio_unitario`, `direccion`, `estadoEnvio`)
+-- Insertar subpagos de muestra
+INSERT INTO `subpago` (`idPreferencia`, `idPago`, `idVendedor`, `idCarrito`, `estado`, `metodoPago`, `precioTotal`, `fecha`, `direccionEnvio`)
 VALUES 
-(1, 3, 1, 750.00, 'Calle 123, Bogotá', 'Pendiente'),
-(2, 2, 1, 750.00, 'Calle 123, Bogotá', 'Pendiente'),
-(3, 2, 1, 800.00, 'Carrera 45, Medellín', 'Pendiente');
+(1, 1, 2, 1, 'pendiente_pago', 'Tarjeta de Crédito', 1500.00, NOW(), 'Calle 123, Bogotá'),
+(2, 2, 2, 2, 'pendiente_pago', 'PayPal', 800.00, NOW(), 'Carrera 45, Medellín'),
+(3, 3, 2, 3, 'pendiente_pago', 'Tarjeta de Crédito', 1500.00, NOW(), 'Calle 123, Bogotá'),
+(4, 4, 2, 1, 'pendiente_pago', 'Tarjeta de Crédito', 1500.00, NOW(), 'Calle 123, Bogotá'),
+(5, 5, 2, 2, 'pendiente_pago', 'PayPal', 800.00, NOW(), 'Carrera 45, Medellín'),
+(6, 6, 2, 3, 'pendiente_pago', 'Tarjeta de Crédito', 1500.00, NOW(), 'Calle 123, Bogotá'),
+(7, 7, 2, 1, 'pendiente_pago', 'Tarjeta de Crédito', 1500.00, NOW(), 'Calle 123, Bogotá'),
+(8, 8, 2, 2, 'pendiente_pago', 'PayPal', 800.00, NOW(), 'Carrera 45, Medellín'),
+(9, 9, 2, 3, 'pendiente_pago', 'Tarjeta de Crédito', 1500.00, NOW(), 'Calle 123, Bogotá'),
+(10, 10, 2, 1, 'pendiente_pago', 'Tarjeta de Crédito', 1500.00, NOW(), 'Calle 123, Bogotá');
+
+-- Insertar productos del carrito de muestra
+INSERT INTO `carritoProducto` (`idSubpago`, `idProducto`, `idPreferencia`, `cantidad`, `fecha`)
+VALUES 
+(1, 1, 1, 2, NOW()),
+(2, 2, 2, 1, NOW()),
+(3, 3, 3, 1, NOW()),
+(4, 4, 4, 3, NOW()),
+(5, 5, 5, 2, NOW()),
+(6, 6, 6, 1, NOW()),
+(7, 7, 7, 2, NOW()),
+(8, 8, 8, 1, NOW()),
+(9, 9, 9, 1, NOW()),
+(10, 10, 10, 3, NOW());
 
 -- Insertar calificaciones de muestra
 INSERT INTO `calificacion` (`idUsuarioComprador`, `idUsuarioVendedor`, `idProducto`, `idTienda`, `foto`, `comentario`, `nota`)
