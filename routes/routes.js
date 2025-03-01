@@ -76,7 +76,11 @@ const {
   cancelPurchase,
 } = require('../controllers/purchases.js')
 
-const { getQuestions, addQuestion } = require('../controllers/questions.js')
+const { 
+  getQuestions, 
+  addQuestion,
+  answerQuestions
+} = require('../controllers/questions.js')
 
 const { oauthCallback } = require('../controllers/oauth.js')
 
@@ -148,6 +152,7 @@ router.post('/cancelPurchase/:idCarrito', cancelPurchase)
 
 router.get('/questions/:idProducto', getQuestions)
 router.post('/addQuestion', addQuestion)
+router.post('/answerQuestion', answerQuestions)
 
 // Autenticación oauth
 router.get('/oauth/callback', oauthCallback)
