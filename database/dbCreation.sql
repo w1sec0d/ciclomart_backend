@@ -472,8 +472,6 @@ RIGHT JOIN
 ORDER BY 
     producto.ventas DESC;
 
-select * from vista_completa_producto;
-
 DROP VIEW IF EXISTS vista_producto_calificacion_promedio;
 CREATE VIEW vista_producto_calificacion_promedio AS
 SELECT 
@@ -575,6 +573,7 @@ SELECT
     modelo.tipo AS tipoModelo,
     modelo.descripcion AS descripcionModelo,
     marca.nombre AS nombreMarca,
+    imagen.url AS imagenModelo,
     carrito.estado AS estadoCarrito,
     carrito.metodoPago,
     carrito.precioTotal AS precioCarrito,
@@ -591,6 +590,8 @@ JOIN
     modelo ON producto.idModelo = modelo.idModelo
 LEFT JOIN 
     marca ON modelo.idMarca = marca.idMarca
+LEFT JOIN 
+    imagen ON modelo.idModelo = imagen.idModelo
 ORDER BY 
     carrito.fecha DESC;
 
