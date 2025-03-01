@@ -167,7 +167,6 @@ const getProductById = async (req, res) => {
 const createPreference = async (req, res) => {
   try {
     const { producto, cantidad, idComprador } = req.body
-
     // OBTENCION DE DATOS DE VENDEDOR Y COMPRADOR
 
     // Obtener información del vendedor
@@ -284,9 +283,9 @@ const createPreference = async (req, res) => {
           number: comprador.telefono,
         },
         address: {
-          zip_code: 110881,
-          street_name: 'Carrera 87',
-          street_number: '48-50',
+          zip_code: comprador.codigoPostal,
+          street_name: comprador.direccionNombre,
+          street_number: comprador.direccionNumero,
         },
       },
       payment_methods: {
