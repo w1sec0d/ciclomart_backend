@@ -362,7 +362,6 @@ SELECT
     carrito.idCarrito,
     carrito.fecha,
     carrito.precioTotal,
-    carrito.direccionEnvio,
     carritoProducto.idCarritoProducto,
     carritoProducto.idProducto,
     carritoProducto.cantidad,
@@ -376,7 +375,9 @@ FROM
 JOIN 
     usuario ON carrito.idUsuario = usuario.idUsuario
 JOIN 
-    carritoProducto ON carrito.idCarrito = carritoProducto.idCarrito
+    subpago ON carrito.idCarrito = subpago.idCarrito
+JOIN 
+    carritoProducto ON carritoProducto.idSubpago = subpago.idSubpago
 JOIN 
     producto ON producto.idProducto = carritoProducto.idProducto
 JOIN 
@@ -547,70 +548,66 @@ SELECT
     carrito.idCarrito,
     carrito.fecha,
     carrito.precioTotal,
-    carrito.direccionEnvio,
     carritoProducto.idCarritoProducto,
     carritoProducto.idProducto,
     carritoProducto.cantidad,
     carritoProducto.idSubpago,
     carritoProducto.idPreferencia,
-    carritoProducto.precio_unitario
+    subpago.estado AS estadoSubpago,
+    subpago.metodoPago,
+    subpago.precioTotal AS precioSubpago,
+    subpago.direccionEnvio
 FROM 
     carrito
 JOIN 
     usuario ON carrito.idUsuario = usuario.idUsuario
 JOIN 
-    carritoProducto ON carrito.idCarrito = carritoProducto.idCarrito
+    subpago ON carrito.idCarrito = subpago.idCarrito
+JOIN 
+    carritoProducto ON carrito.idCarrito = subpago.idCarrito
 WHERE 
-    carrito.estado != 'recibido'
+    subpago.estado = 'pendiente_pago'
 ORDER BY 
     carrito.fecha DESC;
-    
-DROP VIEW IF EXISTS vista_compras_usuario;
+
 DROP VIEW IF EXISTS vista_compras_usuario;
 CREATE VIEW vista_compras_usuario AS
 SELECT 
     usuario.idUsuario,
     usuario.nombre,
+    usuario.apellido,
     usuario.correo,
     carrito.idCarrito,
     carrito.fecha,
     carrito.precioTotal,
-    carrito.direccionEnvio,
     carritoProducto.idCarritoProducto,
     carritoProducto.idProducto,
     carritoProducto.cantidad,
-    carritoProducto.idSubpago,
-    carritoProducto.idPreferencia,
-    producto.precio,
-    producto.precioCompleto,
-    producto.cantidad AS cantidadProducto,
-    producto.ventas,
+    producto.precio AS precioProducto,
     producto.estado AS estadoProducto,
-    producto.disponibilidad,
-    producto.costoEnvio,
-    producto.retiroEnTienda,
-    producto.fechaPublicacion,
+    producto.disponibilidad AS disponibilidadProducto,
     modelo.nombre AS nombreModelo,
     modelo.tipo AS tipoModelo,
     modelo.descripcion AS descripcionModelo,
-    modelo.categoria AS categoriaModelo,
-    modelo.compatibilidad AS compatibilidadModelo,
     marca.nombre AS nombreMarca,
-    imagen.url AS imagenModelo
+    subpago.estado AS estadoSubpago,
+    subpago.metodoPago,
+    subpago.precioTotal AS precioSubpago,
+    subpago.direccionEnvio
 FROM 
-    carrito
+    usuario
 JOIN 
-    usuario ON carrito.idUsuario = usuario.idUsuario
+    carrito ON usuario.idUsuario = carrito.idUsuario
 JOIN 
-    carritoProducto ON carrito.idCarrito = carritoProducto.idCarrito
+    subpago ON carrito.idCarrito = subpago.idCarrito
+JOIN 
+    carritoProducto ON carritoProducto.idSubpago = subpago.idSubpago
 JOIN 
     producto ON carritoProducto.idProducto = producto.idProducto
 JOIN 
     modelo ON producto.idModelo = modelo.idModelo
 LEFT JOIN 
     marca ON modelo.idMarca = marca.idMarca
-LEFT JOIN 
-    imagen ON modelo.idModelo = imagen.idModelo
 ORDER BY 
     carrito.fecha DESC;
 
@@ -620,9 +617,7 @@ SELECT
     carrito.idCarrito,
     carrito.fecha,
     carrito.precioTotal,
-    carrito.direccionEnvio,
     carritoProducto.idProducto,
-    carritoProducto.precio_unitario,
     carritoProducto.idSubpago,
     carritoProducto.idPreferencia,
     producto.idVendedor,
@@ -631,8 +626,10 @@ SELECT
     usuario.correo AS correoVendedor
 FROM 
     carrito
+JOIN
+    subpago ON carrito.idCarrito = subpago.idCarrito
 JOIN 
-    carritoProducto ON carrito.idCarrito = carritoProducto.idCarrito
+    carritoProducto ON carritoProducto.idSubpago = subpago.idSubpago
 JOIN 
     producto ON carritoProducto.idProducto = producto.idProducto
 JOIN 
@@ -672,6 +669,50 @@ LEFT JOIN
     imagen iv ON iv.idUsuario = u.idUsuario
 LEFT JOIN 
     imagen ic ON ic.idUsuario = c.idUsuarioComprador;
+
+-- Vista de productos asociados a un carrito
+DROP VIEW IF EXISTS vista_productos_carrito_usuario;
+CREATE VIEW vista_productos_carrito AS
+SELECT 
+    carrito.idCarrito,
+    carrito.fecha,
+    carrito.precioTotal,
+    carritoProducto.idCarritoProducto,
+    carritoProducto.idProducto,
+    carritoProducto.cantidad,
+    producto.idModelo,
+    producto.precio,
+    producto.precioCompleto,
+    producto.cantidad AS cantidadProducto,
+    producto.ventas,
+    producto.estado AS estadoProducto,
+    producto.disponibilidad,
+    producto.costoEnvio,
+    producto.retiroEnTienda,
+    producto.fechaPublicacion,
+    modelo.nombre AS nombreModelo,
+    modelo.tipo AS tipoModelo,
+    modelo.descripcion AS descripcionModelo,
+    modelo.categoria AS categoriaModelo,
+    modelo.compatibilidad AS compatibilidadModelo,
+    marca.nombre AS nombreMarca,
+    imagen.url AS imagenModelo
+FROM 
+    carrito
+JOIN 
+    subpago ON carrito.idCarrito = subpago.idCarrito
+JOIN 
+    carritoProducto ON carritoProducto.idSubpago = subpago.idSubpago
+JOIN 
+    producto ON carritoProducto.idProducto = producto.idProducto
+JOIN 
+    modelo ON producto.idModelo = modelo.idModelo
+LEFT JOIN 
+    marca ON modelo.idMarca = marca.idMarca
+LEFT JOIN 
+    imagen ON modelo.idModelo = imagen.idModelo
+ORDER BY 
+    carrito.fecha DESC;
 
 ------------------------------------------------
 -- Procedimientos almacenados
