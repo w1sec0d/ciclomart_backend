@@ -655,6 +655,9 @@ DROP VIEW IF EXISTS vista_productos_carrito;
 CREATE VIEW vista_productos_carrito AS
 SELECT 
     carrito.idCarrito,
+    carrito.idComprador,
+    producto.idVendedor,
+    carrito.estado,
     carrito.fecha,
     carrito.precioTotal,
     carritoProducto.idCarritoProducto,
@@ -680,7 +683,7 @@ SELECT
 FROM 
     carrito
 JOIN 
-    carritoProducto ON carrito.idPago = carritoProducto.idPago
+    carritoProducto ON carrito.idCarrito = carritoProducto.idCarrito
 JOIN 
     producto ON carritoProducto.idProducto = producto.idProducto
 JOIN 
@@ -689,8 +692,11 @@ LEFT JOIN
     marca ON modelo.idMarca = marca.idMarca
 LEFT JOIN 
     imagen ON modelo.idModelo = imagen.idModelo
+WHERE
+    carrito.estado = 'pendiente_pago'
 ORDER BY 
     carrito.fecha DESC;
+
 
 ------------------------------------------------
 -- Procedimientos almacenados
