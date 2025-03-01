@@ -81,17 +81,6 @@ CREATE TABLE `tienda` (
   INDEX `nombre` (`nombre`)
 );
 
-CREATE TABLE `carrito` (
-  `idCarrito` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `idUsuario` int NOT NULL,
-  `cantidadProductos` int DEFAULT 0,
-  `precioTotal` float,
-  `fecha` datetime,
-  `descuento` float,
-  FOREIGN KEY (`idUsuario`) REFERENCES `usuario` (`idUsuario`),
-  INDEX `idUsuario` (`idUsuario`)
-);
-
 CREATE TABLE `documento` (
   `idDocumento` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `idModelo` int NOT NULL,
@@ -126,22 +115,6 @@ CREATE TABLE `producto` (
   FOREIGN KEY (`idTienda`) REFERENCES `tienda` (`idTienda`)
 );  
 
-CREATE TABLE `subpago` (
-  `idSubpago` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `idPreferencia` int,
-  `idPago` int,
-  `idVendedor` int NOT NULL,
-  `idCarrito` int NOT NULL,
-  `estado` ENUM('pendiente_pago', 'pendiente_envio', 'enviado', 'recibido', 'fallido', 'reembolsado') DEFAULT 'pendiente_pago',
-  `metodoPago` varchar(45),
-  `precioTotal` float,
-  `fecha` datetime DEFAULT (current_timestamp),
-  `direccionEnvio` varchar(255),
-  FOREIGN KEY (`idVendedor`) REFERENCES `usuario`(`idUsuario`),
-  FOREIGN KEY (`idCarrito`) REFERENCES `carrito`(`idCarrito`),
-  INDEX (`idPreferencia`)
-);
-
 CREATE TABLE `imagen` (
   `idImagen` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `idUsuario` int UNIQUE,
@@ -156,16 +129,32 @@ CREATE TABLE `imagen` (
   INDEX `imagen_usuario` (`idUsuario`)
 );
 
+CREATE TABLE `carrito` (
+  `idCarrito` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `idPreferencia` int UNIQUE,
+  `idPago` int UNIQUE,
+  `idVendedor` int NOT NULL,
+  `idComprador` int NOT NULL,
+  `estado` ENUM('pendiente_pago', 'pendiente_envio', 'enviado', 'recibido', 'fallido', 'reembolsado') DEFAULT 'pendiente_pago',
+  `metodoPago` varchar(45),
+  `precioTotal` float,
+  `fecha` datetime DEFAULT (current_timestamp),
+  `direccionEnvio` varchar(255),
+  FOREIGN KEY (`idVendedor`) REFERENCES `usuario`(`idUsuario`),
+  FOREIGN KEY (`idComprador`) REFERENCES `usuario`(`idUsuario`),
+  INDEX (`idPreferencia`)
+);
+
 CREATE TABLE `carritoProducto` (
   `idCarritoProducto` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `idSubpago` int NOT NULL,
+  `idPago` int NOT NULL,
   `idProducto` int NOT NULL,
   `idPreferencia` int,
   `cantidad` int,
   `fecha` datetime DEFAULT (current_timestamp),
   FOREIGN KEY (`idProducto`) REFERENCES `producto` (`idProducto`),
-  FOREIGN KEY (`idSubpago`) REFERENCES `subpago` (`idSubpago`),
-  FOREIGN KEY (`idPreferencia`) REFERENCES `subpago` (`idPreferencia`)
+  FOREIGN KEY (`idPago`) REFERENCES `carrito` (`idPago`),
+  FOREIGN KEY (`idPreferencia`) REFERENCES `carrito` (`idPreferencia`)
 );
 
 CREATE TABLE `pregunta` (
@@ -275,13 +264,6 @@ INSERT INTO `tienda` (`idUsuarioAdministrador`, `nombre`, `descripcion`, `telefo
 VALUES 
 (3, 'Tienda de Bicis Bogotá', 'La mejor tienda de bicicletas en Bogotá', '3001234567');
 
--- Insertar carritos de muestra
-INSERT INTO `carrito` (`idUsuario`, `cantidadProductos`, `precioTotal`, `fecha`,`descuento`)
-VALUES 
-(1, 2, 1500.00, NOW(), 0),
-(2, 1, 800.00, NOW(), 0),
-(3, 2, 1500.00, NOW(), 0);
-
 -- Insertar productos de muestra
 INSERT INTO `producto` (`idModelo`, `idVendedor`, `idTienda`, `precio`, `precioCompleto`, `cantidad`,`ventas`, `estado`, `disponibilidad`, `costoEnvio`, `retiroEnTienda`)
 VALUES 
@@ -297,8 +279,8 @@ VALUES
 (10, 1, null, 5000, null, 15,9, 'nuevo', 'disponible', 0, false),
 (11, 1, null, 10000, 20000, 10,6, 'nuevo', 'disponible', 0, false);
 
--- Insertar subpagos de muestra
-INSERT INTO `subpago` (`idPreferencia`, `idPago`, `idVendedor`, `idCarrito`, `estado`, `metodoPago`, `precioTotal`, `fecha`, `direccionEnvio`)
+-- Insertar pagos de muestra
+INSERT INTO `carrito` (`idPreferencia`, `idPago`, `idVendedor`, `idComprador`, `estado`, `metodoPago`, `precioTotal`, `fecha`, `direccionEnvio`)
 VALUES 
 (1, 1, 2, 1, 'pendiente_pago', 'Tarjeta de Crédito', 1500.00, NOW(), 'Calle 123, Bogotá'),
 (2, 2, 2, 2, 'pendiente_pago', 'PayPal', 800.00, NOW(), 'Carrera 45, Medellín'),
@@ -312,7 +294,7 @@ VALUES
 (10, 10, 2, 1, 'pendiente_pago', 'Tarjeta de Crédito', 1500.00, NOW(), 'Calle 123, Bogotá');
 
 -- Insertar productos del carrito de muestra
-INSERT INTO `carritoProducto` (`idSubpago`, `idProducto`, `idPreferencia`, `cantidad`, `fecha`)
+INSERT INTO `carritoProducto` (`idPago`, `idProducto`, `idPreferencia`, `cantidad`, `fecha`)
 VALUES 
 (1, 1, 1, 2, NOW()),
 (2, 2, 2, 1, NOW()),
@@ -365,7 +347,7 @@ SELECT
     carritoProducto.idCarritoProducto,
     carritoProducto.idProducto,
     carritoProducto.cantidad,
-    carritoProducto.idSubpago,
+    carritoProducto.idPago,
     carritoProducto.idPreferencia,
     producto.idModelo,
     producto.costoEnvio,
@@ -373,11 +355,9 @@ SELECT
 FROM 
     carrito
 JOIN 
-    usuario ON carrito.idUsuario = usuario.idUsuario
+    usuario ON carrito.idComprador = usuario.idUsuario
 JOIN 
-    subpago ON carrito.idCarrito = subpago.idCarrito
-JOIN 
-    carritoProducto ON carritoProducto.idSubpago = subpago.idSubpago
+    carritoProducto ON carritoProducto.idPago = carrito.idPago
 JOIN 
     producto ON producto.idProducto = carritoProducto.idProducto
 JOIN 
@@ -551,22 +531,20 @@ SELECT
     carritoProducto.idCarritoProducto,
     carritoProducto.idProducto,
     carritoProducto.cantidad,
-    carritoProducto.idSubpago,
+    carritoProducto.idPago,
     carritoProducto.idPreferencia,
-    subpago.estado AS estadoSubpago,
-    subpago.metodoPago,
-    subpago.precioTotal AS precioSubpago,
-    subpago.direccionEnvio
+    carrito.estado AS estadoCarrito,
+    carrito.metodoPago,
+    carrito.precioTotal AS precioCarrito,
+    carrito.direccionEnvio
 FROM 
-    carrito
+    usuario
 JOIN 
-    usuario ON carrito.idUsuario = usuario.idUsuario
+    carrito ON usuario.idUsuario = carrito.idVendedor
 JOIN 
-    subpago ON carrito.idCarrito = subpago.idCarrito
-JOIN 
-    carritoProducto ON carrito.idCarrito = subpago.idCarrito
+    carritoProducto ON carrito.idPago = carritoProducto.idPago
 WHERE 
-    subpago.estado = 'pendiente_pago'
+    carrito.estado = 'pendiente_pago'
 ORDER BY 
     carrito.fecha DESC;
 
@@ -590,18 +568,16 @@ SELECT
     modelo.tipo AS tipoModelo,
     modelo.descripcion AS descripcionModelo,
     marca.nombre AS nombreMarca,
-    subpago.estado AS estadoSubpago,
-    subpago.metodoPago,
-    subpago.precioTotal AS precioSubpago,
-    subpago.direccionEnvio
+    carrito.estado AS estadoCarrito,
+    carrito.metodoPago,
+    carrito.precioTotal AS precioCarrito,
+    carrito.direccionEnvio
 FROM 
     usuario
 JOIN 
-    carrito ON usuario.idUsuario = carrito.idUsuario
+    carrito ON usuario.idUsuario = carrito.idComprador
 JOIN 
-    subpago ON carrito.idCarrito = subpago.idCarrito
-JOIN 
-    carritoProducto ON carritoProducto.idSubpago = subpago.idSubpago
+    carritoProducto ON carrito.idPago = carritoProducto.idPago
 JOIN 
     producto ON carritoProducto.idProducto = producto.idProducto
 JOIN 
@@ -618,7 +594,7 @@ SELECT
     carrito.fecha,
     carrito.precioTotal,
     carritoProducto.idProducto,
-    carritoProducto.idSubpago,
+    carritoProducto.idPago,
     carritoProducto.idPreferencia,
     producto.idVendedor,
     usuario.nombre AS nombreVendedor,
@@ -626,10 +602,8 @@ SELECT
     usuario.correo AS correoVendedor
 FROM 
     carrito
-JOIN
-    subpago ON carrito.idCarrito = subpago.idCarrito
 JOIN 
-    carritoProducto ON carritoProducto.idSubpago = subpago.idSubpago
+    carritoProducto ON carrito.idPago = carritoProducto.idPago
 JOIN 
     producto ON carritoProducto.idProducto = producto.idProducto
 JOIN 
@@ -700,9 +674,7 @@ SELECT
 FROM 
     carrito
 JOIN 
-    subpago ON carrito.idCarrito = subpago.idCarrito
-JOIN 
-    carritoProducto ON carritoProducto.idSubpago = subpago.idSubpago
+    carritoProducto ON carrito.idPago = carritoProducto.idPago
 JOIN 
     producto ON carritoProducto.idProducto = producto.idProducto
 JOIN 
