@@ -120,9 +120,9 @@ const getUsuarioPhoto = (request, response) => {
 // Registra un nuevo usuario
 const registerUsuario = async (request, response) => {
   try {
-    const { nombre, apellido, email, password } = request.body
+    const { nombre, apellido, email, password, telefono } = request.body
 
-    if (!nombre || !apellido || !email || !password) {
+    if (!nombre || !apellido || !email || !password || !telefono) {
       return response.status(400).json({
         success: false,
         message: 'Faltan campos obligatorios',
@@ -132,8 +132,8 @@ const registerUsuario = async (request, response) => {
     const passwordHash = await bcrypt.hash(password, 10)
 
     db.query(
-      'INSERT INTO usuario (nombre, apellido, correo, password, fechaRegistro) VALUES (?, ?, ?, ?, ?)',
-      [nombre, apellido, email, passwordHash, new Date()],
+      'INSERT INTO usuario (nombre, apellido, correo, password,telefono,fechaRegistro) VALUES (?, ?, ?, ?, ?, ?)',
+      [nombre, apellido, email, passwordHash, telefono, new Date()],
       (error, results) => {
         if (error) {
           console.error('Error ejecutando la consulta', error)
