@@ -2,12 +2,14 @@ const { preference } = require('../utils/mercadoPago')
 
 const createExposurePreference = async (req, res) => {
   try {
-    const { grade, price, quantity } = req.body
+    const { grade, price, quantity, idProducto } = req.body
 
+    const externalReference = `exposicion-${idProducto}-${grade}`
     const preferenceBody = {
       items: [
         {
           title: `Exposure grade ${grade}`,
+          category_id: 'exposicion',
           unit_price: Number(price),
           quantity: Number(quantity),
           currency_id: 'COP',
@@ -20,6 +22,7 @@ const createExposurePreference = async (req, res) => {
       },
       auto_return: 'approved',
       notification_url: process.env.BACKEND_URL + '/webhookMercadoLibre',
+      external_reference: externalReference,
     }
     const result = await preference.create({
       body: preferenceBody,

@@ -410,6 +410,7 @@ SELECT
     producto.costoEnvio,
     producto.retiroEnTienda,
     producto.fechaPublicacion,
+    producto.exposicion,
     modelo.idModelo,
     modelo.nombre,
     modelo.tipo,
@@ -712,5 +713,6 @@ BEGIN
         SET MESSAGE_TEXT = 'No se encontró el carrito o no se pudo actualizar el estado';
     END IF;
 END //
+
 
 DELIMITER ;
