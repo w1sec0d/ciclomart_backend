@@ -148,10 +148,10 @@ CREATE TABLE `carrito` (
 CREATE TABLE `carritoProducto` (
   `idCarritoProducto` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `idCarrito` int NOT NULL,
-  `idPago` varchar(255) NOT NULL,
+  `idPago` varchar(255),
   `idPreferencia` varchar(255),
   `idProducto` int NOT NULL,
-  `cantidad` int,
+  `cantidad` int DEFAULT 1,
   `fecha` datetime DEFAULT (current_timestamp),
   FOREIGN KEY (`idCarrito`) REFERENCES `carrito` (`idCarrito`),
   FOREIGN KEY (`idPago`) REFERENCES `carrito` (`idPago`),
@@ -213,9 +213,9 @@ VALUES
 ('Maria', 'Gomez', '1990-08-22', 'vendedor', 'maria.gomez@ejemplo.com', 'Carrera 45, Medellín', '3107654321', 'mariag', '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.'),
 ('Carlos', 'Lopez', '1978-11-30', 'administrador', 'carlos.lopez@ejemplo.com', 'Avenida 10, Cali', '3209876543', 'carlosl', '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.');
 
-INSERT INTO `usuario` VALUES ('4', 'Carlos', 'Ramírez', '2003-07-15', 'vendedor', 'user@example.com', '110881', 'Calle 324', '48-50 Sur', '', '', 'Bogota', NULL, NULL, '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.', '0', '2025-03-01 14:51:26', '0000000000', 'TEST-REDACTED', 'TG-REDACTED', 'TEST-REDACTED');
-
-
+INSERT INTO `usuario` VALUES
+('4', 'Ronald', 'Ramírez', '2003-07-15', 'vendedor', 'seller@example.com', '110881', 'Calle 324', '48-50 Sur', '', '', 'Bogota', NULL, NULL, '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.', '0', '2025-03-01 14:51:26', '0000000000', 'TEST-REDACTED', 'TG-REDACTED', 'TEST-REDACTED'),
+('5', 'Johan', 'Madrid', NULL, 'comprador', 'comprador@unal.edu.co', '110881', 'Calle 324', '48-50 Sur', '', '', 'Bogota', NULL, NULL, '$2b$10$7/xaDQ2udFej9pWBhNmemeNXUAAl5fiOMapdBDRYvDHXIDIhXtQzq', '0', '2025-03-01 15:13:31', NULL, NULL, NULL, NULL);
 
 -- Insertar marcas de muestra
 INSERT INTO `marca` (`nombre`)

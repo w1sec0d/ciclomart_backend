@@ -330,11 +330,10 @@ const createPreference = async (req, res) => {
 
     // Crear carritoProducto
     const carritoProductoQuery = `
-      INSERT INTO carritoProducto (idCarrito, idPago, idProducto, cantidad, fecha)
-      VALUES (?, ?, ?, ?, NOW())
+      INSERT INTO carritoProducto (idCarrito, idProducto, cantidad)
+      VALUES (?, ?, ?)
     `
     const carritoProductoValues = [
-      carritoId,
       carritoId,
       producto.idProducto,
       cantidad,
