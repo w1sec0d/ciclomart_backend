@@ -367,7 +367,9 @@ JOIN
 JOIN 
     modelo ON modelo.idModelo = producto.idModelo
 ORDER BY 
-    carrito.fecha DESC;
+    carrito.fecha DESC
+WHERE  
+    carrito.estado = 'pendiente_pago';
 
 -- Crear la vista consolidada
 DROP VIEW IF EXISTS vista_completa_producto;
@@ -649,7 +651,7 @@ LEFT JOIN
     imagen ic ON ic.idUsuario = c.idUsuarioComprador;
 
 -- Vista de productos asociados a un carrito
-DROP VIEW IF EXISTS vista_productos_carrito_usuario;
+DROP VIEW IF EXISTS vista_productos_carrito;
 CREATE VIEW vista_productos_carrito AS
 SELECT 
     carrito.idCarrito,
