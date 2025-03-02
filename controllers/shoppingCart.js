@@ -26,7 +26,7 @@ const getShoppingCart = async (request, response) => {
 
   try {
     const results = await executeQuery(
-      'SELECT * FROM vista_productos_carrito_usuario WHERE idUsuario = ?',
+      'SELECT * FROM vista_productos_carrito WHERE id_comprador = ?',
       [idUsuario]
     )
     return response.status(200).json({
@@ -56,59 +56,54 @@ const addToShoppingCart = async (request, response) => {
 
   try {
     const carritoResults = await executeQuery(
-      'SELECT idCarrito FROM carrito WHERE idUsuario = ?',
+      'SELECT idCarrito FROM carrito WHERE idComprador = ? AND estado = "pendiente_pago"',
       [idUsuario]
     )
 
     if (carritoResults.length === 0) {
-      return response.status(404).json({
-        success: false,
-        message: 'Carrito no encontrado',
-      })
-    }
-
-    const idCarrito = carritoResults[0].idCarrito
-
-    const productoResults = await executeQuery(
-      'SELECT * FROM producto WHERE idProducto = ?',
-      [idProducto]
-    )
-
-    if (productoResults.length === 0) {
-      return response.status(404).json({
-        success: false,
-        message: 'Producto no encontrado',
-      })
-    }
-
-    const producto = productoResults[0]
-
-    const carritoProductoResults = await executeQuery(
-      'SELECT * FROM carritoProducto WHERE idCarrito = ? AND idProducto = ?',
-      [idCarrito, idProducto]
-    )
-
-    if (carritoProductoResults.length > 0) {
-      const nuevaCantidad = carritoProductoResults[0].cantidad + cantidad
-      const results = await executeQuery(
-        'UPDATE carritoProducto SET cantidad = ? WHERE idCarrito = ? AND idProducto = ?',
-        [nuevaCantidad, idCarrito, idProducto]
+      const newCarrito = await executeQuery(
+        'INSERT INTO carrito (idComprador, estado) VALUES (?, "pendiente_pago")',
+        [idUsuario]
       )
-      return response.status(200).json({
-        success: true,
-        message: 'Cantidad del producto actualizada en el carrito',
-        results,
-      })
-    } else {
+      const idCarrito = newCarrito.insertId
       const results = await executeQuery(
-        'INSERT INTO carritoProducto (idCarrito, idProducto, cantidad, precio_unitario) VALUES (?, ?, ?, ?)',
-        [idCarrito, idProducto, cantidad, producto.precio]
+        'INSERT INTO carritoProducto (idCarrito, idProducto, cantidad) VALUES (?, ?, ?)',
+        [idCarrito, idProducto, cantidad]
       )
       return response.status(201).json({
         success: true,
-        message: 'Producto agregado al carritoProducto',
+        message: 'Producto agregado al carrito',
         results,
       })
+    } else {
+      const idCarrito = carritoResults[0].idCarrito
+      const carritoProductoResults = await executeQuery(
+        'SELECT * FROM carritoProducto WHERE idCarrito = ? AND idProducto = ?',
+        [idCarrito, idProducto]
+      )
+
+      if (carritoProductoResults.length > 0) {
+        const nuevaCantidad = carritoProductoResults[0].cantidad + cantidad
+        const results = await executeQuery(
+          'UPDATE carritoProducto SET cantidad = ? WHERE idCarrito = ? AND idProducto = ?',
+          [nuevaCantidad, idCarrito, idProducto]
+        )
+        return response.status(200).json({
+          success: true,
+          message: 'Cantidad del producto actualizada en el carrito',
+          results,
+        })
+      } else {
+        const results = await executeQuery(
+          'INSERT INTO carritoProducto (idCarrito, idProducto, cantidad) VALUES (?, ?, ?)',
+          [idCarrito, idProducto, cantidad]
+        )
+        return response.status(201).json({
+          success: true,
+          message: 'Producto agregado al carrito',
+          results,
+        })
+      }
     }
   } catch (error) {
     console.error('Error realizando la consulta ', error)
@@ -132,7 +127,7 @@ const removeFromShoppingCart = async (request, response) => {
 
   try {
     const carritoResults = await executeQuery(
-      'SELECT idCarrito FROM carrito WHERE idUsuario = ?',
+      'SELECT idCarrito FROM carrito WHERE idComprador = ? AND estado = "pendiente_pago"',
       [idUsuario]
     )
 
