@@ -673,6 +673,35 @@ const getImages = async (req, res) => {
   }
 }
 
+const addBrand = async(req, res) => {
+  try {
+    const { nombre } = req.body
+    db.query('INSERT INTO marca (nombre) VALUES (?)', [nombre], (error, results) => {
+      if (error) {
+        console.error('Error agregando marca:', error)
+        return res.status(500).json({
+          success: false,
+          message: 'Error agregando marca',
+          error: error.message,
+        })
+      }
+
+      res.status(200).json({
+        success: true,
+        message: 'Marca agregada exitosamente',
+        results,
+      })
+    })
+  } catch (error) {
+    console.error('Error agregando marca:', error)
+    res.status(500).json({
+      success: false,
+      message: 'Error agregando marca',
+      error: error.message,
+    })
+  }
+}
+
 module.exports = {
   getProducto,
   getBicicletas,
@@ -685,4 +714,5 @@ module.exports = {
   getBrands,
   uploadImage,
   getImages,
+  addBrand
 }
