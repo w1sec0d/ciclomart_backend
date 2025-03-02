@@ -213,9 +213,11 @@ VALUES
 ('Maria', 'Gomez', '1990-08-22', 'vendedor', 'maria.gomez@ejemplo.com', 'Carrera 45, Medellín', '3107654321', 'mariag', '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.'),
 ('Carlos', 'Lopez', '1978-11-30', 'administrador', 'carlos.lopez@ejemplo.com', 'Avenida 10, Cali', '3209876543', 'carlosl', '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.');
 
+
 INSERT INTO `usuario` VALUES
 ('4', 'Ronald', 'Ramírez', '2003-07-15', 'vendedor', 'seller@example.com', '110881', 'Calle 324', '48-50 Sur', '', '', 'Bogota', NULL, NULL, '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.', '0', '2025-03-01 14:51:26', '0000000000', 'TEST-REDACTED', 'TG-REDACTED', 'TEST-REDACTED'),
 ('5', 'Johan', 'Madrid', NULL, 'comprador', 'buyer@example.com', '110881', 'Calle 324', '48-50 Sur', '', '', 'Bogota', NULL, NULL, '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.', '0', '2025-03-01 15:13:31', NULL, NULL, NULL, NULL);
+
 
 -- Insertar marcas de muestra
 INSERT INTO `marca` (`nombre`)
@@ -386,6 +388,7 @@ SELECT
     producto.costoEnvio,
     producto.retiroEnTienda,
     producto.fechaPublicacion,
+    producto.exposicion,
     modelo.idModelo,
     modelo.nombre,
     modelo.tipo,
@@ -409,6 +412,7 @@ SELECT
     bicicleta.pesoBicicleta,
     bicicleta.pesoMaximo,
     bicicleta.extras,
+    bicicleta.tarjeta,
     marca.idMarca,
     marca.nombre AS nombreMarca,
     imagen.idImagen,
@@ -722,5 +726,6 @@ BEGIN
         SET MESSAGE_TEXT = 'No se encontró el carrito o no se pudo actualizar el estado';
     END IF;
 END //
+
 
 DELIMITER ;

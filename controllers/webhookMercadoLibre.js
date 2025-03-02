@@ -19,17 +19,43 @@ const webhookMercadoLibre = async (req, res) => {
       const { status, external_reference } = paymentResponse
       console.log('paymentResponse', paymentResponse)
       if (status === 'approved') {
-        db.query(
-          "UPDATE carrito SET estado='pendiente_envio', idPago = ? WHERE idCarrito = ?",
-          [paymentId, external_reference],
-          (err, result) => {
-            if (err) {
-              console.error(err)
+        const [category, idProducto, grade] = external_reference.split('-')
+
+        if (category === 'exposicion') {
+          console.log(
+            'PAGO POR EXPOSICIÓN RECIBIDO',
+            'CATEGORIA',
+            category,
+            'IDPRODUCTO',
+            idProducto,
+            'GRADO',
+            grade
+          )
+          db.query(
+            'UPDATE producto SET exposicion = ? WHERE idProducto = ?',
+            [grade, idProducto],
+            (err, result) => {
+              if (err) {
+                console.error('Error actualizando producto:', err)
+              } else {
+                console.log('Producto actualizado exitosamente:', result)
+              }
             }
-          }
-        )
+          )
+        } else {
+          db.query(
+            "UPDATE carrito SET estado='pendiente_envio', idPago = ? WHERE idCarrito = ?",
+            [paymentId, external_reference],
+            (err, result) => {
+              if (err) {
+                console.error(err)
+              }
+            }
+          )
+        }
       }
     }
+
     res.status(200).json({ success: true, message: 'Webhook recibido', body })
   } catch (error) {
     console.error('Error en el servidor', error)
