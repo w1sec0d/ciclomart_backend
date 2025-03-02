@@ -48,7 +48,7 @@ CREATE TABLE `bicicleta` (
   `pesoBicicleta` float,
   `pesoMaximo` float,
   `extras` text,
-  `tarjeta` varchar(45)
+  `tarjeta` varchar(255)
 );
 
 CREATE TABLE `marca` (
