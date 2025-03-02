@@ -135,7 +135,7 @@ const sendRecover = async (req, res) => {
 // Envía un código para terminar el registro
 const sendRegisterCode = async (req, res) => {
   try {
-    const { email, nombre, apellido, password } = req.body.data
+    const { email, nombre, apellido, password, telefono } = req.body.data
     if (!req.body.data) {
       return res.status(400).json({
         success: false,
@@ -145,7 +145,14 @@ const sendRegisterCode = async (req, res) => {
 
     const code = generateVerificationCode()
 
-    const userForToken = { correo: email, nombre, apellido, password, code }
+    const userForToken = {
+      correo: email,
+      nombre,
+      apellido,
+      password,
+      telefono,
+      code,
+    }
     const token = jwt.sign(userForToken, process.env.JWT_SECRET, {
       expiresIn: '1h',
     })
@@ -182,7 +189,7 @@ const validateCode = async (req, res) => {
     const token = req.body.token
 
     const decoded = verifyToken(token)
-    const { correo, nombre, apellido, password, code } = decoded
+    const { correo, nombre, apellido, password, telefono, code } = decoded
 
     if (codigo === code) {
       return res.status(200).json({
@@ -190,6 +197,7 @@ const validateCode = async (req, res) => {
         message: 'Código validado correctamente',
         correo,
         nombre,
+        telefono,
         apellido,
         password,
       })
