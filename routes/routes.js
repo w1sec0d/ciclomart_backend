@@ -50,6 +50,7 @@ const {
   getBicicletas,
   getComponentes,
   getProductosOferta,
+  addBrand
 } = require('../controllers/producto.js')
 
 const { createExposurePreference } = require('../controllers/exposicion.js')
@@ -77,7 +78,11 @@ const {
   cancelPurchase,
 } = require('../controllers/purchases.js')
 
-const { getQuestions, addQuestion } = require('../controllers/questions.js')
+const { 
+  getQuestions, 
+  addQuestion,
+  answerQuestions
+} = require('../controllers/questions.js')
 
 const { oauthCallback } = require('../controllers/oauth.js')
 
@@ -119,6 +124,7 @@ router.get('/brands', getBrands)
 router.get('/productos/:id', getProductById)
 router.post('/uploadImage', uploadImage)
 router.get('/images/:id', getImages)
+router.post('/addBrand', addBrand)
 // Mercado Pago
 router.post('/createPreference', createPreference)
 router.post('/createExposurePreference', createExposurePreference)
@@ -150,6 +156,7 @@ router.post('/cancelPurchase/:idCarrito', cancelPurchase)
 
 router.get('/questions/:idProducto', getQuestions)
 router.post('/addQuestion', addQuestion)
+router.post('/answerQuestion', answerQuestions)
 
 // Autenticación oauth
 router.get('/oauth/callback', oauthCallback)
