@@ -421,6 +421,7 @@ SELECT
     usuario.idUsuario AS idVendedor,
     usuario.nombre AS nombreVendedor,
     usuario.apellido AS apellidoVendedor,
+    usuario.telefono AS telefonoVendedor,
     usuario.correo AS correoVendedor,
     usuario.telefono AS telefonoVendedor,
     imagen_vendedor.url AS fotoVendedor
@@ -728,6 +729,5 @@ BEGIN
         SET MESSAGE_TEXT = 'No se encontró el carrito o no se pudo actualizar el estado';
     END IF;
 END //
-
 
 DELIMITER ;
