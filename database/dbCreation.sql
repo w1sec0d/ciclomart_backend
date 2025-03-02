@@ -47,7 +47,8 @@ CREATE TABLE `bicicleta` (
   `manubrio` varchar(45),
   `pesoBicicleta` float,
   `pesoMaximo` float,
-  `extras` text
+  `extras` text,
+  `tarjeta` varchar(45)
 );
 
 CREATE TABLE `marca` (
@@ -421,6 +422,7 @@ SELECT
     usuario.nombre AS nombreVendedor,
     usuario.apellido AS apellidoVendedor,
     usuario.correo AS correoVendedor,
+    usuario.telefono AS telefonoVendedor,
     imagen_vendedor.url AS fotoVendedor
 FROM 
     producto
