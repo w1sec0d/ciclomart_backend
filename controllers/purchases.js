@@ -62,7 +62,7 @@ const confirmShipment = async (req, res) => {
 
   try {
     db.query(
-      'UPDATE carrito SET estado = "Enviado" WHERE idCarrito = ?',
+      'UPDATE carrito SET estado = "recibido" WHERE idCarrito = ?',
       [idCarrito],
       (error, results) => {
         if (error) {
