@@ -219,6 +219,7 @@ const createPreference = async (req, res) => {
     const carritoQuery = `
       INSERT INTO carrito (idPreferencia, idPago, idVendedor, idComprador, estado, metodoPago, precioTotal, fecha, direccionEnvio)
       VALUES (?, ?, ?, ?, 'pendiente_pago', ?, ?, NOW(), ?)
+
     `
     const carritoValues = [
       null, // idPreferencia
@@ -283,9 +284,11 @@ const createPreference = async (req, res) => {
           number: comprador.telefono,
         },
         address: {
+
           zip_code: comprador.codigoPostal,
           street_name: comprador.direccionNombre,
           street_number: comprador.direccionNumero,
+
         },
       },
       payment_methods: {
@@ -311,7 +314,9 @@ const createPreference = async (req, res) => {
     // Actualizar carrito con el id de la preferencia
     await new Promise((resolve, reject) => {
       db.query(
+
         'UPDATE carrito SET idPreferencia = ? WHERE idCarrito = ?',
+
         [idPreferenciaPago, carritoId],
         (error, results) => {
           if (error) {
@@ -329,6 +334,7 @@ const createPreference = async (req, res) => {
 
     // Crear carritoProducto
     const carritoProductoQuery = `
+
       INSERT INTO carritoProducto (idCarrito, idProducto, cantidad)
       VALUES (?, ?, ?)
     `
@@ -336,6 +342,7 @@ const createPreference = async (req, res) => {
       carritoId,
       producto.idProducto,
       cantidad,
+
     ]
 
     await new Promise((resolve, reject) => {
@@ -419,6 +426,7 @@ const publishProducto = async (req, res) => {
         req.body.pesoBicicleta != '' ? req.body.pesoBicicleta : null,
       pesoMaximo: req.body.pesoMaximo != '' ? req.body.pesoBicicleta : null,
       extras: req.body.extras,
+      tarjeta: req.body.tarjeta,
     }
   }
 
