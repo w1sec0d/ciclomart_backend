@@ -167,7 +167,6 @@ const getProductById = async (req, res) => {
 const createPreference = async (req, res) => {
   try {
     const { producto, cantidad, idComprador } = req.body
-
     // OBTENCION DE DATOS DE VENDEDOR Y COMPRADOR
 
     // Obtener información del vendedor
@@ -218,16 +217,18 @@ const createPreference = async (req, res) => {
 
     // Crear carrito
     const carritoQuery = `
-      INSERT INTO carrito (idUsuario, cantidadProductos, precioTotal, fecha, estado, metodoPago, direccionEnvio, descuento)
-      VALUES (?, ?, ?, NOW(), 'pendiente_pago', ?, ?, ?)
+      INSERT INTO carrito (idPreferencia, idPago, idVendedor, idComprador, estado, metodoPago, precioTotal, fecha, direccionEnvio)
+      VALUES (?, ?, ?, ?, 'pendiente_pago', ?, ?, NOW(), ?)
+
     `
     const carritoValues = [
+      null, // idPreferencia
+      null, // idPago
+      producto.idVendedor,
       idComprador,
-      cantidad,
-      producto.precio * cantidad,
       'MercadoPago',
+      producto.precio * cantidad,
       'Direccion de envio',
-      0,
     ]
 
     const carritoResults = await new Promise((resolve, reject) => {
@@ -282,34 +283,17 @@ const createPreference = async (req, res) => {
           area_code: '57',
           number: comprador.telefono,
         },
-        // identification: {
-        //   type: 'CC',
-        //   number: comprador.cedula,
-        // }
         address: {
-          zip_code: 110881,
-          street_name: 'Carrera 87',
-          street_number: '48-50',
+
+          zip_code: comprador.codigoPostal,
+          street_name: comprador.direccionNombre,
+          street_number: comprador.direccionNumero,
+
         },
       },
       payment_methods: {
         default_installments: 1,
       },
-      // shipments: {
-      //   mode: 'custom',
-      //   local_pickup: false,
-      //   dimensions: producto.dimensiones ?? '30 x 30 x 30, 500',
-      //   receiver_address: {
-      //     zip_code: comprador.codigoPostal ?? '110831',
-      //     street_name: comprador.direccionNombre ?? 'Carrera 12',
-      //     street_number: comprador.direccionNumero ?? '48-30',
-      //     floor: comprador.dirrecionPiso ?? '3',
-      //     apartment: comprador.direccionApartamento ?? 'C',
-      //     city_name: comprador.direccionCiudad ?? 'Bogota',
-      //     country_name: 'Colombia',
-      //     state_name: 'Bogota',
-      //   },
-      // },
       back_urls: {
         success: process.env.FRONTEND_URL + '/requestResult/purchaseComplete',
         failure: process.env.FRONTEND_URL + '/requestResult/purchaseFailed',
@@ -330,7 +314,9 @@ const createPreference = async (req, res) => {
     // Actualizar carrito con el id de la preferencia
     await new Promise((resolve, reject) => {
       db.query(
-        'UPDATE carrito SET idPreferenciaPago = ? WHERE idCarrito = ?',
+
+        'UPDATE carrito SET idPreferencia = ? WHERE idCarrito = ?',
+
         [idPreferenciaPago, carritoId],
         (error, results) => {
           if (error) {
@@ -348,14 +334,15 @@ const createPreference = async (req, res) => {
 
     // Crear carritoProducto
     const carritoProductoQuery = `
-      INSERT INTO carritoProducto (idProducto, idCarrito, cantidad, precio_unitario, estadoEnvio)
-      VALUES (?, ?, ?, ?,'Pendiente')
+
+      INSERT INTO carritoProducto (idCarrito, idProducto, cantidad)
+      VALUES (?, ?, ?)
     `
     const carritoProductoValues = [
-      producto.idProducto,
       carritoId,
+      producto.idProducto,
       cantidad,
-      producto.precio,
+
     ]
 
     await new Promise((resolve, reject) => {
