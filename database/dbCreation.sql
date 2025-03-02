@@ -421,7 +421,6 @@ SELECT
     usuario.idUsuario AS idVendedor,
     usuario.nombre AS nombreVendedor,
     usuario.apellido AS apellidoVendedor,
-    usuario.telefono AS telefonoVendedor,
     usuario.correo AS correoVendedor,
     usuario.telefono AS telefonoVendedor,
     imagen_vendedor.url AS fotoVendedor
