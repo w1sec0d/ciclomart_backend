@@ -442,6 +442,7 @@ SELECT
     usuario.idUsuario AS idVendedor,
     usuario.nombre AS nombreVendedor,
     usuario.apellido AS apellidoVendedor,
+    usuario.telefono AS telefonoVendedor,
     usuario.correo AS correoVendedor,
     imagen_vendedor.url AS fotoVendedor
 FROM 
@@ -559,7 +560,6 @@ SELECT
     usuario.nombre,
     usuario.correo,
     carrito.idCarrito,
-    carrito.idPreferenciaPago,
     carrito.fecha,
     carrito.precioTotal,
     carrito.metodoPago,
@@ -586,7 +586,6 @@ SELECT
     usuario.nombre,
     usuario.correo,
     carrito.idCarrito,
-    carrito.idPreferenciaPago,
     carrito.fecha,
     carrito.estado,
     carrito.precioTotal,
@@ -634,7 +633,6 @@ DROP VIEW IF EXISTS vista_ventas_usuario;
 CREATE VIEW vista_ventas_usuario AS
 SELECT 
     carrito.idCarrito,
-	carrito.idPreferenciaPago,
     carrito.fecha,
     carrito.precioTotal,
     carrito.metodoPago,
@@ -713,6 +711,5 @@ BEGIN
         SET MESSAGE_TEXT = 'No se encontró el carrito o no se pudo actualizar el estado';
     END IF;
 END //
-
 
 DELIMITER ;
