@@ -38,7 +38,7 @@ npm install
 npm run dev
 ```
 
-To run the project correctly, you must include a .env file in the project root with the following environment variables: DB_PORT, DB_HOST, DB_USER, DB_PASSWORD and DB_NAME
+To run the project correctly, you must include a .env file in the project root with the following environment variables: DB_PORT, DB_HOST, DB_USER, DB_PASSWORD, DB_NAME and FRONTEND_URL
 
 These parameters must match a MySQL database instance, which can be initialized with the script in `./database/dbCreation.sql`
 
