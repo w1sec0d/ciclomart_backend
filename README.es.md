@@ -35,7 +35,15 @@ CicloMart es una aplicación web de compra-venta de bicicletas y repuestos de ci
     npm run dev
    ```
 
-Para ejecutar correctamente el projecto debe incluirse un archivo .env en la raiz del proyecto con las siguientes variables de entorno: DB_PORT, DB_HOST, DB_USER, DB_PASSWORD y DB_NAME
+Para ejecutar correctamente el projecto debe incluirse un archivo .env en la raiz del proyecto con las siguientes variables de entorno:
+
+- DB_PORT: Puerto de la base de datos
+- DB_HOST: Host de la base de datos
+- DB_USER: Usuario de la base de datos
+- DB_PASSWORD: Contraseña de la base de datos
+- DB_NAME: Nombre de la base de datos
+- FRONTEND_URL: URL del frontend de la aplicación
+- JWT_SECRET: Clave secreta para el JSON Web Token
 
 Estos parametros deben coincidir con una instancia de base de datos MySQL, puede ser inicializada con el script en `./database/dbCreation.sql`
 
