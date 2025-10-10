@@ -44,6 +44,10 @@ Para ejecutar correctamente el projecto debe incluirse un archivo .env en la rai
 - DB_NAME: Nombre de la base de datos
 - FRONTEND_URL: URL del frontend de la aplicación
 - JWT_SECRET: Clave secreta para el JSON Web Token
+- EMAIL_ONLINE: Correo electrónico para el envío de correo
+- PASSWORD_ONLINE: Contraseña del correo electrónico para el envío de correo
+- EMAIL_HOST: Host del correo electrónico
+- EMAIL_PORT: Puerto del correo electrónico
 
 Estos parametros deben coincidir con una instancia de base de datos MySQL, puede ser inicializada con el script en `./database/dbCreation.sql`
 
