@@ -47,6 +47,10 @@ To run the project correctly, you must include a .env file in the project root w
 - DB_NAME: Database name
 - FRONTEND_URL: Frontend URL
 - JWT_SECRET: JSON Web Token secret key
+- EMAIL_ONLINE: Email for email sending
+- PASSWORD_ONLINE: Email password for email sending
+- EMAIL_HOST: Email host
+- EMAIL_PORT: Email port
 
 These parameters must match a MySQL database instance, which can be initialized with the script in `./database/dbCreation.sql`
 
