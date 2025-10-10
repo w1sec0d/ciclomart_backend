@@ -2,9 +2,9 @@
 -- Inicializa la base de datos ciclomart en mysql workbench 8.0
 
 -- Recomiendo crear un esquema aparte para probar
-DROP DATABASE IF EXISTS ciclomart2;
-CREATE DATABASE ciclomart2;
-USE ciclomart2;
+DROP DATABASE IF EXISTS ciclomart;
+CREATE DATABASE ciclomart;
+USE ciclomart;
 
 CREATE TABLE `usuario` (
   `idUsuario` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
