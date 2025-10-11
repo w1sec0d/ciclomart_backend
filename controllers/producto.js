@@ -295,9 +295,9 @@ const createPreference = async (req, res) => {
         default_installments: 1,
       },
       back_urls: {
-        success: process.env.FRONTEND_URL + '/requestResult/purchaseComplete',
-        failure: process.env.FRONTEND_URL + '/requestResult/purchaseFailed',
-        pending: process.env.FRONTEND_URL + '/requestResult/purchasePending',
+        success: process.env.FRONTEND_EXTERNAL_URL + '/requestResult/purchaseComplete',
+        failure: process.env.FRONTEND_EXTERNAL_URL + '/requestResult/purchaseFailed',
+        pending: process.env.FRONTEND_EXTERNAL_URL + '/requestResult/purchasePending',
       },
       notification_url: process.env.BACKEND_URL + '/webhookMercadoLibre',
       statement_descriptor: 'Compra CicloMart',
@@ -305,8 +305,6 @@ const createPreference = async (req, res) => {
       external_reference: carritoId,
       marketplace_fee: calculateFee(producto.tipo, producto.precio),
     }
-
-    console.log('preferenceBody', preferenceBody)
 
     const preferenceResult = await preference.create({ body: preferenceBody })
     const idPreferenciaPago = preferenceResult.id

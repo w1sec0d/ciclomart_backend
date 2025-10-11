@@ -27,29 +27,24 @@ const oauthCallback = async (req, res) => {
       }
     )
 
-    console.log('oauthResponse', oauthResponse.data)
-
     // Guardar los tokens y el user_id en la base de datos
     const { access_token, public_key, refresh_token, user_id } =
       oauthResponse.data
 
-    await db.query(
-      'UPDATE usuario SET mp_access_token = ?, mp_refresh_token = ?, mp_user_id = ?, mp_public_key = ?, rol = "vendedor" WHERE idUsuario = ?',
-      [access_token, refresh_token, user_id, public_key, idUsuario],
-      (error, results) => {
-        if (error) {
-          console.error('Error actualizando el usuario', error)
-          return res
-            .status(500)
-            .json({
-              success: false,
-              message: 'Error interno del servidor',
-              error: error.message,
-            })
+    await new Promise((resolve, reject) => {
+      db.query(
+        'UPDATE usuario SET mp_access_token = ?, mp_refresh_token = ?, mp_user_id = ?, mp_public_key = ?, rol = "vendedor" WHERE idUsuario = ?',
+        [access_token, refresh_token, user_id, public_key, idUsuario],
+        (error, results) => {
+          if (error) {
+            console.error('Error actualizando el usuario', error)
+            return reject(error)
+          }
+          resolve(results)
         }
-      }
-    )
-    const frontendURL = process.env.FRONTEND_URL
+      )
+    })
+    const frontendURL = process.env.FRONTEND_EXTERNAL_URL
     // Redirigir a la página de notificación
     return res.redirect(
       frontendURL + '/requestResult/sellerRegistrationSuccess'

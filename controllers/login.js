@@ -273,8 +273,8 @@ const sendRecoverEmail = async (email, token) => {
     from: '"Ciclo Mart Soporte" <ciclomartsoporte@gmail.com>',
     to: email,
     subject: 'Recuperación de contraseña',
-    text: `¡Hola!, para restablecer tu contraseña, ingresa al siguiente enlace: ${process.env.FRONTEND_URL}/passwordRecovery/${token}`,
-    html: `<b>Hola, para restablecer tu contraseña, ingresa al siguiente enlace: <a href="${process.env.FRONTEND_URL}/passwordRecovery/${token}">Restablecer Contraseña</a></b>`,
+    text: `¡Hola!, para restablecer tu contraseña, ingresa al siguiente enlace: ${process.env.FRONTEND_EXTERNAL_URL}/passwordRecovery/${token}`,
+    html: `<b>Hola, para restablecer tu contraseña, ingresa al siguiente enlace: <a href="${process.env.FRONTEND_EXTERNAL_URL}/passwordRecovery/${token}">Restablecer Contraseña</a></b>`,
   })
 }
 
@@ -284,8 +284,8 @@ const sendVerificationCode = async (email, token, code) => {
     from: '"Ciclo Mart Soporte" <ciclomartsoporte@gmail.com>',
     to: email,
     subject: 'Código CicloMart',
-    text: `¡Hola!, este es tu código de verificación: ${code} Puedes ingresar el código en CicloMart o hacer click aquí: ${process.env.FRONTEND_URL}/verificationCode/${token}?code=${code}`,
-    html: `¡Hola!, este es tu código de verificación: <b>${code}</b> Puedes ingresar el código en CicloMart o hacer click aquí: <a href="${process.env.FRONTEND_URL}/verificationCode/${token}?code=${code}">Da click aquí</a>`,
+    text: `¡Hola!, este es tu código de verificación: ${code} Puedes ingresar el código en CicloMart o hacer click aquí: ${process.env.FRONTEND_EXTERNAL_URL}/verificationCode/${token}?code=${code}`,
+    html: `¡Hola!, este es tu código de verificación: <b>${code}</b> Puedes ingresar el código en CicloMart o hacer click aquí: <a href="${process.env.FRONTEND_EXTERNAL_URL}/verificationCode/${token}?code=${code}">Da click aquí</a>`,
   })
 }
 
