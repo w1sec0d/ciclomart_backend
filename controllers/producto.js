@@ -376,6 +376,7 @@ const createPreference = async (req, res) => {
       success: false,
       message: 'Error creando preferencia de MercadoPago',
       error: error.message,
+      error_object: error,
     })
   }
 }
@@ -673,7 +674,7 @@ const getImages = async (req, res) => {
   }
 }
 
-const addBrand = async(req, res) => {
+const addBrand = async (req, res) => {
   try {
     const { nombre } = req.body
     db.query('INSERT INTO marca (nombre) VALUES (?)', [nombre], (error, results) => {

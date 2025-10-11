@@ -51,6 +51,12 @@ To run the project correctly, you must include a .env file in the project root w
 - PASSWORD_ONLINE: Email password for email sending
 - EMAIL_HOST: Email host
 - EMAIL_PORT: Email port
+- BACKEND_URL: Backend URL
+- MP_ACCESS_TOKEN: MercadoPago (Payment Gateway) access token
+- MP_CLIENT_ID: MercadoPago (Payment Gateway) client id
+- MP_CLIENT_SECRET: MercadoPago (Payment Gateway) client secret
+- MP_PUBLIC_KEY: MercadoPago (Payment Gateway) public key
+- MP_REDIRECT_URL: MercadoPago (Payment Gateway) redirect URL
 
 These parameters must match a MySQL database instance, which can be initialized with the script in `./database/dbCreation.sql`
 

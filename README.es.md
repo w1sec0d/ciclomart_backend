@@ -48,6 +48,12 @@ Para ejecutar correctamente el projecto debe incluirse un archivo .env en la rai
 - PASSWORD_ONLINE: Contraseña del correo electrónico para el envío de correo
 - EMAIL_HOST: Host del correo electrónico
 - EMAIL_PORT: Puerto del correo electrónico
+- BACKEND_URL: URL del backend de la aplicación
+- MP_ACCESS_TOKEN: Token de acceso de MercadoPago (Payment Gateway)
+- MP_CLIENT_ID: ID de cliente de MercadoPago (Payment Gateway)
+- MP_CLIENT_SECRET: Secreto de cliente de MercadoPago (Payment Gateway)
+- MP_PUBLIC_KEY: Clave pública de MercadoPago (Payment Gateway)
+- MP_REDIRECT_URL: URL de redirección de MercadoPago (Payment Gateway)
 
 Estos parametros deben coincidir con una instancia de base de datos MySQL, puede ser inicializada con el script en `./database/dbCreation.sql`
 
