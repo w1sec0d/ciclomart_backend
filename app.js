@@ -1,29 +1,29 @@
-// Description: Archivo principal de la aplicación.
-// Se encarga de configurar el servidor y las rutas de la API.
-require('dotenv').config() // Cargar las variables de entorno
+// Description: Main app file
+// It configures the server and the API routes.
+require('dotenv').config() // Load environment variables
 
-// Importar las dependencias necesarias
+// Import the necessary dependencies
 const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
-const morgan = require('morgan') // Middleware para mostrar los logs de las solicitudes
+const morgan = require('morgan') // Middleware to show the request logs
 
-// Crear la aplicación de express
+// Create the express application
 const app = express()
-app.use(bodyParser.json()) // Convierte el cuerpo de la solicitud a objeto JS
+app.use(bodyParser.json()) // Convert the request body to a JS object
 
-// Permite solicitudes al api únicamente desde el frontend autorizado
+// Only allow requests from the authorized frontend
 const corsOptions = {
   origin: process.env.FRONTEND_INTERNAL_URL,
   optionsSuccessStatus: 200,
 }
 app.use(cors(corsOptions))
 
-// Muestra los logs de las solicitudes en la consola
+// Show the request logs in the console
 morgan.token('requestBody', (request) => JSON.stringify(request.body))
 app.use(morgan(' :method :url :response-time :requestBody'))
 
-// Cargar las rutas de la API
+// Load the API routes
 app.use('/api', require('./routes/routes'))
 
 module.exports = app
