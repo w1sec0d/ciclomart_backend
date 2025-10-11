@@ -19,16 +19,16 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd /home/ec2-user/CicloMart_Back
+            cd /home/ec2-user/ciclomart_backend
 
             # Pull latest changes
             git pull origin main
 
-            # Install dependencies (solo si cambió package.json)
+            # Install dependencies (only if package.json changed)
             npm ci --production
 
             # Restart PM2
             pm2 reload ecosystem.config.js --env production --update-env
 
-            # Show status
+            # Show status PM2
             pm2 list
