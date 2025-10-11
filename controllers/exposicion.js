@@ -16,9 +16,9 @@ const createExposurePreference = async (req, res) => {
         },
       ],
       back_urls: {
-        success: process.env.FRONTEND_URL + '/requestResult/publishSuccess',
-        failure: `${process.env.FRONTEND_URL}/exposure/${idProducto}?failure=true`,
-        pending: process.env.FRONTEND_URL + '/requestResult/purchasePending',
+        success: process.env.FRONTEND_EXTERNAL_URL + '/requestResult/publishSuccess',
+        failure: `${process.env.FRONTEND_EXTERNAL_URL}/exposure/${idProducto}?failure=true`,
+        pending: process.env.FRONTEND_EXTERNAL_URL + '/requestResult/purchasePending',
       },
       auto_return: 'approved',
       notification_url: process.env.BACKEND_URL + '/webhookMercadoLibre',

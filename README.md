@@ -45,7 +45,8 @@ To run the project correctly, you must include a .env file in the project root w
 - DB_USER: Database user
 - DB_PASSWORD: Database password
 - DB_NAME: Database name
-- FRONTEND_URL: Frontend URL
+- FRONTEND_INTERNAL_URL: Frontend URL (internal address)
+- FRONTEND_EXTERNAL_URL: Frontend URL (external address)
 - JWT_SECRET: JSON Web Token secret key
 - EMAIL_ONLINE: Email for email sending
 - PASSWORD_ONLINE: Email password for email sending

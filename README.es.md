@@ -42,7 +42,8 @@ Para ejecutar correctamente el projecto debe incluirse un archivo .env en la rai
 - DB_USER: Usuario de la base de datos
 - DB_PASSWORD: Contraseña de la base de datos
 - DB_NAME: Nombre de la base de datos
-- FRONTEND_URL: URL del frontend de la aplicación
+- FRONTEND_INTERNAL_URL: URL del frontend de la aplicación (desde red interna)
+- FRONTEND_EXTERNAL_URL: URL del frontend de la aplicación (desde red externa)
 - JWT_SECRET: Clave secreta para el JSON Web Token
 - EMAIL_ONLINE: Correo electrónico para el envío de correo
 - PASSWORD_ONLINE: Contraseña del correo electrónico para el envío de correo

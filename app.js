@@ -14,7 +14,7 @@ app.use(bodyParser.json()) // Convierte el cuerpo de la solicitud a objeto JS
 
 // Permite solicitudes al api únicamente desde el frontend autorizado
 const corsOptions = {
-  origin: process.env.FRONTEND_URL,
+  origin: process.env.FRONTEND_INTERNAL_URL,
   optionsSuccessStatus: 200,
 }
 app.use(cors(corsOptions))
