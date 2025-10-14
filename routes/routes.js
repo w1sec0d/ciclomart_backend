@@ -4,9 +4,7 @@ const router = express.Router()
 
 // Users controllers
 const {
-  getUsuarios,
   registerUsuario,
-  getUsuarioById,
   getUsuarioPhoto,
   updateUsuarioFoto,
   updateUsuario,
@@ -87,12 +85,9 @@ const {
 const { oauthCallback } = require('../controllers/oauth.js')
 
 // Users routes
-router.get('/usuarios', getUsuarios)
-router.get('/usuarios/:id', getUsuarioById)
 router.get('/getUsuarioPhoto/:id', getUsuarioPhoto)
 router.post('/usuarios', registerUsuario)
 router.put('/updateUsuarioFoto/:idUsuario', updateUsuarioFoto)
-router.put('/updateUsuario/:id', updateUsuario)
 router.put('/updateUsuarioDireccion/:idUsuario', updateUsuarioDireccion)
 
 // Authentication routes
