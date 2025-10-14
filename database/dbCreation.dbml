@@ -1,5 +1,5 @@
 // Use dbml language to define the database
-// Documentation: https://dbml.dbdiagram.io/docs
+// See online documentation: https://dbdocs.io/cramirezmun/Ciclomart
 
 // Relationships in the database:
 // one to one: -
