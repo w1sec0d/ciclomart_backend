@@ -4,14 +4,12 @@ const router = express.Router()
 
 // Users controllers
 const {
+  getUser,
   registerUsuario,
   getUsuarioPhoto,
   updateUsuarioFoto,
-  updateUsuario,
   updateUsuarioDireccion,
 } = require('../controllers/usuario.js')
-
-const { userInfo } = require('../controllers/userInfo.js')
 
 // Authentication controllers
 const {
@@ -92,7 +90,7 @@ router.put('/updateUsuarioDireccion/:idUsuario', updateUsuarioDireccion)
 
 // Authentication routes
 router.post('/login', login)
-router.get('/userInfo', userInfo)
+router.get('/userInfo', getUser)
 router.post('/sendRecover', sendRecover)
 router.get('/verifyToken/:token', verifyToken)
 router.post('/updatePassword', updatePassword)
