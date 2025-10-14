@@ -1,8 +1,8 @@
-// Configura las rutas de la API
+// Configures the API routes
 const express = require('express')
 const router = express.Router()
 
-// Controladores usuarios
+// Users controllers
 const {
   getUsuarios,
   registerUsuario,
@@ -15,7 +15,7 @@ const {
 
 const { userInfo } = require('../controllers/userInfo.js')
 
-// Controladores autenticación
+// Authentication controllers
 const {
   login,
   sendRecover,
@@ -25,17 +25,17 @@ const {
   validateCode,
 } = require('../controllers/login.js')
 
-// Controladores transaccion
+// Transactions controllers
 const {
   getTransacciones,
   getCompras,
   getVentas,
 } = require('../controllers/transaccion.js')
 
-// Controladores tienda
+// Store controllers
 const { getTiendas } = require('../controllers/tienda.js')
 
-// Controlador de busqueda
+// Search controller
 const { search } = require('../controllers/search.js')
 
 const {
@@ -55,7 +55,7 @@ const {
 
 const { createExposurePreference } = require('../controllers/exposicion.js')
 
-// Controladores de calificaciones de productos
+// Product ratings controllers
 const {
   ratingProduct,
   averageProductRatings,
@@ -78,15 +78,15 @@ const {
   cancelPurchase,
 } = require('../controllers/purchases.js')
 
-const { 
-  getQuestions, 
+const {
+  getQuestions,
   addQuestion,
   answerQuestions
 } = require('../controllers/questions.js')
 
 const { oauthCallback } = require('../controllers/oauth.js')
 
-// Rutas usuarios
+// Users routes
 router.get('/usuarios', getUsuarios)
 router.get('/usuarios/:id', getUsuarioById)
 router.get('/getUsuarioPhoto/:id', getUsuarioPhoto)
@@ -95,7 +95,7 @@ router.put('/updateUsuarioFoto/:idUsuario', updateUsuarioFoto)
 router.put('/updateUsuario/:id', updateUsuario)
 router.put('/updateUsuarioDireccion/:idUsuario', updateUsuarioDireccion)
 
-// Rutas de autenticación
+// Authentication routes
 router.post('/login', login)
 router.get('/userInfo', userInfo)
 router.post('/sendRecover', sendRecover)
@@ -104,15 +104,15 @@ router.post('/updatePassword', updatePassword)
 router.post('/sendRegisterCode', sendRegisterCode)
 router.post('/validateCode', validateCode)
 
-// Rutas de transacciones
+// Transactions routes
 router.get('/transacciones', getTransacciones)
 router.get('/compras/:id', getCompras)
 router.get('/ventas/:id', getVentas)
 
-// Rutas de tienda
+// Store routes
 router.get('/tiendas', getTiendas)
 
-// Rutas de productos
+// Products routes
 router.get('/search', search)
 router.get('/productos', getProducto)
 router.get('/bicicletas', getBicicletas)
@@ -125,23 +125,24 @@ router.get('/productos/:id', getProductById)
 router.post('/uploadImage', uploadImage)
 router.get('/images/:id', getImages)
 router.post('/addBrand', addBrand)
-// Mercado Pago
+
+// Mercado Pago routes
 router.post('/createPreference', createPreference)
 router.post('/createExposurePreference', createExposurePreference)
 
-//Rutas calificaciones productos
+// Products ratings routes
 router.get('/ratingProduct/:id', ratingProduct)
 router.get('/averageProductRatings/:id', averageProductRatings)
 router.post('/addRatingProduct', addRatingProduct)
 router.post('/checkUserPurchase/', checkUserPurchase)
 
-//Rutas de vista vendedor
+// Seller view routes
 router.get('/ratingSeller/:id', getRatingSeller)
 
-// Ruta de prueba webhook
-
+// Webhook routes
 router.post('/webhookMercadoLibre', webhookMercadoLibre)
 
+// Shopping cart routes
 router.get('/shoppingCart/:id', getShoppingCart)
 router.post('/addToShoppingCart', addToShoppingCart)
 router.delete(
@@ -149,16 +150,17 @@ router.delete(
   removeFromShoppingCart
 )
 
-// compras
+// Purchases routes
 router.get('/purchases/:idComprador', getPurchasesById)
 router.post('/confirmShipment/:idCarrito', confirmShipment)
 router.post('/cancelPurchase/:idCarrito', cancelPurchase)
 
+// Questions routes
 router.get('/questions/:idProducto', getQuestions)
 router.post('/addQuestion', addQuestion)
 router.post('/answerQuestion', answerQuestions)
 
-// Autenticación oauth
+// OAuth Authentication routes
 router.get('/oauth/callback', oauthCallback)
 
 module.exports = router
