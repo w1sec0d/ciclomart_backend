@@ -55,7 +55,7 @@ const oauthCallback = async (req, res) => {
       .status(500)
       .json({
         success: false,
-        message: 'Error interno del servidor',
+        message: 'Internal server error',
         error: error.message,
       })
   }

@@ -83,6 +83,7 @@ const {
 const { oauthCallback } = require('../controllers/oauth.js')
 
 // Users routes
+router.get('/getUser', getUser)
 router.get('/getUsuarioPhoto/:id', getUsuarioPhoto)
 router.post('/usuarios', registerUsuario)
 router.put('/updateUsuarioFoto/:idUsuario', updateUsuarioFoto)
@@ -90,7 +91,6 @@ router.put('/updateUsuarioDireccion/:idUsuario', updateUsuarioDireccion)
 
 // Authentication routes
 router.post('/login', login)
-router.get('/userInfo', getUser)
 router.post('/sendRecover', sendRecover)
 router.get('/verifyToken/:token', verifyToken)
 router.post('/updatePassword', updatePassword)

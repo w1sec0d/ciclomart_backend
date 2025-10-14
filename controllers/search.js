@@ -24,7 +24,7 @@ const search = (request, response) => {
         console.error('Error ejecutando la consulta', error)
         return response.status(500).json({
           success: false,
-          message: 'Error interno del servidor',
+          message: 'Internal server error',
           error: error.message,
         })
       }
@@ -35,10 +35,10 @@ const search = (request, response) => {
       })
     })
   } catch (error) {
-    console.error('Error en el servidor', error)
+    console.error('Server error', error)
     return response.status(500).json({
       success: false,
-      message: 'Error interno del servidor',
+      message: 'Internal server error',
       error: error.message,
     })
   }

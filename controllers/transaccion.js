@@ -8,7 +8,7 @@ const getTransacciones = (request, response) => {
         return response.status(500).json({
           success: false,
           message:
-            'Error interno del servidor, no se pueden obtener las transacciones',
+            'Internal server error, no se pueden obtener las transacciones',
           error: error.message,
         })
       }
@@ -19,10 +19,10 @@ const getTransacciones = (request, response) => {
       })
     })
   } catch (error) {
-    console.error('Error en el servidor', error)
+    console.error('Server error', error)
     return response.status(500).json({
       success: false,
-      message: 'Error interno del servidor',
+      message: 'Internal server error',
       error: error.message,
     })
   }
@@ -59,10 +59,10 @@ const getCompras = (request, response) => {
       }
     )
   } catch (error) {
-    console.error('Error en el servidor', error)
+    console.error('Server error', error)
     return response.status(500).json({
       success: false,
-      message: 'Error interno del servidor',
+      message: 'Internal server error',
       error: error.message,
     })
   }
@@ -84,7 +84,7 @@ const getVentas = (request, response) => {
         if (error) {
           return response.status(500).json({
             success: false,
-            message: 'Error en el servidor, no se encontraron las ventas',
+            message: 'Server error, no se encontraron las ventas',
             error: error.message,
           })
         }
@@ -96,10 +96,10 @@ const getVentas = (request, response) => {
       }
     )
   } catch (error) {
-    console.error('Error en el servidor', error)
+    console.error('Server error', error)
     return response.status(500).json({
       success: false,
-      message: 'Error interno del servidor',
+      message: 'Internal server error',
       error: error.message,
     })
   }

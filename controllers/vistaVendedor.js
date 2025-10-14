@@ -19,7 +19,7 @@ const getRatingSeller = async (request, response) => {
         console.error('Error realizando la consulta', error)
         return response.status(500).json({
           success: false,
-          message: 'Error en el servidor, intentelo más tarde',
+          message: 'Server error, intentelo más tarde',
           error: error.message,
         })
       }
