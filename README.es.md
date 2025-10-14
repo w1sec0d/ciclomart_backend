@@ -63,7 +63,7 @@ Para ejecutar correctamente el projecto debe incluirse un archivo .env en la rai
 
 ### Variables de MercadoPago (requeridas para configurar el gateway de pago)
 
-- BACKEND_URL: URL del backend de la aplicación
+- BACKEND_URL: URL del backend de la aplicación (debe ser accesible desde webhook de MercadoPago)
 - MP_ACCESS_TOKEN: Token de acceso de MercadoPago (Payment Gateway)
 - MP_CLIENT_ID: ID de cliente de MercadoPago (Payment Gateway)
 - MP_CLIENT_SECRET: Secreto de cliente de MercadoPago (Payment Gateway)
