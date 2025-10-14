@@ -16,7 +16,7 @@ const handleError = (res, error, message) => {
   console.error(message, error)
   res.status(500).json({
     success: false,
-    message: 'Error interno del servidor',
+    message: 'Internal server error',
     error: error.message,
   })
 }
@@ -37,7 +37,7 @@ const getPurchasesById = async (req, res) => {
           console.error('Error ejecutando la consulta', error)
           return res.status(500).json({
             success: false,
-            message: 'Error interno del servidor',
+            message: 'Internal server error',
             error: error.message,
           })
         }
@@ -69,7 +69,7 @@ const confirmShipment = async (req, res) => {
           console.error('Error ejecutando la consulta', error)
           return res.status(500).json({
             success: false,
-            message: 'Error interno del servidor',
+            message: 'Internal server error',
             error: error.message,
           })
         }

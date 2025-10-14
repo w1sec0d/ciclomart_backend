@@ -32,10 +32,10 @@ const registerUsuario = async (request, response) => {
     })
 
   } catch (error) {
-    console.error('Error en el servidor', error)
+    console.error('Server error', error)
     return response.status(500).json({
       success: false,
-      message: 'Error interno del servidor',
+      message: 'Internal server error',
       error: error.message,
     })
   }
@@ -66,7 +66,7 @@ const getUser = async (request, response) => {
           return response.status(500).json({
             success: false,
             message:
-              'Error en el servidor, no se puede obtener la información del usuario',
+              'Server error, no se puede obtener la información del usuario',
             error: err.message,
           })
         }
@@ -162,10 +162,10 @@ const updateUsuarioFoto = async (request, response) => {
       message: 'Foto del usuario actualizada correctamente',
     })
   } catch (error) {
-    console.error('Error en el servidor', error)
+    console.error('Server error', error)
     return response.status(500).json({
       success: false,
-      message: 'Error interno del servidor',
+      message: 'Internal server error',
       error: error.message,
     })
   }

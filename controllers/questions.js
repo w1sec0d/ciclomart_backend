@@ -11,7 +11,7 @@ const getQuestions = (request, response) => {
         console.error('Error realizando la consulta ', error)
         return response.status(500).json({
           success: false,
-          message: 'Error en el servidor, intentalo más tarde',
+          message: 'Server error, intentalo más tarde',
           error: error.message,
         })
       }
@@ -35,7 +35,7 @@ const addQuestion = (request, response) => {
         console.error('Error realizando la consulta ', error)
         return response.status(500).json({
           success: false,
-          message: 'Error en el servidor, intentalo más tarde',
+          message: 'Server error, intentalo más tarde',
           error: error.message,
         })
       }
@@ -59,7 +59,7 @@ const answerQuestions = (request, response) => {
         console.error('Error realizando la consulta ', error)
         return response.status(500).json({
           success: false,
-          message: 'Error en el servidor, intentalo más tarde',
+          message: 'Server error, intentalo más tarde',
           error: error.message,
         })
       }

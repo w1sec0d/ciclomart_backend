@@ -20,7 +20,7 @@ const ratingProduct = (request, response) => {
         console.error('Error realizando la consulta ', error)
         return response.status(500).json({
           success: false,
-          message: 'Error en el servidor, intentalo más tarde',
+          message: 'Server error, intentalo más tarde',
           error: error.message,
         })
       }
@@ -47,7 +47,7 @@ const averageProductRatings = (request, response) => {
         console.error('Error realizando la consulta ', error)
         return response.status(500).json({
           success: false,
-          message: 'Error en el servidor. Intentelo más tarde',
+          message: 'Server error. Intentelo más tarde',
           error: error.message,
         })
       }
@@ -79,7 +79,7 @@ const checkUserPurchase = (request, response) => {
         console.error('Error ejecutando la validacion', error)
         return response.status(500).json({
           success: false,
-          message: 'Error en el servidor. Intentelo más tarde',
+          message: 'Server error. Intentelo más tarde',
           error: error.message,
         })
       }
@@ -119,7 +119,7 @@ const addRatingProduct = (request, response) => {
         console.error('Error ejecutando la insercion', error)
         return response.status(500).json({
           success: false,
-          message: 'Error en el servidor. Intentelo más tarde',
+          message: 'Server error. Intentelo más tarde',
           error: error.message,
         })
       }

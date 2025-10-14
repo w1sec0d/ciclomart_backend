@@ -27,7 +27,7 @@ const login = async (req, res) => {
         if (err) {
           return res.status(500).json({
             success: false,
-            message: 'Error en el servidor, intentalo más tarde',
+            message: 'Server error, intentalo más tarde',
             error: err.message,
           })
         }
@@ -68,10 +68,10 @@ const login = async (req, res) => {
       }
     )
   } catch (error) {
-    console.error('Error en el servidor', error)
+    console.error('Server error', error)
     return res.status(500).json({
       success: false,
-      message: 'Error interno del servidor',
+      message: 'Internal server error',
       error: error.message,
     })
   }
@@ -126,7 +126,7 @@ const sendRecover = async (req, res) => {
   } catch (err) {
     return res.status(500).json({
       success: false,
-      message: 'Error en el servidor, intentalo más tarde',
+      message: 'Server error, intentalo más tarde',
       error: err.message,
     })
   }
@@ -176,7 +176,7 @@ const sendRegisterCode = async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: 'Error en el servidor, intentalo más tarde',
+      message: 'Server error, intentalo más tarde',
       error: error.message,
     })
   }
@@ -208,10 +208,10 @@ const validateCode = async (req, res) => {
       })
     }
   } catch (error) {
-    console.error('Error en el servidor', error)
+    console.error('Server error', error)
     return res.status(500).json({
       success: false,
-      message: 'Error interno del servidor',
+      message: 'Internal server error',
       error: error.message,
     })
   }
@@ -247,7 +247,7 @@ const updatePassword = async (req, res) => {
         if (err) {
           return res.status(500).json({
             success: false,
-            message: 'Error en el servidor, intentalo más tarde',
+            message: 'Server error, intentalo más tarde',
             error: err.message,
           })
         } else {

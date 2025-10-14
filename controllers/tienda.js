@@ -7,7 +7,7 @@ const getTiendas = async (request, response) => {
       if (error) {
         return response.status(500).json({
           success: false,
-          message: 'Error en el servidor, no se pueden obtener las tiendas',
+          message: 'Server error, no se pueden obtener las tiendas',
           error: error.message,
         })
       }
@@ -18,10 +18,10 @@ const getTiendas = async (request, response) => {
       })
     })
   } catch (error) {
-    console.error('Error en el servidor', error)
+    console.error('Server error', error)
     return response.status(500).json({
       success: false,
-      message: 'Error interno del servidor',
+      message: 'Internal server error',
       error: error.message,
     })
   }
