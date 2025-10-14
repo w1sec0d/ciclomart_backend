@@ -1,9 +1,9 @@
-// Punto de entrada de la aplicación
+// Entry point of the application
 require('dotenv').config()
 const app = require('./app')
 const appPort = process.env.PORT || 3001
 
-// Inicia el servidor cargando el archivo app.js
+// Start the server loading the app.js file
 app.listen(appPort, () => {
-  console.log(`Servidor ejecutándose en: http://localhost:${appPort}`)
+  console.log(`Server running on: http://localhost:${appPort}`)
 })
