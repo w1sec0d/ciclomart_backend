@@ -1,4 +1,4 @@
-// Objetos de configuración de MercadoPago
+// Sets up payment gateway client (Mercado Pago)
 const {
   MercadoPagoConfig,
   Preference,
