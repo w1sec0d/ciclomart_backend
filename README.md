@@ -40,19 +40,33 @@ npm run dev
 
 To run the project correctly, you must include a .env file in the project root with the following environment variables:
 
+### Database Variables
+
 - DB_PORT: Database port
 - DB_HOST: Database host
 - DB_USER: Database user
 - DB_PASSWORD: Database password
 - DB_NAME: Database name
-- FRONTEND_INTERNAL_URL: Frontend URL (internal address)
-- FRONTEND_EXTERNAL_URL: Frontend URL (external address)
+
+### Frontend Variables
+
+- FRONTEND_INTERNAL_URL: Frontend URL (internal address for communication between backend and frontend)
+- FRONTEND_EXTERNAL_URL: Frontend URL (external address, must be publicly accessible. This sets up mercadopago callback URL)
+
+### Authentication Variables
+
 - JWT_SECRET: JSON Web Token secret key
+
+### Email Variables (required to send verification codes)
+
 - EMAIL_ONLINE: Email for email sending
 - PASSWORD_ONLINE: Email password for email sending
 - EMAIL_HOST: Email host
 - EMAIL_PORT: Email port
-- BACKEND_URL: Backend URL
+
+### MercadoPago Variables (required to set up payment gateway)
+
+- BACKEND_URL: Backend URL (must be publicly accessible from mercadopago webhooks)
 - MP_ACCESS_TOKEN: MercadoPago (Payment Gateway) access token
 - MP_CLIENT_ID: MercadoPago (Payment Gateway) client id
 - MP_CLIENT_SECRET: MercadoPago (Payment Gateway) client secret
