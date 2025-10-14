@@ -1,6 +1,8 @@
+// Calculates marketplace fee based on product category and price
 const calculateFee = (category, price) => {
   let fee = 0
 
+  // If the category is a bicicle
   if (category === 'bicicleta') {
     if (price <= 299999) {
       fee = price * 0.04
@@ -15,6 +17,7 @@ const calculateFee = (category, price) => {
       fee = 250000 + (price - 10000000) * 0.01
     }
   } else if (category === 'componente') {
+    // If the category is a component 
     if (price <= 49999) {
       fee = 2000
     } else if (price >= 50000 && price <= 99999) {
@@ -29,7 +32,7 @@ const calculateFee = (category, price) => {
     }
   } else {
     fee = 0
-    console.error('Error: Categoria no válida')
+    console.error('Error: Invalid Category')
   }
 
   return fee
