@@ -1,10 +1,10 @@
-//Conexion a la base de datos usando variables de entorno
+//Connection to the database using environment variables
 require('dotenv').config()
-const mysql = require('mysql2') // Use mysql2 instead of mysql
+const mysql = require('mysql2')
 
-// Crea un pool de conexiones a la base de datos
+// Create a pool of connections to the database
 const db = mysql.createPool({
-  connectionLimit: 10, // Número máximo de conexiones en el pool
+  connectionLimit: 10, // Maximum number of connections in the pool
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
@@ -12,14 +12,14 @@ const db = mysql.createPool({
   port: process.env.DB_PORT,
 })
 
-// Test de conexión
+// Test connection
 db.getConnection((err, connection) => {
   if (err) {
-    console.error('Error conectando a la base de datos', err)
+    console.error('Error connecting to the database', err)
     return
   }
-  console.log('Conectado a la base de datos')
-  connection.release() // Liberar la conexión de vuelta al pool
+  console.log('Connected to the database')
+  connection.release() // Release the connection back to the pool
 })
 
 module.exports = db

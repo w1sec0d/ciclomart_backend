@@ -1,22 +1,25 @@
-// Usa lenguaje dbml para definir la base de datos
-// Documentación: https://dbml.dbdiagram.io/docs
+// Use dbml language to define the database
+// Documentation: https://dbml.dbdiagram.io/docs
 
-// Relaciones en la bd:
-// uno a uno: -
-// uno a muchos: <
-// muchos a uno: >
+// Relationships in the database:
+// one to one: -
+// one to many: <
+// many to one: >
 
-// Posibles enums
+// Possible enums
 Enum "usuario_rol_enum" {
   "comprador"
-  "cliente"
+  "vendedor"
   "administrador"
 }
 
-Enum "transaccion_estado_enum" {
-  "pendiente"
-  "exitosa"
-  "fallida"
+Enum "carrito_estado_enum" {
+  "pendiente_pago"
+  "pendiente_envio"
+  "enviado"
+  "recibido"
+  "fallido"
+  "reembolsado"
 }
 
 Enum "producto_disponibilidad_enum" {
@@ -44,11 +47,21 @@ Table "usuario" {
   "fechaNacimiento" date 
   "rol" usuario_rol_enum [default:"comprador"]
   "correo" varchar(255) [not null]
-  "direccion" varchar(255)
+  "codigoPostal" varchar(30)
+  "direccionNombre" varchar(255)
+  "direccionNumero" varchar(255)
+  "direccionPiso" varchar(30)
+  "direccionApartamento" varchar(30)
+  "direccionCiudad" varchar(255) [default: "Bogotá"]
   "telefono" varchar(60) 
   "username" varchar(45) 
   "password" varchar(64) [not null]
+  "reporte" boolean [default: false]
   "fechaRegistro" datetime [default: `current_timestamp`]
+  "mp_user_id" varchar(100)
+  "mp_access_token" varchar(100)
+  "mp_refresh_token" varchar(100)
+  "mp_public_key" varchar(100)
 }
 
 Table "modelo" {
@@ -59,7 +72,7 @@ Table "modelo" {
   "categoria" varchar(100)
   "compatibilidad" text
   "idBicicleta" int [ref: > bicicleta.idBicicleta]
-  "idMarca" int [not null, ref: > marca.idMarca]
+  "idMarca" int [ref: > marca.idMarca]
   // crea indices para optimizar busquedas   
   Indexes {
     idMarca [name: "idMarca"]
@@ -69,7 +82,7 @@ Table "modelo" {
 
 Table "imagen" {
   "idImagen" int [pk, not null, increment]
-  "idUsuario" int [ref: > usuario.idUsuario]
+  "idUsuario" int [unique, ref: > usuario.idUsuario]
   "idDocumento" int [ref: > documento.idDocumento]
   "idModelo" int [ref: > modelo.idModelo]
   "url" varchar(255)
@@ -100,6 +113,7 @@ Table "bicicleta" {
   "pesoBicicleta" float
   "pesoMaximo" float
   "extras" text
+  "tarjeta" varchar(255)
 }
 
 Table "marca" {
@@ -123,28 +137,28 @@ Table "tienda" {
 
 Table "carrito" {
   "idCarrito" int [pk, not null, increment]
-  "idUsuario" int [not null, ref: > usuario.idUsuario]
-  "cantidadProductos" int [default: 0]
-  "precioTotal" float 
-  "fecha" datetime 
-  "estado" transaccion_estado_enum [default: "pendiente"]
+  "idPreferencia" varchar(255) [unique]
+  "idPago" varchar(255) [unique]
+  "idVendedor" int [not null, ref: > usuario.idUsuario]
+  "idComprador" int [not null, ref: > usuario.idUsuario]
+  "estado" carrito_estado_enum [default: "pendiente_pago"]
   "metodoPago" varchar(45)
-  "direccionEnvio" varchar(45)
-  "descuento" float 
+  "precioTotal" float 
+  "fecha" datetime [default: `current_timestamp`]
+  "direccionEnvio" varchar(255)
   Indexes {
-    idUsuario [name: "idUsuario"]
+    idPreferencia [name: "idPreferencia"]
   }
 }
 
 Table "carritoProducto" {
   "idCarritoProducto" int [pk, not null, increment]
-  "idProducto" int [not null, ref: > producto.idProducto]
   "idCarrito" int [not null, ref: > carrito.idCarrito]
-  "cantidad" int 
-  "precio_unitario" float 
+  "idPago" varchar(255) [ref: > carrito.idPago]
+  "idPreferencia" varchar(255) [ref: > carrito.idPreferencia]
+  "idProducto" int [not null, ref: > producto.idProducto]
+  "cantidad" int [default: 1]
   "fecha" datetime [default: `current_timestamp`]
-  "direccion" text
-  "estadoEnvio" varchar(45) 
 }
 
 Table "documento" {
@@ -165,14 +179,29 @@ Table "producto" {
   "idModelo" int [not null, ref: > modelo.idModelo]
   "idVendedor" int [ref: > usuario.idUsuario]
   "idTienda" int [ref: > tienda.idTienda]
+  "exposicion" int [default: 0]
   "precio" float
   "precioCompleto" float
   "cantidad" int [default: 0]
+  "ventas" int [default: 0]
   "estado" producto_estado_enum [default: "nuevo"]
+  "dimensiones" varchar(255)
   "disponibilidad" producto_disponibilidad_enum [default: "disponible"]
   "costoEnvio" float [not null, default: 0]
   "retiroEnTienda" bool [not null, default: false]
   "fechaPublicacion" datetime [default: `current_timestamp`]
+}
+
+Table "pregunta" {
+  "idPregunta" int [pk, not null, increment]
+  "idProducto" int [not null, ref: > producto.idProducto]
+  "idUsuario" int [not null, ref: > usuario.idUsuario]
+  "descripcion" varchar(255) [not null]
+  "respuesta" varchar(255)
+  Indexes {
+    idProducto [name: "idProducto"]
+    idUsuario [name: "idUsuario"]
+  }
 }
 
 Table "calificacion" {
