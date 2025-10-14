@@ -1,13 +1,14 @@
+// This route is responsible for getting all the useful information about a seller
 const db = require('../database/connection')
 
-//Obtiene todas las calificaciones de un vendedor
+//Gets all the ratings of a seller
 const getRatingSeller = async (request, response) => {
   let id = parseInt(request.params.id)
 
   if (isNaN(id)) {
     return response.status(400).json({
       success: false,
-      message: 'ID vendedor invalido',
+      message: 'Invalid seller ID',
     })
   }
 
@@ -16,16 +17,16 @@ const getRatingSeller = async (request, response) => {
     [id],
     (error, results) => {
       if (error) {
-        console.error('Error realizando la consulta', error)
+        console.error('Error performing the query', error)
         return response.status(500).json({
           success: false,
-          message: 'Server error, intentelo más tarde',
+          message: 'Server error, try again later',
           error: error.message,
         })
       }
       return response.status(200).json({
         success: true,
-        message: 'Calificaciones obtenidas con exito',
+        message: 'Ratings obtained successfully',
         results,
       })
     }
