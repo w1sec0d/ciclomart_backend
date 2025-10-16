@@ -1,5 +1,7 @@
+// This controller handles product questions and answers
 const db = require('../database/connection')
 
+// Gets all questions for a specific product
 const getQuestions = (request, response) => {
   const { idProducto } = request.params
 
@@ -8,22 +10,23 @@ const getQuestions = (request, response) => {
     [idProducto],
     (error, results) => {
       if (error) {
-        console.error('Error realizando la consulta ', error)
+        console.error('Error executing the query', error)
         return response.status(500).json({
           success: false,
-          message: 'Server error, intentalo más tarde',
+          message: 'Server error, try again later',
           error: error.message,
         })
       }
       return response.status(200).json({
         success: true,
-        message: 'Preguntas obtenidas con exito',
+        message: 'Questions obtained successfully',
         results,
       })
     }
   )
 }
 
+// Adds a new question to a product
 const addQuestion = (request, response) => {
   const { idProducto, idUsuario, pregunta } = request.body
 
@@ -32,22 +35,23 @@ const addQuestion = (request, response) => {
     [idProducto, idUsuario, pregunta],
     (error, results) => {
       if (error) {
-        console.error('Error realizando la consulta ', error)
+        console.error('Error executing the query', error)
         return response.status(500).json({
           success: false,
-          message: 'Server error, intentalo más tarde',
+          message: 'Server error, try again later',
           error: error.message,
         })
       }
       return response.status(200).json({
         success: true,
-        message: 'Pregunta agregada con exito',
+        message: 'Question added successfully',
         results,
       })
     }
   )
 }
 
+// Adds an answer to a question for a product
 const answerQuestions = (request, response) => {
   const { idPregunta, idProducto, respuesta } = request.body
 
@@ -56,16 +60,16 @@ const answerQuestions = (request, response) => {
     [respuesta, idProducto, idPregunta],
     (error, results) => {
       if (error) {
-        console.error('Error realizando la consulta ', error)
+        console.error('Error executing the query', error)
         return response.status(500).json({
           success: false,
-          message: 'Server error, intentalo más tarde',
+          message: 'Server error, try again later',
           error: error.message,
         })
       }
       return response.status(200).json({
         success: true,
-        message: 'Pregunta respondida con exito',
+        message: 'Question answered successfully',
         results,
       })
     }

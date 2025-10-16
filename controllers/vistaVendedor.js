@@ -1,11 +1,11 @@
-// This route is responsible for getting all the useful information about a seller
+// This controller handles seller-related information and ratings
 const db = require('../database/connection')
 
-//Gets all the ratings of a seller
+// Gets all the ratings of a seller
 const getRatingSeller = async (request, response) => {
-  let id = parseInt(request.params.id)
+  let sellerId = parseInt(request.params.sellerId)
 
-  if (isNaN(id)) {
+  if (isNaN(sellerId)) {
     return response.status(400).json({
       success: false,
       message: 'Invalid seller ID',
@@ -14,7 +14,7 @@ const getRatingSeller = async (request, response) => {
 
   db.query(
     'SELECT * FROM vista_calificaciones_productos_vendedor WHERE idUsuario = ?',
-    [id],
+    [sellerId],
     (error, results) => {
       if (error) {
         console.error('Error performing the query', error)

@@ -1,40 +1,26 @@
+// This controller handles purchase-related operations including viewing, confirming, and canceling purchases
 const db = require('../database/connection')
 const { refund } = require('../utils/mercadoPago')
+const { executeQuery } = require('../utils/executeQuery')
+const { handleError } = require('../utils/handleError')
 
-const query = (sql, params) => {
-  return new Promise((resolve, reject) => {
-    db.query(sql, params, (error, results) => {
-      if (error) {
-        return reject(error)
-      }
-      resolve(results)
-    })
-  })
-}
 
-const handleError = (res, error, message) => {
-  console.error(message, error)
-  res.status(500).json({
-    success: false,
-    message: 'Internal server error',
-    error: error.message,
-  })
-}
 
+// Gets all purchases for a specific buyer
 const getPurchasesById = async (req, res) => {
-  const { idComprador } = req.params
-  if (!idComprador)
+  const { buyerId } = req.params
+  if (!buyerId)
     return res
       .status(400)
-      .json({ success: false, message: 'Falta el id del comprador' })
+      .json({ success: false, message: 'Buyer ID is required' })
 
   try {
     db.query(
       'SELECT * FROM vista_compras_usuario WHERE idUsuario = ?',
-      [idComprador],
+      [buyerId],
       (error, results) => {
         if (error) {
-          console.error('Error ejecutando la consulta', error)
+          console.error('Error executing the query', error)
           return res.status(500).json({
             success: false,
             message: 'Internal server error',
@@ -43,22 +29,23 @@ const getPurchasesById = async (req, res) => {
         }
         return res.status(200).json({
           success: true,
-          message: 'Compras obtenidas exitosamente',
+          message: 'Purchases obtained successfully',
           results,
         })
       }
     )
   } catch (error) {
-    res.status(500).json({ message: 'Error al obtener las compras' })
+    res.status(500).json({ message: 'Error getting purchases' })
   }
 }
 
+// Confirms that a shipment has been received by the buyer
 const confirmShipment = async (req, res) => {
   const { idCarrito } = req.params
   if (!idCarrito)
     return res
       .status(400)
-      .json({ success: false, message: 'Falta el id del carrito' })
+      .json({ success: false, message: 'Cart ID is required' })
 
   try {
     db.query(
@@ -66,7 +53,7 @@ const confirmShipment = async (req, res) => {
       [idCarrito],
       (error, results) => {
         if (error) {
-          console.error('Error ejecutando la consulta', error)
+          console.error('Error executing the query', error)
           return res.status(500).json({
             success: false,
             message: 'Internal server error',
@@ -75,33 +62,34 @@ const confirmShipment = async (req, res) => {
         }
         return res.status(200).json({
           success: true,
-          message: 'Compra confirmada exitosamente',
+          message: 'Shipment confirmed successfully',
         })
       }
     )
   } catch (error) {
-    res.status(500).json({ message: 'Error al confirmar la compra' })
+    res.status(500).json({ message: 'Error confirming shipment' })
   }
 }
 
+// Cancels a purchase and processes a refund if payment was made
 const cancelPurchase = async (req, res) => {
   const { idCarrito } = req.params
   if (!idCarrito) {
     return res
       .status(400)
-      .json({ success: false, message: 'Falta el id del carrito' })
+      .json({ success: false, message: 'Cart ID is required' })
   }
 
   try {
-    // Obtiene el id del pago para cancelarlo
-    const results = await query(
+    // Get the payment ID to cancel it
+    const results = await executeQuery(
       'SELECT idPago FROM carrito WHERE idCarrito = ?',
       [idCarrito]
     )
     if (results.length === 0) {
       return res
         .status(404)
-        .json({ success: false, message: 'Compra no encontrada' })
+        .json({ success: false, message: 'Purchase not found' })
     }
 
     const idPago = results[0].idPago
@@ -111,20 +99,20 @@ const cancelPurchase = async (req, res) => {
         const refundResponse = await refund.create({ payment_id: idPago })
         console.log('refundResponse', refundResponse)
       } catch (error) {
-        return handleError(res, error, 'Error al cancelar el pago')
+        return handleError(res, error, 'Error canceling payment')
       }
     }
 
-    // Actualiza el estado del carrito a fallido
-    await query('UPDATE carrito SET estado = "reembolsado" WHERE idCarrito = ?', [
+    // Update the cart status to refunded
+    await executeQuery('UPDATE carrito SET estado = "reembolsado" WHERE idCarrito = ?', [
       idCarrito,
     ])
     res.status(200).json({
       success: true,
-      message: 'Compra cancelada exitosamente',
+      message: 'Purchase canceled successfully',
     })
   } catch (error) {
-    handleError(res, error, 'Error ejecutando la consulta')
+    handleError(res, error, 'Error executing the query')
   }
 }
 
