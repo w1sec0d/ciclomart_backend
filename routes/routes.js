@@ -15,7 +15,6 @@ const {
 const {
   login,
   sendRecover,
-  verifyToken,
   updatePassword,
   sendRegisterCode,
   validateCode,
@@ -92,7 +91,6 @@ router.put('/updateUsuarioDireccion/:idUsuario', updateUsuarioDireccion)
 // Authentication routes
 router.post('/login', login)
 router.post('/sendRecover', sendRecover)
-router.get('/verifyToken/:token', verifyToken)
 router.post('/updatePassword', updatePassword)
 router.post('/sendRegisterCode', sendRegisterCode)
 router.post('/validateCode', validateCode)

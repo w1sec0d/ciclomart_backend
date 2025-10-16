@@ -1,11 +1,23 @@
 // This controller handles product exposure payment preferences through Mercado Pago
 const { preference } = require('../utils/mercadoPago')
-const { handleError } = require('../utils/responseHandler')
+const { sendSuccess, sendError, handleError } = require('../utils/responseHandler')
+const { validateRequiredFields, isValidNumber } = require('../utils/validation')
 
 // Creates a payment preference for product exposure upgrade
 const createExposurePreference = async (req, res) => {
   try {
     const { grade, price, quantity, idProducto } = req.body
+
+    // Validate required fields
+    const validation = validateRequiredFields(req.body, ['grade', 'price', 'quantity', 'idProducto'])
+    if (!validation.isValid) {
+      return sendError(res, `Missing required fields: ${validation.missingFields.join(', ')}`, 400)
+    }
+
+    // Validate IDs and numbers
+    if (!isValidNumber(idProducto) || !isValidNumber(price) || !isValidNumber(quantity)) {
+      return sendError(res, 'Invalid product ID, price, or quantity', 400)
+    }
 
     const externalReference = `exposicion-${idProducto}-${grade}`
     const preferenceBody = {
@@ -27,19 +39,18 @@ const createExposurePreference = async (req, res) => {
       notification_url: process.env.BACKEND_URL + '/webhookMercadoLibre',
       external_reference: externalReference,
     }
+
     const result = await preference.create({
       body: preferenceBody,
     })
 
-    return res.status(200).json({
-      success: true,
-      message: 'MercadoPago preference created successfully',
+    return sendSuccess(res, 'MercadoPago preference created successfully', {
       preferenceId: result.id,
       paymentURL: result.init_point,
       result,
     })
   } catch (error) {
-    handleError(res, error, 'Error creating MercadoPago preference')
+    return handleError(res, error, 'Error creating exposure preference')
   }
 }
 

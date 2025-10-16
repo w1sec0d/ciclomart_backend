@@ -1,6 +1,7 @@
 // This route is responsible for listening to notifications produced by Mercado Pago (Payment Gateway)
 // like the payment confirmations made by the users
-const db = require('../database/connection')
+const { executeQuery } = require('../utils/dbHelpers')
+const { sendSuccess, handleError } = require('../utils/responseHandler')
 const { mercadoPagoClient } = require('../utils/mercadoPago')
 const { Payment } = require('mercadopago')
 const payment = new Payment(mercadoPagoClient)
@@ -31,40 +32,26 @@ const webhookMercadoLibre = async (req, res) => {
             'GRADE',
             grade
           )
-          db.query(
+
+          await executeQuery(
             'UPDATE producto SET exposicion = ? WHERE idProducto = ?',
-            [grade, idProducto],
-            (err, result) => {
-              if (err) {
-                console.error('Error updating product:', err)
-              } else {
-                console.log('Product updated successfully:', result)
-              }
-            }
+            [grade, idProducto]
           )
+          console.log('Product updated successfully')
         } else {
           // If the payment is for a purchase, update the cart status
-          db.query(
+          await executeQuery(
             "UPDATE carrito SET estado='pendiente_envio', idPago = ? WHERE idCarrito = ?",
-            [paymentId, external_reference],
-            (err, result) => {
-              if (err) {
-                console.error(err)
-              }
-            }
+            [paymentId, external_reference]
           )
+          console.log('Cart status updated successfully')
         }
       }
     }
 
-    res.status(200).json({ success: true, message: 'Webhook received', body })
+    return sendSuccess(res, 'Webhook received', body)
   } catch (error) {
-    console.error('Server error', error)
-    return res.status(500).json({
-      success: false,
-      message: 'Internal server error',
-      error: error.message,
-    })
+    return handleError(res, error, 'Error processing webhook')
   }
 }
 

@@ -2,8 +2,10 @@
 
 // Load environment variables and necessary modules
 require('dotenv').config()
-const db = require('../database/connection')
-const jwt = require('jsonwebtoken')
+const { executeQuery, findUserByEmail } = require('../utils/dbHelpers')
+const { sendSuccess, sendError, handleError } = require('../utils/responseHandler')
+const { validateRequiredFields, isValidEmail } = require('../utils/validation')
+const { verifyJwtToken, createJwtToken } = require('../utils/authHelpers')
 const bcrypt = require('bcrypt')
 const { emailTransporter } = require('../utils/email')
 const generateVerificationCode = require('../utils/generateVerificationCode')
@@ -13,85 +15,47 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body
 
-    if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: 'Incomplete credentials, verify your data',
-      })
+    // Validate required fields
+    const validation = validateRequiredFields(req.body, ['email', 'password'])
+    if (!validation.isValid) {
+      return sendError(res, 'Incomplete credentials, verify your data', 400)
     }
 
-    db.query(
-      'SELECT * FROM usuario WHERE correo = ?',
-      [email],
-      async (err, result) => {
-        if (err) {
-          return res.status(500).json({
-            success: false,
-            message: 'Server error, try again later',
-            error: err.message,
-          })
-        }
+    // Validate email format
+    if (!isValidEmail(email)) {
+      return sendError(res, 'Invalid email format', 400)
+    }
 
-        if (result.length === 0) {
-          return res.status(401).json({
-            success: false,
-            message: 'Incorrect credentials, try again',
-          })
-        }
+    // Find user by email
+    const user = await findUserByEmail(email)
+    if (!user) {
+      return sendError(res, 'Incorrect credentials, try again', 401)
+    }
 
-        const user = result[0]
-        // Compare the password with the hashed password in the database
-        const passwordUser = await bcrypt.compare(password, user.password)
+    // Compare passwords
+    const passwordMatch = await bcrypt.compare(password, user.password)
+    if (!passwordMatch) {
+      return sendError(res, 'Incorrect credentials, try again', 401)
+    }
 
-        if (!passwordUser) {
-          return res.status(401).json({
-            success: false,
-            message: 'Incorrect credentials, try again',
-          })
-        }
+    // Create JWT token
+    const token = createJwtToken({
+      id: user.idUsuario,
+      correo: user.correo,
+      username: user.username,
+    }, '1h')
 
-        const userForToken = {
-          id: user.idUsuario,
-          correo: user.correo,
-          username: user.username,
-        }
-
-        const token = jwt.sign(userForToken, process.env.JWT_SECRET, {
-          expiresIn: '1h',
-        })
-
-        res.status(200).json({
-          success: true,
-          message: 'Login successful',
-          token,
-          user: result[0],
-        })
-      }
-    )
+    return sendSuccess(res, 'Login successful', { token, user })
   } catch (error) {
-    handleError(res, error, 'Server error')
+    return handleError(res, error, 'Error during login')
   }
 }
 
 // Verifies if the email exists in the database
 const isEmailAvailable = async (email) => {
   try {
-    const result = await new Promise((resolve, reject) => {
-      db.query(
-        'SELECT * FROM usuario WHERE correo = ?',
-        [email],
-        (err, result) => {
-          if (err) {
-            return reject(err)
-          }
-          if (result.length === 0) {
-            return resolve(true) // Correo no existe
-          }
-          resolve(false) // Correo existe
-        }
-      )
-    })
-    return result
+    const user = await findUserByEmail(email)
+    return !user // Returns true if email is available (user not found)
   } catch (error) {
     console.error('Error verifying the email:', error)
     throw error
@@ -102,79 +66,67 @@ const isEmailAvailable = async (email) => {
 const sendRecover = async (req, res) => {
   try {
     const email = req.body.data
-    const user = await isEmailAvailable(email)
-    if (!user) {
-      const userForToken = { correo: email }
-      const token = jwt.sign(userForToken, process.env.JWT_SECRET, {
-        expiresIn: '1h',
-      })
-      await sendRecoverEmail(email, token)
-      return res.status(200).json({
-        success: true,
-        message: 'Se ha enviado un correo de verificación a tu correo',
-      })
-    } else {
-      return res.status(401).json({
-        success: false,
-        message: 'El correo no existe en el sistema, verifícalo de nuevo',
-      })
+
+    if (!isValidEmail(email)) {
+      return sendError(res, 'Invalid email format', 400)
     }
+
+    const emailAvailable = await isEmailAvailable(email)
+    if (emailAvailable) {
+      return sendError(res, 'Email does not exist in the system', 401)
+    }
+
+    const token = createJwtToken({ correo: email }, '1h')
+    await sendRecoverEmail(email, token)
+
+    return sendSuccess(res, 'Recovery email sent successfully')
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      message: 'Server error, intentalo más tarde',
-      error: err.message,
-    })
+    return handleError(res, err, 'Error sending recovery email')
   }
 }
 
 // Sends a verification code to complete registration
 const sendRegisterCode = async (req, res) => {
   try {
-    const { email, nombre, apellido, password, telefono } = req.body.data
     if (!req.body.data) {
-      return res.status(400).json({
-        success: false,
-        message: 'Faltan datos de registro, intentalo de nuevo',
-      })
+      return sendError(res, 'Registration data missing', 400)
+    }
+
+    const { email, nombre, apellido, password, telefono } = req.body.data
+
+    // Validate required fields
+    const validation = validateRequiredFields(req.body.data, ['email', 'nombre', 'apellido', 'password', 'telefono'])
+    if (!validation.isValid) {
+      return sendError(res, `Missing required fields: ${validation.missingFields.join(', ')}`, 400)
+    }
+
+    // Validate email format
+    if (!isValidEmail(email)) {
+      return sendError(res, 'Invalid email format', 400)
+    }
+
+    // Check if email is available
+    const emailAvailable = await isEmailAvailable(email)
+    if (!emailAvailable) {
+      return sendError(res, 'Email already registered', 400)
     }
 
     const code = generateVerificationCode()
 
-    const userForToken = {
+    const token = createJwtToken({
       correo: email,
       nombre,
       apellido,
       password,
       telefono,
       code,
-    }
-    const token = jwt.sign(userForToken, process.env.JWT_SECRET, {
-      expiresIn: '1h',
-    })
-
-    const validEmail = await isEmailAvailable(email)
-
-    if (!validEmail) {
-      return res.status(400).json({
-        success: false,
-        message: 'El correo ya se encuentra registrado',
-      })
-    }
+    }, '1h')
 
     await sendVerificationCode(email, token, code)
-    return res.status(200).json({
-      success: true,
-      message: 'Codigo de confirmación enviado con éxito',
-      email,
-      token,
-    })
+
+    return sendSuccess(res, 'Verification code sent successfully', { email, token })
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: 'Server error, intentalo más tarde',
-      error: error.message,
-    })
+    return handleError(res, error, 'Error sending verification code')
   }
 }
 
@@ -184,13 +136,11 @@ const validateCode = async (req, res) => {
     const codigo = parseInt(req.body.data.code)
     const token = req.body.token
 
-    const decoded = verifyToken(token)
+    const decoded = verifyJwtToken(token)
     const { correo, nombre, apellido, password, telefono, code } = decoded
 
     if (codigo === code) {
-      return res.status(200).json({
-        success: true,
-        message: 'Código validado correctamente',
+      return sendSuccess(res, 'Code validated successfully', {
         correo,
         nombre,
         telefono,
@@ -198,28 +148,13 @@ const validateCode = async (req, res) => {
         password,
       })
     } else {
-      return res.status(400).json({
-        success: false,
-        message: 'Codigo no congruente! Intentalo de nuevo',
-      })
+      return sendError(res, 'Code does not match! Try again', 400)
     }
-  } catch (error) {
-    handleError(res, error, 'Server error')
-  }
-}
-
-// Verifies the token for password reset
-const verifyToken = (token) => {
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
-    return decoded
   } catch (error) {
     if (error.name === 'TokenExpiredError') {
-      console.error('!El token del usuario ha vencido')
-    } else {
-      console.error('Verificacion de token fallida:', error)
+      return sendError(res, 'Code has expired', 401)
     }
-    throw error
+    return handleError(res, error, 'Error validating code', 'Invalid code')
   }
 }
 
@@ -228,33 +163,24 @@ const updatePassword = async (req, res) => {
   try {
     const { data, token } = req.body
 
-    const decoded = verifyToken(token)
+    if (!data || !token) {
+      return sendError(res, 'Password and token are required', 400)
+    }
+
+    const decoded = verifyJwtToken(token)
     const hashedPassword = await bcrypt.hash(data, 10)
 
-    db.query(
+    await executeQuery(
       'UPDATE usuario SET password = ? WHERE correo = ?',
-      [hashedPassword, decoded.correo],
-      (err, result) => {
-        if (err) {
-          return res.status(500).json({
-            success: false,
-            message: 'Server error, try again later',
-            error: err.message,
-          })
-        } else {
-          return res.status(200).json({
-            success: true,
-            message: 'Password updated successfully',
-          })
-        }
-      }
+      [hashedPassword, decoded.correo]
     )
+
+    return sendSuccess(res, 'Password updated successfully')
   } catch (err) {
-    res.status(400).json({
-      success: false,
-      message: 'Invalid or expired token',
-      error: err.message,
-    })
+    if (err.name === 'TokenExpiredError') {
+      return sendError(res, 'Token has expired', 401)
+    }
+    return handleError(res, err, 'Error updating password', 'Invalid or expired token')
   }
 }
 
@@ -283,7 +209,6 @@ const sendVerificationCode = async (email, token, code) => {
 module.exports = {
   login,
   sendRecover,
-  verifyToken,
   updatePassword,
   sendRegisterCode,
   validateCode,

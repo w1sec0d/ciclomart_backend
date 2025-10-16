@@ -22,4 +22,6 @@ db.getConnection((err, connection) => {
   connection.release() // Release the connection back to the pool
 })
 
+// TODO: Add new spare parts and diversify current bikes
+
 module.exports = db

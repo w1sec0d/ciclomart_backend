@@ -1,36 +1,26 @@
 // This controller handles seller-related information and ratings
-const db = require('../database/connection')
+const { executeQuery } = require('../utils/dbHelpers')
+const { sendSuccess, sendError, handleError } = require('../utils/responseHandler')
+const { isValidNumber } = require('../utils/validation')
 
 // Gets all the ratings of a seller
 const getRatingSeller = async (request, response) => {
-  let sellerId = parseInt(request.params.sellerId)
+  try {
+    const { sellerId } = request.params
 
-  if (isNaN(sellerId)) {
-    return response.status(400).json({
-      success: false,
-      message: 'Invalid seller ID',
-    })
-  }
-
-  db.query(
-    'SELECT * FROM vista_calificaciones_productos_vendedor WHERE idUsuario = ?',
-    [sellerId],
-    (error, results) => {
-      if (error) {
-        console.error('Error performing the query', error)
-        return response.status(500).json({
-          success: false,
-          message: 'Server error, try again later',
-          error: error.message,
-        })
-      }
-      return response.status(200).json({
-        success: true,
-        message: 'Ratings obtained successfully',
-        results,
-      })
+    if (!isValidNumber(sellerId)) {
+      return sendError(response, 'Invalid seller ID', 400)
     }
-  )
+
+    const results = await executeQuery(
+      'SELECT * FROM vista_calificaciones_productos_vendedor WHERE idUsuario = ?',
+      [sellerId]
+    )
+
+    return sendSuccess(response, 'Ratings obtained successfully', results)
+  } catch (error) {
+    return handleError(response, error, 'Error getting seller ratings')
+  }
 }
 
 module.exports = {
