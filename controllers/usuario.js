@@ -1,5 +1,5 @@
 // Handles user related operations
-const executeQuery = require('../utils/executeQuery')
+const { executeQuery } = require('../utils/dbHelpers')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const db = require('../database/connection')

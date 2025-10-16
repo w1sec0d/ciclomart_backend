@@ -1,6 +1,6 @@
 // This controller handles product exposure payment preferences through Mercado Pago
 const { preference } = require('../utils/mercadoPago')
-const { handleError } = require('../utils/handleError')
+const { handleError } = require('../utils/responseHandler')
 
 // Creates a payment preference for product exposure upgrade
 const createExposurePreference = async (req, res) => {
