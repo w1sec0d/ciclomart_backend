@@ -1,19 +1,20 @@
+// This route is responsible for store related operations
 const db = require('../database/connection.js')
 
-// Obtiene todas las tiendas
+// Gets all the stores
 const getTiendas = async (request, response) => {
   try {
     db.query('SELECT * FROM tienda', (error, results) => {
       if (error) {
         return response.status(500).json({
           success: false,
-          message: 'Server error, no se pueden obtener las tiendas',
+          message: 'Server error, cannot get the stores',
           error: error.message,
         })
       }
       return response.status(200).json({
         success: true,
-        message: 'Tiendas obtenidas exitosamente',
+        message: 'Stores obtained successfully',
         results,
       })
     })

@@ -1,6 +1,7 @@
+// This route is responsible for getting all the transactions (purchases and sales)
 const db = require('../database/connection.js')
 
-// Obtiene todas las transacciones
+// Gets all the transactions
 const getTransacciones = (request, response) => {
   try {
     db.query('SELECT * FROM transaccion', (error, results) => {
@@ -8,13 +9,13 @@ const getTransacciones = (request, response) => {
         return response.status(500).json({
           success: false,
           message:
-            'Internal server error, no se pueden obtener las transacciones',
+            'Internal server error, cannot get the transactions',
           error: error.message,
         })
       }
       return response.status(200).json({
         success: true,
-        message: 'Transacciones obtenidas exitosamente',
+        message: 'Transactions obtained successfully',
         results,
       })
     })
@@ -28,32 +29,32 @@ const getTransacciones = (request, response) => {
   }
 }
 
-// Obtiene las compras de un usuario dado
-const getCompras = (request, response) => {
+// Gets all the purchases of a given user
+const getPurchasesByBuyerId = (request, response) => {
   try {
-    const idComprador = request.params.id
+    const buyerId = request.params.id
 
-    if (isNaN(idComprador)) {
+    if (isNaN(buyerId)) {
       return response.status(400).json({
         success: false,
-        message: 'Id de comprador inválida',
+        message: 'Invalid buyer ID',
       })
     }
 
     db.query(
       'SELECT * FROM vista_compras_usuario WHERE idUsuario = ?',
-      [idComprador],
+      [buyerId],
       (error, results) => {
         if (error) {
           return response.status(500).json({
             success: false,
-            message: 'Error, no se pueden obtener las tiendas',
+            message: 'Error, cannot get the purchases',
             error: error.message,
           })
         }
         return response.status(200).json({
           success: true,
-          message: 'Compras obtenidas exitosamente',
+          message: 'Purchases obtained successfully',
           results,
         })
       }
@@ -68,29 +69,29 @@ const getCompras = (request, response) => {
   }
 }
 
-// Obtiene las ventas de un usuario dado
-const getVentas = (request, response) => {
+// Gets all the sales of a given user
+const getSalesBySellerId = (request, response) => {
   try {
-    const idVendedor = request.params.id
-    if (isNaN(idVendedor)) {
+    const sellerId = request.params.id
+    if (isNaN(sellerId)) {
       return response
         .status(400)
-        .json({ message: 'Id de vendedor inválida', success: false })
+        .json({ message: 'Invalid sellerId ID', success: false })
     }
     db.query(
       'SELECT * FROM vista_ventas_usuario WHERE idVendedor = ? ',
-      [idVendedor],
+      [sellerId],
       (error, results) => {
         if (error) {
           return response.status(500).json({
             success: false,
-            message: 'Server error, no se encontraron las ventas',
+            message: 'Server error, cannot get the sales',
             error: error.message,
           })
         }
         return response.status(200).json({
           success: true,
-          message: 'Ventas obtenidas exitosamente',
+          message: 'Sales obtained successfully',
           results,
         })
       }
@@ -105,4 +106,4 @@ const getVentas = (request, response) => {
   }
 }
 
-module.exports = { getTransacciones, getCompras, getVentas }
+module.exports = { getTransacciones, getPurchasesByBuyerId, getSalesBySellerId }

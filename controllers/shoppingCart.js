@@ -1,140 +1,134 @@
-const db = require('../database/connection')
+// This route is responsible for shopping cart related operations
+const { executeQuery } = require('../utils/database.js')
 
-// Helper function to execute a query and return a promise
-const executeQuery = (query, params) => {
-  return new Promise((resolve, reject) => {
-    db.query(query, params, (error, results) => {
-      if (error) {
-        return reject(error)
-      }
-      resolve(results)
-    })
-  })
-}
-
-// Obtiene el carrito de un usuario
-const getShoppingCart = async (request, response) => {
-  const { id } = request.params
-  const idUsuario = parseInt(id)
-
-  if (isNaN(idUsuario)) {
+// Gets the shopping cart of a user
+const getShoppingCartByBuyerId = async (request, response) => {
+  const { buyerId } = request.params
+  if (isNaN(buyerId)) {
     return response.status(400).json({
       success: false,
-      message: 'ID usuario inválido',
+      message: 'Invalid buyer ID',
     })
   }
 
   try {
     const results = await executeQuery(
       'SELECT * FROM vista_productos_carrito WHERE id_comprador = ?',
-      [idUsuario]
+      [buyerId]
     )
     return response.status(200).json({
       success: true,
-      message: 'Carrito obtenido con exito',
+      message: 'Shopping cart obtained successfully',
       results,
     })
   } catch (error) {
-    console.error('Error realizando la consulta ', error)
+    console.error('Error executing the query ', error)
     return response.status(500).json({
       success: false,
-      message: 'Error obteniendo carrito',
+      message: 'Error getting the shopping cart',
       error: error.message,
     })
   }
 }
 
-const addToShoppingCart = async (request, response) => {
-  const { idUsuario, idProducto, cantidad } = request.body
+// Adds a product to the shopping cart of a user
+const addToShoppingCartByBuyerId = async (request, response) => {
+  const { buyerId, productId, quantity } = request.body
 
-  if (isNaN(idUsuario) || isNaN(idProducto) || isNaN(cantidad)) {
+  if (isNaN(buyerId) || isNaN(productId) || isNaN(quantity)) {
     return response.status(400).json({
       success: false,
-      message: 'Datos inválidos',
+      message: 'Invalid data',
     })
   }
 
   try {
     const carritoResults = await executeQuery(
       'SELECT idCarrito FROM carrito WHERE idComprador = ? AND estado = "pendiente_pago"',
-      [idUsuario]
+      [buyerId]
     )
 
+    // If the shopping cart is not found, create a new one and add the product to it
     if (carritoResults.length === 0) {
       const newCarrito = await executeQuery(
         'INSERT INTO carrito (idComprador, estado) VALUES (?, "pendiente_pago")',
-        [idUsuario]
+        [buyerId]
       )
       const idCarrito = newCarrito.insertId
       const results = await executeQuery(
         'INSERT INTO carritoProducto (idCarrito, idProducto, cantidad) VALUES (?, ?, ?)',
-        [idCarrito, idProducto, cantidad]
+        [idCarrito, productId, quantity]
       )
       return response.status(201).json({
         success: true,
-        message: 'Producto agregado al carrito',
+        message: 'Product added to the shopping cart',
         results,
       })
-    } else {
+    }
+    // If the shopping cart is found, add the product to it 
+    else {
       const idCarrito = carritoResults[0].idCarrito
       const carritoProductoResults = await executeQuery(
         'SELECT * FROM carritoProducto WHERE idCarrito = ? AND idProducto = ?',
-        [idCarrito, idProducto]
+        [idCarrito, productId]
       )
 
       if (carritoProductoResults.length > 0) {
-        const nuevaCantidad = carritoProductoResults[0].cantidad + cantidad
+        // If the product is already in the shopping cart, update the quantity
+        const newQuantity = carritoProductoResults[0].cantidad + quantity
         const results = await executeQuery(
           'UPDATE carritoProducto SET cantidad = ? WHERE idCarrito = ? AND idProducto = ?',
-          [nuevaCantidad, idCarrito, idProducto]
+          [newQuantity, idCarrito, productId]
         )
         return response.status(200).json({
           success: true,
-          message: 'Cantidad del producto actualizada en el carrito',
+          message: 'Quantity of the product updated in the shopping cart',
           results,
         })
       } else {
+        // If the product is not in the shopping cart, add it to it
         const results = await executeQuery(
           'INSERT INTO carritoProducto (idCarrito, idProducto, cantidad) VALUES (?, ?, ?)',
-          [idCarrito, idProducto, cantidad]
+          [idCarrito, productId, quantity]
         )
         return response.status(201).json({
           success: true,
-          message: 'Producto agregado al carrito',
+          message: 'Product added to the shopping cart',
           results,
         })
       }
     }
   } catch (error) {
-    console.error('Error realizando la consulta ', error)
+    console.error('Error executing the query ', error)
     return response.status(500).json({
       success: false,
-      message: 'Error procesando la solicitud',
+      message: 'Error processing the request',
       error: error.message,
     })
   }
 }
 
-const removeFromShoppingCart = async (request, response) => {
-  const { idUsuario, idProducto } = request.params
+// Removes a product from the shopping cart of a user
+const removeFromShoppingCartByBuyerId = async (request, response) => {
+  const { buyerId, productId } = request.params
 
-  if (isNaN(idUsuario) || isNaN(idProducto)) {
+  if (isNaN(buyerId) || isNaN(productId)) {
     return response.status(400).json({
       success: false,
-      message: 'Datos inválidos',
+      message: 'Invalid data',
     })
   }
 
   try {
     const carritoResults = await executeQuery(
       'SELECT idCarrito FROM carrito WHERE idComprador = ? AND estado = "pendiente_pago"',
-      [idUsuario]
+      [buyerId]
     )
 
     if (carritoResults.length === 0) {
       return response.status(404).json({
         success: false,
-        message: 'Carrito no encontrado',
+        message: 'Shopping cart not found',
       })
     }
 
@@ -142,28 +136,28 @@ const removeFromShoppingCart = async (request, response) => {
 
     const results = await executeQuery(
       'DELETE FROM carritoProducto WHERE idCarrito = ? AND idProducto = ?',
-      [idCarrito, idProducto]
+      [idCarrito, productId]
     )
 
     if (results.affectedRows === 0) {
       return response.status(404).json({
         success: false,
-        message: 'Producto no encontrado en el carrito',
+        message: 'Product not found in the shopping cart',
       })
     }
 
     return response.status(200).json({
       success: true,
-      message: 'Producto eliminado del carrito',
+      message: 'Product removed from the shopping cart',
     })
   } catch (error) {
-    console.error('Error realizando la consulta ', error)
+    console.error('Error executing the query ', error)
     return response.status(500).json({
       success: false,
-      message: 'Error eliminando producto del carrito',
+      message: 'Error removing the product from the shopping cart',
       error: error.message,
     })
   }
 }
 
-module.exports = { getShoppingCart, addToShoppingCart, removeFromShoppingCart }
+module.exports = { getShoppingCartByBuyerId, addToShoppingCartByBuyerId, removeFromShoppingCartByBuyerId }
