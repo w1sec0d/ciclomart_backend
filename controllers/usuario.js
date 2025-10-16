@@ -1,153 +1,105 @@
 // Handles user related operations
-const { executeQuery } = require('../utils/dbHelpers')
-const jwt = require('jsonwebtoken')
+const { executeQuery, findUserById, insert, updateById } = require('../utils/dbHelpers')
+const { sendSuccess, sendError, handleError } = require('../utils/responseHandler')
+const { isValidNumber, validateRequiredFields, isValidEmail } = require('../utils/validation')
+const { extractBearerToken, verifyJwtToken } = require('../utils/authHelpers')
 const bcrypt = require('bcrypt')
-const db = require('../database/connection')
-const { verifyToken } = require('./login')
 
 // Registers a new user
 const registerUsuario = async (request, response) => {
   try {
     const { nombre, apellido, email, password, telefono } = request.body
 
-    if (!nombre || !apellido || !email || !password || !telefono) {
-      return response.status(400).json({
-        success: false,
-        message: 'Missing required fields',
-      })
+    // Validate required fields
+    const validation = validateRequiredFields(request.body, ['nombre', 'apellido', 'email', 'password', 'telefono'])
+    if (!validation.isValid) {
+      return sendError(response, `Missing required fields: ${validation.missingFields.join(', ')}`, 400)
     }
 
+    // Validate email format
+    if (!isValidEmail(email)) {
+      return sendError(response, 'Invalid email format', 400)
+    }
+
+    // Hash password and insert user
     const passwordHash = await bcrypt.hash(password, 10)
-    const insertUsuarioQuery = 'INSERT INTO usuario (nombre, apellido, correo, password,telefono, fechaRegistro) VALUES (?, ?, ?, ?, ?, ?)'
-    const usuarioResults = await executeQuery(insertUsuarioQuery, [nombre, apellido, email, passwordHash, telefono, new Date()])
-
-    const idUsuario = usuarioResults.insertId
-
-    return response.status(201).json({
-      success: true,
-      message: 'User added successfully',
-      data: {
-        idUsuario,
-      },
+    const result = await insert('usuario', {
+      nombre,
+      apellido,
+      correo: email,
+      password: passwordHash,
+      telefono,
+      fechaRegistro: new Date()
     })
 
+    return sendSuccess(response, 'User added successfully', { idUsuario: result.insertId }, 201)
   } catch (error) {
-    console.error('Server error', error)
-    return response.status(500).json({
-      success: false,
-      message: 'Internal server error',
-      error: error.message,
-    })
+    return handleError(response, error, 'Error registering user')
   }
 }
 
 // Gets user's information received from the token
 const getUser = async (request, response) => {
-  // Obtiene el encabezado de la autorización de la solicitud
-  const authHeader = request.headers.authorization
-
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return response.status(401).json({
-      success: false,
-      message: 'No se proporcionó token',
-    })
-  }
-
-  const token = authHeader.split(' ')[1]
-
   try {
-    const decoded = verifyToken(token)
+    // Extract and validate token
+    const { token, error } = extractBearerToken(request)
+    if (error) {
+      return sendError(response, error, 401)
+    }
 
-    db.query(
-      'SELECT * FROM usuario WHERE idUsuario = ?',
-      [decoded.id],
-      (err, result) => {
-        if (err) {
-          return response.status(500).json({
-            success: false,
-            message:
-              'Server error, no se puede obtener la información del usuario',
-            error: err.message,
-          })
-        }
-        if (result.length === 0) {
-          return response.status(404).json({
-            success: false,
-            message: 'Usuario no encontrado',
-          })
-        }
-        const user = result[0]
-        response.status(200).json({
-          success: true,
-          message: 'Información del usuario obtenida exitosamente',
-          user,
-        })
-      }
-    )
+    // Verify token
+    const decoded = verifyJwtToken(token)
+
+    // Find user
+    const user = await findUserById(decoded.id)
+    if (!user) {
+      return sendError(response, 'User not found', 404)
+    }
+
+    return sendSuccess(response, 'User information retrieved successfully', { user })
   } catch (error) {
-    response.status(401).json({
-      success: false,
-      message: 'Token inválido',
-      error: error.message,
-    })
+    if (error.name === 'TokenExpiredError') {
+      return sendError(response, 'Token has expired', 401)
+    }
+    return handleError(response, error, 'Authentication error', 'Invalid token')
   }
 }
 
 // Gets a user's photo by their ID
 const getUsuarioPhoto = async (request, response) => {
   try {
-    const idUser = parseInt(request.params.id)
+    const { id } = request.params
 
-    if (isNaN(idUser)) {
-      return response.status(400).json({
-        success: false,
-        message: 'Invalid user ID',
-      })
+    if (!isValidNumber(id)) {
+      return sendError(response, 'Invalid user ID', 400)
     }
 
-    const query = 'SELECT url FROM imagen WHERE idUsuario = ?'
-    const results = await executeQuery(query, [idUser])
+    const results = await executeQuery('SELECT url FROM imagen WHERE idUsuario = ?', [id])
 
     if (results.length === 0) {
-      return response.status(404).json({
-        success: false,
-        message: 'Photo not found for the specified user',
-      })
+      return sendError(response, 'Photo not found for the specified user', 404)
     }
 
-    return response.status(200).json({
-      success: true,
-      message: 'User photo retrieved successfully',
-      photoUrl: results[0].url,
-    })
+    return sendSuccess(response, 'User photo retrieved successfully', { photoUrl: results[0].url })
   } catch (error) {
-    console.error('Server Error', error)
-    return response.status(500).json({
-      success: false,
-      message: 'Internal server error',
-      error: error.message,
-    })
+    return handleError(response, error, 'Error getting user photo')
   }
 }
 
 // Updates a user's photo
 const updateUsuarioFoto = async (request, response) => {
   try {
-    const photoUrl = request.body.photoUrl
-    const idUser = parseInt(request.params.idUsuario)
+    const { photoUrl } = request.body
+    const { idUsuario } = request.params
 
-    if (!photoUrl) {
-      return response.status(400).json({
-        success: false,
-        message: 'No se proporcionó una URL de la foto',
-      })
+    // Validate required fields
+    const validation = validateRequiredFields(request.body, ['photoUrl'])
+    if (!validation.isValid) {
+      return sendError(response, 'No photo URL provided', 400)
     }
 
-    if (isNaN(idUser)) {
-      return response.status(400).json({
-        success: false,
-        message: 'ID de usuario inválido',
-      })
+    if (!isValidNumber(idUsuario)) {
+      return sendError(response, 'Invalid user ID', 400)
     }
 
     const query = `
@@ -155,72 +107,42 @@ const updateUsuarioFoto = async (request, response) => {
       VALUES (?, ?)
       ON DUPLICATE KEY UPDATE url = VALUES(url)
     `
-    await executeQuery(query, [idUser, photoUrl])
+    await executeQuery(query, [idUsuario, photoUrl])
 
-    return response.status(200).json({
-      success: true,
-      message: 'Foto del usuario actualizada correctamente',
-    })
+    return sendSuccess(response, 'User photo updated successfully')
   } catch (error) {
-    console.error('Server error', error)
-    return response.status(500).json({
-      success: false,
-      message: 'Internal server error',
-      error: error.message,
-    })
+    return handleError(response, error, 'Error updating user photo')
   }
 }
 
 // Updates a user's address
 const updateUsuarioDireccion = async (req, res) => {
-  const {
-    direccionNombre,
-    direccionNumero,
-    codigoPostal,
-    direccionCiudad,
-    direccionApartamento,
-    direccionPiso,
-  } = req.body
-  const idUsuario = req.params.idUsuario
-
   try {
-    const query = `
-      UPDATE usuario
-      SET direccionNombre = ?, direccionNumero = ?, codigoPostal = ?, direccionCiudad = ?, direccionApartamento = ?, direccionPiso = ?
-      WHERE idUsuario = ?
-    `
-    const values = [
-      direccionNombre,
-      direccionNumero,
-      codigoPostal,
-      direccionCiudad,
-      direccionApartamento,
-      direccionPiso,
-      idUsuario,
-    ]
+    const { idUsuario } = req.params
+    const addressData = req.body
 
-    const results = await executeQuery(query, values)
+    // Validate user ID
+    if (!isValidNumber(idUsuario)) {
+      return sendError(res, 'Invalid user ID', 400)
+    }
 
-    res.status(200).json({
-      success: true,
-      message: 'Dirección actualizada exitosamente',
-      data: {
-        direccionNombre,
-        direccionNumero,
-        codigoPostal,
-        direccionCiudad,
-        direccionApartamento,
-        direccionPiso,
-      },
-      results,
-    })
+    // Validate required fields
+    const validation = validateRequiredFields(addressData, [
+      'direccionNombre',
+      'direccionNumero',
+      'codigoPostal',
+      'direccionCiudad'
+    ])
+    if (!validation.isValid) {
+      return sendError(res, `Missing required fields: ${validation.missingFields.join(', ')}`, 400)
+    }
+
+    // Update address using helper
+    await updateById('usuario', 'idUsuario', idUsuario, addressData)
+
+    return sendSuccess(res, 'Address updated successfully', addressData)
   } catch (error) {
-    console.error('Error actualizando dirección:', error)
-    res.status(500).json({
-      success: false,
-      message: 'Error actualizando dirección',
-      error: error.message,
-    })
+    return handleError(res, error, 'Error updating address')
   }
 }
 
