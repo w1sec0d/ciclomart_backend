@@ -1,4 +1,4 @@
-// This route is responsible for getting all the transactions (purchases and sales)
+// This controller is responsible for getting all the transactions (purchases and sales)
 const db = require('../database/connection.js')
 
 // Gets all the transactions
@@ -32,7 +32,7 @@ const getTransacciones = (request, response) => {
 // Gets all the purchases of a given user
 const getPurchasesByBuyerId = (request, response) => {
   try {
-    const buyerId = request.params.id
+    const buyerId = request.params.buyerId
 
     if (isNaN(buyerId)) {
       return response.status(400).json({
@@ -72,7 +72,7 @@ const getPurchasesByBuyerId = (request, response) => {
 // Gets all the sales of a given user
 const getSalesBySellerId = (request, response) => {
   try {
-    const sellerId = request.params.id
+    const sellerId = request.params.sellerId
     if (isNaN(sellerId)) {
       return response
         .status(400)

@@ -1,6 +1,6 @@
-// Descripcion: Contiene la lógica de las peticiones de login
+// This controller handles user authentication and password recovery operations
 
-// Carga variables de entorno y módulos necesarios
+// Load environment variables and necessary modules
 require('dotenv').config()
 const db = require('../database/connection')
 const jwt = require('jsonwebtoken')
@@ -8,7 +8,7 @@ const bcrypt = require('bcrypt')
 const { emailTransporter } = require('../utils/email')
 const generateVerificationCode = require('../utils/generateVerificationCode')
 
-// Función para loguear al usuario
+// Logs in the user
 const login = async (req, res) => {
   try {
     const { email, password } = req.body
@@ -16,7 +16,7 @@ const login = async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({
         success: false,
-        message: 'Credenciales incompletas, verifica tus datos',
+        message: 'Incomplete credentials, verify your data',
       })
     }
 
@@ -27,7 +27,7 @@ const login = async (req, res) => {
         if (err) {
           return res.status(500).json({
             success: false,
-            message: 'Server error, intentalo más tarde',
+            message: 'Server error, try again later',
             error: err.message,
           })
         }
@@ -35,17 +35,18 @@ const login = async (req, res) => {
         if (result.length === 0) {
           return res.status(401).json({
             success: false,
-            message: 'Credenciales incorrectas, intentalo de nuevo',
+            message: 'Incorrect credentials, try again',
           })
         }
 
         const user = result[0]
+        // Compare the password with the hashed password in the database
         const passwordUser = await bcrypt.compare(password, user.password)
 
         if (!passwordUser) {
           return res.status(401).json({
             success: false,
-            message: 'Credenciales incorrectas, intentalo de nuevo',
+            message: 'Incorrect credentials, try again',
           })
         }
 
@@ -61,23 +62,18 @@ const login = async (req, res) => {
 
         res.status(200).json({
           success: true,
-          message: 'Login exitoso',
+          message: 'Login successful',
           token,
           user: result[0],
         })
       }
     )
   } catch (error) {
-    console.error('Server error', error)
-    return res.status(500).json({
-      success: false,
-      message: 'Internal server error',
-      error: error.message,
-    })
+    handleError(res, error, 'Server error')
   }
 }
 
-// Verifica si el email existe en la base de datos
+// Verifies if the email exists in the database
 const isEmailAvailable = async (email) => {
   try {
     const result = await new Promise((resolve, reject) => {
@@ -97,12 +93,12 @@ const isEmailAvailable = async (email) => {
     })
     return result
   } catch (error) {
-    console.error('Error verificando el email:', error)
+    console.error('Error verifying the email:', error)
     throw error
   }
 }
 
-// Envía un correo al usuario para recuperar su cuenta
+// Sends an email to the user to recover their account
 const sendRecover = async (req, res) => {
   try {
     const email = req.body.data
@@ -132,7 +128,7 @@ const sendRecover = async (req, res) => {
   }
 }
 
-// Envía un código para terminar el registro
+// Sends a verification code to complete registration
 const sendRegisterCode = async (req, res) => {
   try {
     const { email, nombre, apellido, password, telefono } = req.body.data
@@ -182,7 +178,7 @@ const sendRegisterCode = async (req, res) => {
   }
 }
 
-// Valida si el código introducido por el usuario es igual al código almacenado en el token
+// Validates if the code entered by the user matches the code stored in the token
 const validateCode = async (req, res) => {
   try {
     const codigo = parseInt(req.body.data.code)
@@ -208,16 +204,11 @@ const validateCode = async (req, res) => {
       })
     }
   } catch (error) {
-    console.error('Server error', error)
-    return res.status(500).json({
-      success: false,
-      message: 'Internal server error',
-      error: error.message,
-    })
+    handleError(res, error, 'Server error')
   }
 }
 
-// Evalúa el token para restablecer la contraseña
+// Verifies the token for password reset
 const verifyToken = (token) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
@@ -232,7 +223,7 @@ const verifyToken = (token) => {
   }
 }
 
-// Actualiza la contraseña del usuario
+// Updates the user's password
 const updatePassword = async (req, res) => {
   try {
     const { data, token } = req.body
@@ -247,13 +238,13 @@ const updatePassword = async (req, res) => {
         if (err) {
           return res.status(500).json({
             success: false,
-            message: 'Server error, intentalo más tarde',
+            message: 'Server error, try again later',
             error: err.message,
           })
         } else {
           return res.status(200).json({
             success: true,
-            message: 'Contraseña actualizada con éxito',
+            message: 'Password updated successfully',
           })
         }
       }
@@ -261,13 +252,13 @@ const updatePassword = async (req, res) => {
   } catch (err) {
     res.status(400).json({
       success: false,
-      message: 'Token inválido o expirado',
+      message: 'Invalid or expired token',
       error: err.message,
     })
   }
 }
 
-// Envía el correo al usuario (recuperación de contraseña)
+// Sends the recovery email to the user (password recovery)
 const sendRecoverEmail = async (email, token) => {
   await emailTransporter.sendMail({
     from: '"Ciclo Mart Soporte" <ciclomartsoporte@gmail.com>',
@@ -278,7 +269,7 @@ const sendRecoverEmail = async (email, token) => {
   })
 }
 
-// Envía el código al usuario (para terminar el registro)
+// Sends the verification code to the user (to complete registration)
 const sendVerificationCode = async (email, token, code) => {
   await emailTransporter.sendMail({
     from: '"Ciclo Mart Soporte" <ciclomartsoporte@gmail.com>',

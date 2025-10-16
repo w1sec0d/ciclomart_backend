@@ -1,85 +1,87 @@
+// This controller handles product rating and review operations
 const db = require('../database/connection')
 
-// Obtiene todas las calificaciones de un producto
+// Gets all the ratings for a specific product
 const ratingProduct = (request, response) => {
-  const { id } = request.params
-  const idProducto = parseInt(id)
+  const { productId } = request.params
+  const parsedProductId = parseInt(productId)
 
-  if (isNaN(idProducto)) {
+  if (isNaN(parsedProductId)) {
     return response.status(400).json({
       success: false,
-      message: 'ID producto inválido',
+      message: 'Invalid product ID',
     })
   }
 
   db.query(
     'SELECT * FROM vista_producto_calificacion WHERE idProducto = ?',
-    [idProducto],
+    [parsedProductId],
     (error, results) => {
       if (error) {
-        console.error('Error realizando la consulta ', error)
+        console.error('Error executing the query', error)
         return response.status(500).json({
           success: false,
-          message: 'Server error, intentalo más tarde',
+          message: 'Server error, try again later',
           error: error.message,
         })
       }
       return response.status(200).json({
         success: true,
-        message: 'Calificaciones obtenidas con exito',
+        message: 'Ratings obtained successfully',
         results,
       })
     }
   )
 }
 
-//Calcula el promedio de las calificaciones de un producto
-
+// Calculates and returns the average rating of a product
 const averageProductRatings = (request, response) => {
-  const { id } = request.params
-  const idProducto = parseInt(id)
+  const { productId } = request.params
+  const parsedProductId = parseInt(productId)
 
   db.query(
     'SELECT * from vista_producto_calificacion_promedio WHERE idProducto = ?',
-    [idProducto],
+    [parsedProductId],
     (error, results) => {
       if (error) {
-        console.error('Error realizando la consulta ', error)
+        console.error('Error executing the query', error)
         return response.status(500).json({
           success: false,
-          message: 'Server error. Intentelo más tarde',
+          message: 'Server error. Try again later',
           error: error.message,
         })
       }
       return response.status(200).json({
         success: true,
-        message: 'Promedio de la calificación obtenida con éxito',
+        message: 'Average rating obtained successfully',
         results,
       })
     }
   )
 }
 
-// Permite revisar si un usuario compro un producto. De vuelve el id vendedor
+// Checks if a user purchased a product before allowing them to rate it
 const checkUserPurchase = (request, response) => {
-  const { idComprador, idProducto } = request.body
+  const { buyerId, productId } = request.body
+  const parsedBuyerId = parseInt(buyerId)
+  const parsedProductId = parseInt(productId)
 
-  if (!idComprador || !idProducto) {
+  if (!parsedBuyerId || !parsedProductId) {
     return response.status(400).json({
       success: false,
-      message: 'El idComprador e idProducto deben ser obligatorios',
+      message: 'The buyerId and productId are required',
     })
   }
 
   db.query(
     'SELECT * from vista_compras_usuario WHERE idUsuario = ? AND idProducto = ?',
-    [idComprador, idProducto],
+    [parsedBuyerId, parsedProductId],
     (error, results) => {
       if (error) {
-        console.error('Error ejecutando la validacion', error)
+        console.error('Error executing the validation', error)
         return response.status(500).json({
           success: false,
-          message: 'Server error. Intentelo más tarde',
+          message: 'Server error. Try again later',
           error: error.message,
         })
       }
@@ -87,46 +89,51 @@ const checkUserPurchase = (request, response) => {
       if (results.length === 0) {
         return response.status(404).json({
           success: false,
-          message: 'No se encontraron compras del usuario',
+          message: 'No purchases found for the user',
         })
       }
 
       return response.status(200).json({
         success: true,
-        message: 'Se obtuvo con exito de validacion de compra de un usuario',
+        message: 'Purchase validation obtained successfully',
         results,
       })
     }
   )
 }
 
+// Adds a new rating/review for a product
 const addRatingProduct = (request, response) => {
   const {
-    idProducto,
-    comentario,
-    idUsuarioComprador,
-    idUsuarioVendedor,
-    nota,
-    foto,
+    productId,
+    comment,
+    buyerId,
+    sellerId,
+    rating,
+    photo,
   } = request.body
+  const parsedProductId = parseInt(productId)
+  const parsedBuyerId = parseInt(buyerId)
+  const parsedSellerId = parseInt(sellerId)
+  const parsedRating = parseInt(rating)
   const query = `INSERT INTO calificacion (idProducto,comentario, idUsuarioComprador, idUsuarioVendedor, nota, foto) VALUES (?, ?, ?, ?, ?, ?)`
 
   db.query(
     query,
-    [idProducto, comentario, idUsuarioComprador, idUsuarioVendedor, nota, foto],
+    [parsedProductId, comment, parsedBuyerId, parsedSellerId, parsedRating, photo],
     (error, results) => {
       if (error) {
-        console.error('Error ejecutando la insercion', error)
+        console.error('Error executing the insertion', error)
         return response.status(500).json({
           success: false,
-          message: 'Server error. Intentelo más tarde',
+          message: 'Server error. Try again later',
           error: error.message,
         })
       }
 
       return response.status(201).json({
         success: true,
-        message: 'Comentario añadido con éxito',
+        message: 'Rating added successfully',
       })
     }
   )

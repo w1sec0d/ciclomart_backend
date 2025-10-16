@@ -1,5 +1,8 @@
+// This controller handles product exposure payment preferences through Mercado Pago
 const { preference } = require('../utils/mercadoPago')
+const { handleError } = require('../utils/handleError')
 
+// Creates a payment preference for product exposure upgrade
 const createExposurePreference = async (req, res) => {
   try {
     const { grade, price, quantity, idProducto } = req.body
@@ -30,18 +33,13 @@ const createExposurePreference = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: 'Preferencia de MercadoPago creada exitosamente',
+      message: 'MercadoPago preference created successfully',
       preferenceId: result.id,
       paymentURL: result.init_point,
       result,
     })
   } catch (error) {
-    console.error('Error creando preferencia de MercadoPago:', error)
-    res.status(500).json({
-      success: false,
-      message: 'Error creando preferencia de MercadoPago',
-      error: error.message,
-    })
+    handleError(res, error, 'Error creating MercadoPago preference')
   }
 }
 

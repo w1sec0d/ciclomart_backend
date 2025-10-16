@@ -1,128 +1,134 @@
+// This controller handles all product-related operations including CRUD, payments, and image management
 const { MercadoPagoConfig, Preference } = require('mercadopago')
 const db = require('../database/connection')
 const calculateFee = require('../utils/calculateFee')
 
+// Gets all products from the database
 const getProducto = async (req, res) => {
   try {
     db.query('SELECT * FROM vista_completa_producto', (error, results) => {
       if (error) {
-        console.error('Error obteniendo productos:', error)
+        console.error('Error getting products:', error)
         return res.status(500).json({
           success: false,
-          message: 'Error obteniendo productos',
+          message: 'Error getting products',
           error: error.message,
         })
       }
 
       res.status(200).json({
         success: true,
-        message: 'Productos obtenidos exitosamente',
+        message: 'Products obtained successfully',
         results,
       })
     })
   } catch (error) {
-    console.error('Error obteniendo productos:', error)
+    console.error('Error getting products:', error)
     res.status(500).json({
       success: false,
-      message: 'Error obteniendo productos',
+      message: 'Error getting products',
       error: error.message,
     })
   }
 }
 
+// Gets all bicycles (filtered products)
 const getBicicletas = async (req, res) => {
   try {
     db.query(
       'SELECT * FROM vista_completa_producto WHERE tipo = "bicicleta"',
       (error, results) => {
         if (error) {
-          console.error('Error obteniendo bicicletas:', error)
+          console.error('Error getting bicycles:', error)
           return res.status(500).json({
             success: false,
-            message: 'Error obteniendo bicicletas',
+            message: 'Error getting bicycles',
             error: error.message,
           })
         }
 
         res.status(200).json({
           success: true,
-          message: 'Bicicletas obtenidas exitosamente',
+          message: 'Bicycles obtained successfully',
           results,
         })
       }
     )
   } catch (error) {
-    console.error('Error obteniendo bicicletas:', error)
+    console.error('Error getting bicycles:', error)
     res.status(500).json({
       success: false,
-      message: 'Error obteniendo bicicletas',
+      message: 'Error getting bicycles',
       error: error.message,
     })
   }
 }
 
+// Gets all components (filtered products)
 const getComponentes = async (req, res) => {
   try {
     db.query(
       'SELECT * FROM vista_completa_producto WHERE tipo = "componente"',
       (error, results) => {
         if (error) {
-          console.error('Error obteniendo bicicletas:', error)
+          console.error('Error getting components:', error)
           return res.status(500).json({
             success: false,
-            message: 'Error obteniendo bicicletas',
+            message: 'Error getting components',
             error: error.message,
           })
         }
 
         res.status(200).json({
           success: true,
-          message: 'Bicicletas obtenidas exitosamente',
+          message: 'Components obtained successfully',
           results,
         })
       }
     )
   } catch (error) {
-    console.error('Error obteniendo bicicletas:', error)
+    console.error('Error getting components:', error)
     res.status(500).json({
       success: false,
-      message: 'Error obteniendo bicicletas',
+      message: 'Error getting components',
       error: error.message,
     })
   }
 }
 
+// Gets all products that have an offer/discount
 const getProductosOferta = async (req, res) => {
   try {
     db.query(
       'SELECT * FROM vista_completa_producto WHERE  precioCompleto IS NOT NULL',
       (error, results) => {
         if (error) {
-          console.error('Error obteniendo componentes:', error)
+          console.error('Error getting offer products:', error)
           return res.status(500).json({
             success: false,
-            message: 'Error obteniendo componentes',
+            message: 'Error getting offer products',
             error: error.message,
           })
         }
 
         res.status(200).json({
           success: true,
-          message: 'Componentes obtenidos exitosamente',
+          message: 'Offer products obtained successfully',
           results,
         })
       }
     )
   } catch (error) {
-    console.error('Error obteniendo componentes:', error)
+    console.error('Error getting offer products:', error)
     res.status(500).json({
       success: false,
-      message: 'Error obteniendo componentes',
+      message: 'Error getting offer products',
       error: error.message,
     })
   }
 }
 
+// Gets a single product by its ID
 const getProductById = async (req, res) => {
   try {
     const id = parseInt(req.params.id)
@@ -130,7 +136,7 @@ const getProductById = async (req, res) => {
     if (isNaN(id)) {
       return res.status(400).json({
         success: false,
-        message: 'ID de producto inválido',
+        message: 'Invalid product ID',
       })
     }
 
@@ -139,45 +145,46 @@ const getProductById = async (req, res) => {
       [id],
       (error, results) => {
         if (error) {
-          console.error('Error obteniendo producto:', error)
+          console.error('Error getting product:', error)
           return res.status(500).json({
             success: false,
-            message: 'Error obteniendo producto',
+            message: 'Error getting product',
             error: error.message,
           })
         }
 
         res.status(200).json({
           success: true,
-          message: 'Producto obtenido exitosamente',
+          message: 'Product obtained successfully',
           results,
         })
       }
     )
   } catch (error) {
-    console.error('Error obteniendo producto:', error)
+    console.error('Error getting product:', error)
     res.status(500).json({
       success: false,
-      message: 'Error obteniendo producto',
+      message: 'Error getting product',
       error: error.message,
     })
   }
 }
 
+// Creates a MercadoPago payment preference for a product purchase
 const createPreference = async (req, res) => {
   try {
     const { producto, cantidad, idComprador } = req.body
-    // OBTENCION DE DATOS DE VENDEDOR Y COMPRADOR
+    // GET SELLER AND BUYER DATA
 
-    // Obtener información del vendedor
+    // Get seller information
     const vendedorQuery = 'SELECT * FROM usuario WHERE idUsuario = ?'
     const [vendedor] = await new Promise((resolve, reject) => {
       db.query(vendedorQuery, [producto.idVendedor], (error, results) => {
         if (error) {
-          console.error('Error obteniendo vendedor:', error)
+          console.error('Error getting seller:', error)
           return reject({
             success: false,
-            message: 'Error obteniendo vendedor',
+            message: 'Error getting seller',
             error: error.message,
           })
         }
@@ -187,19 +194,19 @@ const createPreference = async (req, res) => {
     if (!vendedor || vendedor.length === 0) {
       return res.status(404).json({
         success: false,
-        message: 'Vendedor no encontrado',
+        message: 'Seller not found',
       })
     }
 
-    // Obtener información del comprador
+    // Get buyer information
     const compradorQuery = 'SELECT * FROM usuario WHERE idUsuario = ?'
     const [comprador] = await new Promise((resolve, reject) => {
       db.query(compradorQuery, [idComprador], (error, results) => {
         if (error) {
-          console.error('Error obteniendo comprador:', error)
+          console.error('Error getting buyer:', error)
           return reject({
             success: false,
-            message: 'Error obteniendo comprador',
+            message: 'Error getting buyer',
             error: error.message,
           })
         }
@@ -209,13 +216,13 @@ const createPreference = async (req, res) => {
     if (!comprador || comprador.length === 0) {
       return res.status(404).json({
         success: false,
-        message: 'Comprador no encontrado',
+        message: 'Buyer not found',
       })
     }
 
-    // REGISTRO DE PREFERENCIA DE MERCADOPAGO EN LA BASE DE DATOS
+    // REGISTER MERCADOPAGO PREFERENCE IN DATABASE
 
-    // Crear carrito
+    // Create cart
     const carritoQuery = `
       INSERT INTO carrito (idPreferencia, idPago, idVendedor, idComprador, estado, metodoPago, precioTotal, fecha, direccionEnvio)
       VALUES (?, ?, ?, ?, 'pendiente_pago', ?, ?, NOW(), ?)
@@ -234,10 +241,10 @@ const createPreference = async (req, res) => {
     const carritoResults = await new Promise((resolve, reject) => {
       db.query(carritoQuery, carritoValues, (error, results) => {
         if (error) {
-          console.error('Error creando carrito:', error)
+          console.error('Error creating cart:', error)
           return reject({
             success: false,
-            message: 'Error creando carrito',
+            message: 'Error creating cart',
             error: error.message,
           })
         }
@@ -247,9 +254,9 @@ const createPreference = async (req, res) => {
 
     const carritoId = carritoResults.insertId
 
-    // CREACION DE PREFERENCIA DE MERCADOPAGO
+    // CREATE MERCADOPAGO PREFERENCE
 
-    // Configurar el cliente de MercadoPago con el access_token del vendedor
+    // Configure MercadoPago client with seller's access_token
     const mercadoPagoClient = new MercadoPagoConfig({
       accessToken: vendedor.mp_access_token,
       options: {
@@ -309,7 +316,7 @@ const createPreference = async (req, res) => {
     const preferenceResult = await preference.create({ body: preferenceBody })
     const idPreferenciaPago = preferenceResult.id
 
-    // Actualizar carrito con el id de la preferencia
+    // Update cart with the preference ID
     await new Promise((resolve, reject) => {
       db.query(
 
@@ -318,10 +325,10 @@ const createPreference = async (req, res) => {
         [idPreferenciaPago, carritoId],
         (error, results) => {
           if (error) {
-            console.error('Error actualizando carrito:', error)
+            console.error('Error updating cart:', error)
             return reject({
               success: false,
-              message: 'Error actualizando carrito',
+              message: 'Error updating cart',
               error: error.message,
             })
           }
@@ -330,7 +337,7 @@ const createPreference = async (req, res) => {
       )
     })
 
-    // Crear carritoProducto
+    // Create cart product relationship
     const carritoProductoQuery = `
 
       INSERT INTO carritoProducto (idCarrito, idProducto, cantidad)
@@ -349,10 +356,10 @@ const createPreference = async (req, res) => {
         carritoProductoValues,
         (error, results) => {
           if (error) {
-            console.error('Error creando carritoProducto:', error)
+            console.error('Error creating cart product:', error)
             return reject({
               success: false,
-              message: 'Error creando carritoProducto',
+              message: 'Error creating cart product',
               error: error.message,
             })
           }
@@ -363,25 +370,26 @@ const createPreference = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: 'Preferencia de MercadoPago creada exitosamente',
+      message: 'MercadoPago preference created successfully',
       preferenceId: preferenceResult.id,
       paymentURL: preferenceResult.init_point,
       preferenceResult,
     })
   } catch (error) {
-    console.error('Error creando preferencia de MercadoPago:', error)
+    console.error('Error creating MercadoPago preference:', error)
     res.status(500).json({
       success: false,
-      message: 'Error creando preferencia de MercadoPago',
+      message: 'Error creating MercadoPago preference',
       error: error.message,
       error_object: error,
     })
   }
 }
 
+// Publishes a new product to the marketplace
 const publishProducto = async (req, res) => {
   const {
-    // Datos para la tabla producto
+    // Data for the product table
     idModelo,
     idVendedor,
     idTienda,
@@ -401,9 +409,9 @@ const publishProducto = async (req, res) => {
     idMarca,
   } = req.body
 
-  // Convertir valores booleanos a 0 o 1
+  // Convert boolean values to 0 or 1
   const retiroInt = retiro ? 1 : 0
-  // Datos para la tabla del tipo correspondiente
+  // Data for the corresponding type table
   let tipoData = {}
   if (tipo === 'bicicleta') {
     tipoData = {
@@ -430,7 +438,7 @@ const publishProducto = async (req, res) => {
   }
 
   try {
-    // Insertar en la tabla producto
+    // Insert into the product table
     const modelColumns = [
       'nombre',
       'tipo',
@@ -452,10 +460,10 @@ const publishProducto = async (req, res) => {
     const modelQuery = `INSERT INTO modelo (${modelColumns.join(', ')}) VALUES (${modelPlaceholders})`
     db.query(modelQuery, modelValues, (error, results) => {
       if (error) {
-        console.error('Error publicando producto:', error)
+        console.error('Error publishing product:', error)
         return res.status(500).json({
           success: false,
-          message: 'Error al publicar el producto',
+          message: 'Error publishing product',
         })
       }
       console.log('results', results)
@@ -464,7 +472,7 @@ const publishProducto = async (req, res) => {
       if (!modeloId) {
         return res.status(500).json({
           success: false,
-          message: 'Error al obtener el id del producto',
+          message: 'Error getting product ID',
         })
       }
 
@@ -500,7 +508,7 @@ const publishProducto = async (req, res) => {
       // const [resultProduct] = await db.query(productoQuery, productoValues)
       db.query(productoQuery, productoValues, (error, results) => {
         try {
-          // Insertar en la tabla correspondiente
+          // Insert into the corresponding type table
           if (tipo === 'bicicleta') {
             tipoData['idBicicleta'] = modeloId
             const bicicletaColumns = Object.keys(tipoData).filter(
@@ -517,7 +525,7 @@ const publishProducto = async (req, res) => {
             console.log('values', bicicletaValues)
             db.query(bicicletaQuery, [...bicicletaValues], (error, results) => {
               if (error) {
-                console.error('Error publicando producto:', error)
+                console.error('Error publishing product:', error)
                 return res.status(500).json({
                   success: false,
                   message: 'Error al publicar el producto',
@@ -549,6 +557,7 @@ const publishProducto = async (req, res) => {
   }
 }
 
+// Gets available models for a product type and brand
 const getModels = async (req, res) => {
   tipo = req.params.tipo
   id = req.params.id
@@ -562,22 +571,23 @@ const getModels = async (req, res) => {
       models,
     })
   } catch (error) {
-    console.error('Error obteniendo modelos:', error)
+    console.error('Error getting models:', error)
     res.status(500).json({
       success: false,
-      message: 'Error obteniendo modelos',
+      message: 'Error getting models',
     })
   }
 }
 
+// Gets all available brands
 const getBrands = async (req, res) => {
   try {
     db.query('SELECT * FROM marca', (error, results) => {
       if (error) {
-        console.error('Error obteniendo marcas:', error)
+        console.error('Error getting brands:', error)
         return res.status(500).json({
           success: false,
-          message: 'Error obteniendo marcas',
+          message: 'Error getting brands',
         })
       }
 
@@ -587,14 +597,15 @@ const getBrands = async (req, res) => {
       })
     })
   } catch (error) {
-    console.error('Error obteniendo marcas:', error)
+    console.error('Error getting brands:', error)
     res.status(500).json({
       success: false,
-      message: 'Error obteniendo marcas',
+      message: 'Error getting brands',
     })
   }
 }
 
+// Uploads an image for a product
 const uploadImage = async (req, res) => {
   try {
     const { idProducto, file } = req.body
@@ -603,7 +614,7 @@ const uploadImage = async (req, res) => {
     if (!file) {
       return res.status(400).json({
         success: false,
-        message: 'No se proporcionó una imagen',
+        message: 'No image was provided',
       })
     }
 
@@ -615,30 +626,31 @@ const uploadImage = async (req, res) => {
 
     db.query(imageQuery, imageValues, (error, results) => {
       if (error) {
-        console.error('Error subiendo imagen:', error)
+        console.error('Error uploading image:', error)
         return res.status(500).json({
           success: false,
-          message: 'Error subiendo imagen',
+          message: 'Error uploading image',
           error: error.message,
         })
       }
 
       res.status(200).json({
         success: true,
-        message: 'Imagen subida exitosamente',
+        message: 'Image uploaded successfully',
         results,
       })
     })
   } catch (error) {
-    console.error('Error subiendo imagen:', error)
+    console.error('Error uploading image:', error)
     res.status(500).json({
       success: false,
-      message: 'Error subiendo imagen',
+      message: 'Error uploading image',
       error: error.message,
     })
   }
 }
 
+// Gets all images for a product
 const getImages = async (req, res) => {
   try {
     const { idProducto } = req.params
@@ -647,55 +659,56 @@ const getImages = async (req, res) => {
       [idProducto],
       (error, results) => {
         if (error) {
-          console.error('Error obteniendo imagenes:', error)
+          console.error('Error getting images:', error)
           return res.status(500).json({
             success: false,
-            message: 'Error obteniendo imagenes',
+            message: 'Error getting images',
             error: error.message,
           })
         }
 
         res.status(200).json({
           success: true,
-          message: 'Imagenes obtenidas exitosamente',
+          message: 'Images obtained successfully',
           results,
         })
       }
     )
   } catch (error) {
-    console.error('Error obteniendo imagenes:', error)
+    console.error('Error getting images:', error)
     res.status(500).json({
       success: false,
-      message: 'Error obteniendo imagenes',
+      message: 'Error getting images',
       error: error.message,
     })
   }
 }
 
+// Adds a new brand to the system
 const addBrand = async (req, res) => {
   try {
     const { nombre } = req.body
     db.query('INSERT INTO marca (nombre) VALUES (?)', [nombre], (error, results) => {
       if (error) {
-        console.error('Error agregando marca:', error)
+        console.error('Error adding brand:', error)
         return res.status(500).json({
           success: false,
-          message: 'Error agregando marca',
+          message: 'Error adding brand',
           error: error.message,
         })
       }
 
       res.status(200).json({
         success: true,
-        message: 'Marca agregada exitosamente',
+        message: 'Brand added successfully',
         results,
       })
     })
   } catch (error) {
-    console.error('Error agregando marca:', error)
+    console.error('Error adding brand:', error)
     res.status(500).json({
       success: false,
-      message: 'Error agregando marca',
+      message: 'Error adding brand',
       error: error.message,
     })
   }

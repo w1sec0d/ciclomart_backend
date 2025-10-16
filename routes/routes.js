@@ -32,7 +32,7 @@ const {
 const { getTiendas } = require('../controllers/tienda.js')
 
 // Search controller
-const { search } = require('../controllers/search.js')
+const { searchProducts } = require('../controllers/search.js')
 
 const {
   getProducto,
@@ -106,7 +106,7 @@ router.get('/ventas/:sellerId', getSalesBySellerId)
 router.get('/tiendas', getTiendas)
 
 // Products routes
-router.get('/search', search)
+router.get('/search', searchProducts)
 router.get('/productos', getProducto)
 router.get('/bicicletas', getBicicletas)
 router.get('/componentes', getComponentes)
@@ -124,13 +124,13 @@ router.post('/createPreference', createPreference)
 router.post('/createExposurePreference', createExposurePreference)
 
 // Products ratings routes
-router.get('/ratingProduct/:id', ratingProduct)
-router.get('/averageProductRatings/:id', averageProductRatings)
+router.get('/ratingProduct/:productId', ratingProduct)
+router.get('/averageProductRatings/:productId', averageProductRatings)
 router.post('/addRatingProduct', addRatingProduct)
 router.post('/checkUserPurchase/', checkUserPurchase)
 
 // Seller view routes
-router.get('/ratingSeller/:id', getRatingSeller)
+router.get('/ratingSeller/:sellerId', getRatingSeller)
 
 // Webhook routes
 router.post('/webhookMercadoLibre', webhookMercadoLibre)
@@ -144,7 +144,7 @@ router.delete(
 )
 
 // Purchases routes
-router.get('/purchases/:idComprador', getPurchasesById)
+router.get('/purchases/:buyerId', getPurchasesById)
 router.post('/confirmShipment/:idCarrito', confirmShipment)
 router.post('/cancelPurchase/:idCarrito', cancelPurchase)
 
