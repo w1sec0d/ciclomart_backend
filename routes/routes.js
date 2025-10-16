@@ -24,8 +24,8 @@ const {
 // Transactions controllers
 const {
   getTransacciones,
-  getCompras,
-  getVentas,
+  getPurchasesByBuyerId,
+  getSalesBySellerId,
 } = require('../controllers/transaccion.js')
 
 // Store controllers
@@ -63,9 +63,9 @@ const { getRatingSeller } = require('../controllers/vistaVendedor.js')
 const webhookMercadoLibre = require('../controllers/webhookMercadoLibre.js')
 
 const {
-  getShoppingCart,
-  addToShoppingCart,
-  removeFromShoppingCart,
+  getShoppingCartByBuyerId,
+  addToShoppingCartByBuyerId,
+  removeFromShoppingCartByBuyerId,
 } = require('../controllers/shoppingCart.js')
 
 const {
@@ -99,8 +99,8 @@ router.post('/validateCode', validateCode)
 
 // Transactions routes
 router.get('/transacciones', getTransacciones)
-router.get('/compras/:id', getCompras)
-router.get('/ventas/:id', getVentas)
+router.get('/compras/:buyerId', getPurchasesByBuyerId)
+router.get('/ventas/:sellerId', getSalesBySellerId)
 
 // Store routes
 router.get('/tiendas', getTiendas)
@@ -136,11 +136,11 @@ router.get('/ratingSeller/:id', getRatingSeller)
 router.post('/webhookMercadoLibre', webhookMercadoLibre)
 
 // Shopping cart routes
-router.get('/shoppingCart/:id', getShoppingCart)
-router.post('/addToShoppingCart', addToShoppingCart)
+router.get('/shoppingCart/:buyerId', getShoppingCartByBuyerId)
+router.post('/addToShoppingCart', addToShoppingCartByBuyerId)
 router.delete(
-  '/removeFromShoppingCart/:idUsuario/:idProducto',
-  removeFromShoppingCart
+  '/removeFromShoppingCart/:buyerId/:productId',
+  removeFromShoppingCartByBuyerId
 )
 
 // Purchases routes
