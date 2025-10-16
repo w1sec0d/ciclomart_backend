@@ -1,10 +1,8 @@
 // This controller handles purchase-related operations including viewing, confirming, and canceling purchases
 const db = require('../database/connection')
 const { refund } = require('../utils/mercadoPago')
-const { executeQuery } = require('../utils/executeQuery')
-const { handleError } = require('../utils/handleError')
-
-
+const { executeQuery } = require('../utils/dbHelpers')
+const { handleError } = require('../utils/responseHandler')
 
 // Gets all purchases for a specific buyer
 const getPurchasesById = async (req, res) => {
@@ -20,12 +18,7 @@ const getPurchasesById = async (req, res) => {
       [buyerId],
       (error, results) => {
         if (error) {
-          console.error('Error executing the query', error)
-          return res.status(500).json({
-            success: false,
-            message: 'Internal server error',
-            error: error.message,
-          })
+          handleError(res, error, 'Error executing the query')
         }
         return res.status(200).json({
           success: true,
@@ -35,7 +28,7 @@ const getPurchasesById = async (req, res) => {
       }
     )
   } catch (error) {
-    res.status(500).json({ message: 'Error getting purchases' })
+    handleError(res, error, 'Error getting purchases')
   }
 }
 
@@ -53,12 +46,7 @@ const confirmShipment = async (req, res) => {
       [idCarrito],
       (error, results) => {
         if (error) {
-          console.error('Error executing the query', error)
-          return res.status(500).json({
-            success: false,
-            message: 'Internal server error',
-            error: error.message,
-          })
+          handleError(res, error, 'Error executing the query')
         }
         return res.status(200).json({
           success: true,
@@ -67,7 +55,7 @@ const confirmShipment = async (req, res) => {
       }
     )
   } catch (error) {
-    res.status(500).json({ message: 'Error confirming shipment' })
+    handleError(res, error, 'Error confirming shipment')
   }
 }
 

@@ -1,142 +1,124 @@
 // This controller handles product rating and review operations
-const db = require('../database/connection')
+const { executeQuery } = require('../utils/dbHelpers')
+const { sendSuccess, sendError, handleError } = require('../utils/responseHandler')
+const { isValidNumber, validateRequiredFields, validateIds } = require('../utils/validation')
 
 // Gets all the ratings for a specific product
-const ratingProduct = (request, response) => {
-  const { productId } = request.params
-  const parsedProductId = parseInt(productId)
+const ratingProduct = async (request, response) => {
+  try {
+    const { productId } = request.params
 
-  if (isNaN(parsedProductId)) {
-    return response.status(400).json({
-      success: false,
-      message: 'Invalid product ID',
-    })
-  }
-
-  db.query(
-    'SELECT * FROM vista_producto_calificacion WHERE idProducto = ?',
-    [parsedProductId],
-    (error, results) => {
-      if (error) {
-        console.error('Error executing the query', error)
-        return response.status(500).json({
-          success: false,
-          message: 'Server error, try again later',
-          error: error.message,
-        })
-      }
-      return response.status(200).json({
-        success: true,
-        message: 'Ratings obtained successfully',
-        results,
-      })
+    if (!isValidNumber(productId)) {
+      return sendError(response, 'Invalid product ID', 400)
     }
-  )
+
+    const results = await executeQuery(
+      'SELECT * FROM vista_producto_calificacion WHERE idProducto = ?',
+      [productId]
+    )
+
+    return sendSuccess(response, 'Ratings obtained successfully', results)
+  } catch (error) {
+    return handleError(response, error, 'Error getting ratings')
+  }
 }
 
 // Calculates and returns the average rating of a product
-const averageProductRatings = (request, response) => {
-  const { productId } = request.params
-  const parsedProductId = parseInt(productId)
+const averageProductRatings = async (request, response) => {
+  try {
+    const { productId } = request.params
 
-  db.query(
-    'SELECT * from vista_producto_calificacion_promedio WHERE idProducto = ?',
-    [parsedProductId],
-    (error, results) => {
-      if (error) {
-        console.error('Error executing the query', error)
-        return response.status(500).json({
-          success: false,
-          message: 'Server error. Try again later',
-          error: error.message,
-        })
-      }
-      return response.status(200).json({
-        success: true,
-        message: 'Average rating obtained successfully',
-        results,
-      })
+    if (!isValidNumber(productId)) {
+      return sendError(response, 'Invalid product ID', 400)
     }
-  )
+
+    const results = await executeQuery(
+      'SELECT * from vista_producto_calificacion_promedio WHERE idProducto = ?',
+      [productId]
+    )
+
+    return sendSuccess(response, 'Average rating obtained successfully', results)
+  } catch (error) {
+    return handleError(response, error, 'Error getting average rating')
+  }
 }
 
 // Checks if a user purchased a product before allowing them to rate it
-const checkUserPurchase = (request, response) => {
-  const { buyerId, productId } = request.body
-  const parsedBuyerId = parseInt(buyerId)
-  const parsedProductId = parseInt(productId)
+const checkUserPurchase = async (request, response) => {
+  try {
+    const { buyerId, productId } = request.body
 
-  if (!parsedBuyerId || !parsedProductId) {
-    return response.status(400).json({
-      success: false,
-      message: 'The buyerId and productId are required',
-    })
-  }
-
-  db.query(
-    'SELECT * from vista_compras_usuario WHERE idUsuario = ? AND idProducto = ?',
-    [parsedBuyerId, parsedProductId],
-    (error, results) => {
-      if (error) {
-        console.error('Error executing the validation', error)
-        return response.status(500).json({
-          success: false,
-          message: 'Server error. Try again later',
-          error: error.message,
-        })
-      }
-
-      if (results.length === 0) {
-        return response.status(404).json({
-          success: false,
-          message: 'No purchases found for the user',
-        })
-      }
-
-      return response.status(200).json({
-        success: true,
-        message: 'Purchase validation obtained successfully',
-        results,
-      })
+    // Validate required fields
+    const validation = validateRequiredFields(request.body, ['buyerId', 'productId'])
+    if (!validation.isValid) {
+      return sendError(
+        response,
+        `Missing required fields: ${validation.missingFields.join(', ')}`,
+        400
+      )
     }
-  )
+
+    // Validate IDs are valid numbers
+    const idValidation = validateIds({ buyerId, productId })
+    if (!idValidation.isValid) {
+      return sendError(response, `Invalid IDs: ${idValidation.invalidIds.join(', ')}`, 400)
+    }
+
+    const results = await executeQuery(
+      'SELECT * from vista_compras_usuario WHERE idUsuario = ? AND idProducto = ?',
+      [buyerId, productId]
+    )
+
+    if (results.length === 0) {
+      return sendError(response, 'No purchases found for the user', 404)
+    }
+
+    return sendSuccess(response, 'Purchase validation obtained successfully', results)
+  } catch (error) {
+    return handleError(response, error, 'Error validating purchase')
+  }
 }
 
 // Adds a new rating/review for a product
-const addRatingProduct = (request, response) => {
-  const {
-    productId,
-    comment,
-    buyerId,
-    sellerId,
-    rating,
-    photo,
-  } = request.body
-  const parsedProductId = parseInt(productId)
-  const parsedBuyerId = parseInt(buyerId)
-  const parsedSellerId = parseInt(sellerId)
-  const parsedRating = parseInt(rating)
-  const query = `INSERT INTO calificacion (idProducto,comentario, idUsuarioComprador, idUsuarioVendedor, nota, foto) VALUES (?, ?, ?, ?, ?, ?)`
+const addRatingProduct = async (request, response) => {
+  try {
+    const { productId, comment, buyerId, sellerId, rating, photo } = request.body
 
-  db.query(
-    query,
-    [parsedProductId, comment, parsedBuyerId, parsedSellerId, parsedRating, photo],
-    (error, results) => {
-      if (error) {
-        console.error('Error executing the insertion', error)
-        return response.status(500).json({
-          success: false,
-          message: 'Server error. Try again later',
-          error: error.message,
-        })
-      }
-
-      return response.status(201).json({
-        success: true,
-        message: 'Rating added successfully',
-      })
+    // Validate required fields
+    const validation = validateRequiredFields(request.body, [
+      'productId',
+      'comment',
+      'buyerId',
+      'sellerId',
+      'rating',
+    ])
+    if (!validation.isValid) {
+      return sendError(
+        response,
+        `Missing required fields: ${validation.missingFields.join(', ')}`,
+        400
+      )
     }
-  )
+
+    // Validate IDs are valid numbers
+    const idValidation = validateIds({ productId, buyerId, sellerId })
+    if (!idValidation.isValid) {
+      return sendError(response, `Invalid IDs: ${idValidation.invalidIds.join(', ')}`, 400)
+    }
+
+    // Validate rating is between 1-5
+    if (!isValidNumber(rating) || rating < 1 || rating > 5) {
+      return sendError(response, 'Rating must be a number between 1 and 5', 400)
+    }
+
+    const query = `INSERT INTO calificacion (idProducto, comentario, idUsuarioComprador, idUsuarioVendedor, nota, foto) VALUES (?, ?, ?, ?, ?, ?)`
+
+    await executeQuery(query, [productId, comment, buyerId, sellerId, rating, photo])
+
+    return sendSuccess(response, 'Rating added successfully', null, 201)
+  } catch (error) {
+    return handleError(response, error, 'Error adding rating')
+  }
 }
 
 module.exports = {
@@ -145,3 +127,4 @@ module.exports = {
   addRatingProduct,
   checkUserPurchase,
 }
+

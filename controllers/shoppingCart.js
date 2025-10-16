@@ -1,5 +1,5 @@
 // This route is responsible for shopping cart related operations
-const { executeQuery } = require('../utils/executeQuery.js')
+const { executeQuery } = require('../utils/dbHelpers')
 
 // Gets the shopping cart of a user
 const getShoppingCartByBuyerId = async (request, response) => {

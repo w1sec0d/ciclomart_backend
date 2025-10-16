@@ -1,13 +1,14 @@
-// This route is responsible of product search
-const db = require('../database/connection')
+// This route handles product search
+const { executeQuery } = require('../utils/dbHelpers')
+const { sendSuccess, handleError } = require('../utils/responseHandler')
 
 // Performs a search for products
-const searchProducts = (request, response) => {
+const searchProducts = async (request, response) => {
   try {
     const { nombre, tipo } = request.query
 
     // Build the query based on the type of product
-    let query = ``
+    let query = ''
     const queryParams = []
 
     // If the type of product is provided, join the product with the type of product
@@ -23,29 +24,12 @@ const searchProducts = (request, response) => {
       queryParams.push(`%${nombre}%`)
     }
 
-    db.query(query, queryParams, (error, results) => {
-      if (error) {
-        console.error('Error executing the query', error)
-        return response.status(500).json({
-          success: false,
-          message: 'Internal server error',
-          error: error.message,
-        })
-      }
-      return response.status(200).json({
-        success: true,
-        message: 'Search performed successfully',
-        results,
-      })
-    })
+    const results = await executeQuery(query, queryParams)
+    return sendSuccess(response, 'Search performed successfully', results)
   } catch (error) {
-    console.error('Server error', error)
-    return response.status(500).json({
-      success: false,
-      message: 'Internal server error',
-      error: error.message,
-    })
+    return handleError(response, error, 'Error performing search')
   }
 }
 
 module.exports = { searchProducts }
+
