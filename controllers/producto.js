@@ -112,7 +112,7 @@ const createPreference = async (req, res) => {
 
     // Configure MercadoPago client with seller's access_token
     const mercadoPagoClient = new MercadoPagoConfig({
-      accessToken: vendedor.mp_access_token,
+      accessToken: vendedor.mp_access_token || process.env.MP_ACCESS_TOKEN,
       options: {
         idempotencyKey: Math.random().toString(36).substring(2) + Date.now().toString(36),
       },

@@ -23,5 +23,5 @@ db.getConnection((err, connection) => {
 })
 
 // TODO: Add new spare parts and diversify current bikes
-
+// TODO: Fix user phone null issue
 module.exports = db
