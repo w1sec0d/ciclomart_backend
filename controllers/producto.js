@@ -97,6 +97,15 @@ const createPreference = async (req, res) => {
       return sendError(res, 'A user cannot buy from themselves in marketplace mode', 400)
     }
 
+    if (vendedor.mp_user_id && comprador.mp_user_id && vendedor.mp_user_id === comprador.mp_user_id) {
+      return sendError(res, 'Buyer and seller cannot have the same Mercado Pago account', 400)
+    }
+
+    // Verificar que el vendedor tenga credenciales de OAuth
+    if (!vendedor.mp_access_token || !vendedor.mp_user_id) {
+      return sendError(res, 'Seller must complete OAuth authentication first', 400)
+    }
+
     // Create cart
     const carritoResults = await executeQuery(
       `INSERT INTO carrito (idPreferencia, idPago, idVendedor, idComprador, estado, metodoPago, precioTotal, fecha, direccionEnvio)
