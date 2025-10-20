@@ -162,6 +162,8 @@ const createPreference = async (req, res) => {
         },
       },
       payment_methods: {
+        excluded_payment_methods: [],
+        excluded_payment_types: [],
         default_installments: 1,
       },
       back_urls: {
