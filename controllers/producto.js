@@ -93,6 +93,10 @@ const createPreference = async (req, res) => {
       return sendError(res, 'Buyer not found', 404)
     }
 
+    if (producto.idVendedor === idComprador) {
+      return sendError(res, 'A user cannot buy from themselves in marketplace mode', 400)
+    }
+
     // Create cart
     const carritoResults = await executeQuery(
       `INSERT INTO carrito (idPreferencia, idPago, idVendedor, idComprador, estado, metodoPago, precioTotal, fecha, direccionEnvio)
