@@ -179,8 +179,19 @@ const createPreference = async (req, res) => {
     const preferenceResult = await preference.create({ body: preferenceBody })
     const idPreferenciaPago = preferenceResult.id
 
+    // AGREGAR ESTOS LOGS:
+    console.log('=== PREFERENCE CREATED ===')
+    console.log('Preference ID:', preferenceResult.id)
+    console.log('Collector ID:', preferenceResult.collector_id)
+    console.log('Marketplace:', preferenceResult.marketplace)
+    console.log('Payment Methods:', preferenceResult.payment_methods)
+    console.log('Excluded Payment Methods:', preferenceResult.payment_methods?.excluded_payment_methods)
+    console.log('Excluded Payment Types:', preferenceResult.payment_methods?.excluded_payment_types)
+    console.log('Init Point (Producción):', preferenceResult.init_point)
+    console.log('Sandbox Init Point:', preferenceResult.sandbox_init_point)
     console.log('preferenceBody', preferenceBody)
     console.log('preferenceResult', preferenceResult)
+    console.log('===============================================')
 
     // Update cart with the preference ID
     await executeQuery(
