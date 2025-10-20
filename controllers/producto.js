@@ -110,9 +110,11 @@ const createPreference = async (req, res) => {
 
     const carritoId = carritoResults.insertId
 
+    console.log('vendedor.mp_access_token', vendedor.mp_access_token)
+
     // Configure MercadoPago client with seller's access_token
     const mercadoPagoClient = new MercadoPagoConfig({
-      accessToken: vendedor.mp_access_token || process.env.MP_ACCESS_TOKEN,
+      accessToken: vendedor.mp_access_token,
       options: {
         idempotencyKey: Math.random().toString(36).substring(2) + Date.now().toString(36),
       },
@@ -163,6 +165,9 @@ const createPreference = async (req, res) => {
 
     const preferenceResult = await preference.create({ body: preferenceBody })
     const idPreferenciaPago = preferenceResult.id
+
+    console.log('preferenceBody', preferenceBody)
+    console.log('preferenceResult', preferenceResult)
 
     // Update cart with the preference ID
     await executeQuery(

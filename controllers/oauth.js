@@ -44,7 +44,6 @@ const oauthCallback = async (req, res) => {
     // Save the tokens and user_id in the database
     const { access_token, public_key, refresh_token, user_id } = oauthResponse.data
 
-    // TODO: the mp_public_key is the same for all users, so that field should be removed from the database  
     await updateById('usuario', 'idUsuario', idUsuario, {
       mp_access_token: access_token,
       mp_refresh_token: refresh_token,
