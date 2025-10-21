@@ -81,6 +81,12 @@ const {
 
 const { oauthCallback } = require('../controllers/oauth.js')
 
+const { preferenceTest } = require('../controllers/preferenceTest.js')
+
+const { debugPreference } = require('../controllers/debugPreference.js')
+
+const { debugPayment } = require('../controllers/debugPayment.js')
+
 // Users routes
 router.get('/getUser', getUser)
 router.get('/getUsuarioPhoto/:id', getUsuarioPhoto)
@@ -153,5 +159,12 @@ router.post('/answerQuestion', answerQuestions)
 
 // OAuth Authentication routes
 router.get('/oauth/callback', oauthCallback)
+
+// Preference test
+router.get('/preferenceTest', preferenceTest)
+
+// Debug routes
+router.get('/debug/preference', debugPreference)
+router.get('/debug/payment', debugPayment)
 
 module.exports = router

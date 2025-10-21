@@ -147,25 +147,20 @@ const createPreference = async (req, res) => {
           unit_price: Number(producto.precio),
         },
       ],
-      payer: {
-        name: comprador.nombre,
-        surname: comprador.apellido,
-        email: comprador.correo,
-        phone: {
-          area_code: '57',
-          number: comprador.telefono,
-        },
-        address: {
-          zip_code: comprador.codigoPostal,
-          street_name: comprador.direccionNombre,
-          street_number: comprador.direccionNumero,
-        },
-      },
-      payment_methods: {
-        excluded_payment_methods: [],
-        excluded_payment_types: [],
-        default_installments: 1,
-      },
+      // payer: {
+      //   name: comprador.nombre,
+      //   surname: comprador.apellido,
+      //   email: comprador.correo,
+      //   phone: {
+      //     area_code: '57',
+      //     number: comprador.telefono,
+      //   },
+      //   address: {
+      //     zip_code: comprador.codigoPostal,
+      //     street_name: comprador.direccionNombre,
+      //     street_number: comprador.direccionNumero,
+      //   },
+      // },
       back_urls: {
         success: process.env.FRONTEND_EXTERNAL_URL + '/requestResult/purchaseComplete',
         failure: process.env.FRONTEND_EXTERNAL_URL + '/requestResult/purchaseFailed',
@@ -209,7 +204,7 @@ const createPreference = async (req, res) => {
 
     return sendSuccess(res, 'MercadoPago preference created successfully', {
       preferenceId: preferenceResult.id,
-      paymentURL: preferenceResult.init_point,
+      paymentURL: preferenceResult.sandbox_init_point,
       preferenceResult,
     })
   } catch (error) {
