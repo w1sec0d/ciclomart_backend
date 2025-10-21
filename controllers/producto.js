@@ -3,6 +3,7 @@ const { MercadoPagoConfig, Preference } = require('mercadopago')
 const { executeQuery, findUserById, insert } = require('../utils/dbHelpers')
 const { sendSuccess, sendError, handleError } = require('../utils/responseHandler')
 const { isValidNumber, validateRequiredFields } = require('../utils/validation')
+const axios = require('axios')
 const calculateFee = require('../utils/calculateFee')
 
 // Gets all products from the database
@@ -125,21 +126,13 @@ const createPreference = async (req, res) => {
 
     console.log('vendedor.mp_access_token', vendedor.mp_access_token)
 
-    // Configure MercadoPago client with seller's access_token
-    const mercadoPagoClient = new MercadoPagoConfig({
-      accessToken: vendedor.mp_access_token,
-      options: {
-        idempotencyKey: Math.random().toString(36).substring(2) + Date.now().toString(36),
-      },
-    })
-    const preference = new Preference(mercadoPagoClient)
-
+    // Preparar el body de la preferencia
     const preferenceBody = {
       items: [
         {
-          id: producto.idProducto,
+          id: String(producto.idProducto),
           title: producto.nombre,
-          description: producto.descripcionModelo,
+          description: producto.descripcionModelo || 'Sin descripción',
           picture_url: producto.imagenURL,
           category_id: producto.tipo,
           quantity: Number(cantidad),
@@ -166,18 +159,32 @@ const createPreference = async (req, res) => {
         failure: process.env.FRONTEND_EXTERNAL_URL + '/requestResult/purchaseFailed',
         pending: process.env.FRONTEND_EXTERNAL_URL + '/requestResult/purchasePending',
       },
-      notification_url: process.env.BACKEND_URL + '/webhookMercadoLibre',
+      notification_url: process.env.BACKEND_URL + '/api/webhookMercadoLibre',
       statement_descriptor: 'Compra CicloMart',
       auto_return: 'approved',
       external_reference: String(carritoId),
       marketplace_fee: calculateFee(producto.tipo, producto.precio),
     }
 
-    const preferenceResult = await preference.create({ body: preferenceBody })
+    console.log('preferenceBody', JSON.stringify(preferenceBody, null, 2))
+
+    const preferenceResponse = await axios.post(
+      'https://api.mercadopago.com/checkout/preferences',
+      preferenceBody,
+      {
+        headers: {
+          'Authorization': `Bearer ${vendedor.mp_access_token}`,
+          'Content-Type': 'application/json',
+          'X-Idempotency-Key': Math.random().toString(36).substring(2) + Date.now().toString(36)
+        }
+      }
+    )
+
+    const preferenceResult = preferenceResponse.data
     const idPreferenciaPago = preferenceResult.id
 
-    // AGREGAR ESTOS LOGS:
-    console.log('=== PREFERENCE CREATED ===')
+    // LOGS DE DEBUG
+    console.log('=== PREFERENCE CREATED WITH AXIOS ===')
     console.log('Preference ID:', preferenceResult.id)
     console.log('Collector ID:', preferenceResult.collector_id)
     console.log('Marketplace:', preferenceResult.marketplace)
@@ -186,8 +193,6 @@ const createPreference = async (req, res) => {
     console.log('Excluded Payment Types:', preferenceResult.payment_methods?.excluded_payment_types)
     console.log('Init Point (Producción):', preferenceResult.init_point)
     console.log('Sandbox Init Point:', preferenceResult.sandbox_init_point)
-    console.log('preferenceBody', preferenceBody)
-    console.log('preferenceResult', preferenceResult)
     console.log('===============================================')
 
     // Update cart with the preference ID
@@ -204,10 +209,13 @@ const createPreference = async (req, res) => {
 
     return sendSuccess(res, 'MercadoPago preference created successfully', {
       preferenceId: preferenceResult.id,
-      paymentURL: preferenceResult.init_point,
+      paymentURL: preferenceResult.sandbox_init_point || preferenceResult.init_point,
+      sandboxURL: preferenceResult.sandbox_init_point,
+      productionURL: preferenceResult.init_point,
       preferenceResult,
     })
   } catch (error) {
+    console.error('Error creating preference:', error.response?.data || error.message)
     return handleError(res, error, 'Error creating MercadoPago preference')
   }
 }
