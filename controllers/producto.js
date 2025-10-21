@@ -163,7 +163,7 @@ const createPreference = async (req, res) => {
       statement_descriptor: 'Compra CicloMart',
       auto_return: 'approved',
       external_reference: String(carritoId),
-      marketplace_fee: calculateFee(producto.tipo, producto.precio),
+      // marketplace_fee: calculateFee(producto.tipo, producto.precio),
     }
 
     console.log('preferenceBody', JSON.stringify(preferenceBody, null, 2))
