@@ -91,7 +91,7 @@ const debugPayment = async (req, res) => {
 
         // Buscar en la base de datos local
         const cartItems = await executeQuery(
-            'SELECT * FROM carrito WHERE idPreferencia = ? OR external_reference = ?',
+            'SELECT * FROM carrito WHERE idPreferencia = ?',
             [preferenceId, preferenceDetails.external_reference]
         )
 
