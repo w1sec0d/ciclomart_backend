@@ -26,7 +26,6 @@ const oauthCallback = async (req, res) => {
       client_id: process.env.MP_CLIENT_ID,
       code: code,
       redirect_uri: process.env.MP_REDIRECT_URL,
-      test_token: true,
       grant_type: 'authorization_code',
     }
 
