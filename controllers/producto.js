@@ -147,20 +147,20 @@ const createPreference = async (req, res) => {
           unit_price: Number(producto.precio),
         },
       ],
-      // payer: {
-      //   name: comprador.nombre,
-      //   surname: comprador.apellido,
-      //   email: comprador.correo,
-      //   phone: {
-      //     area_code: '57',
-      //     number: comprador.telefono,
-      //   },
-      //   address: {
-      //     zip_code: comprador.codigoPostal,
-      //     street_name: comprador.direccionNombre,
-      //     street_number: comprador.direccionNumero,
-      //   },
-      // },
+      payer: {
+        name: comprador.nombre,
+        surname: comprador.apellido,
+        email: comprador.correo,
+        phone: {
+          area_code: '57',
+          number: comprador.telefono,
+        },
+        address: {
+          zip_code: comprador.codigoPostal,
+          street_name: comprador.direccionNombre,
+          street_number: comprador.direccionNumero,
+        },
+      },
       back_urls: {
         success: process.env.FRONTEND_EXTERNAL_URL + '/requestResult/purchaseComplete',
         failure: process.env.FRONTEND_EXTERNAL_URL + '/requestResult/purchaseFailed',
@@ -169,7 +169,7 @@ const createPreference = async (req, res) => {
       notification_url: process.env.BACKEND_URL + '/webhookMercadoLibre',
       statement_descriptor: 'Compra CicloMart',
       auto_return: 'approved',
-      external_reference: carritoId,
+      external_reference: String(carritoId),
       marketplace_fee: calculateFee(producto.tipo, producto.precio),
     }
 
