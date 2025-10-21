@@ -46,7 +46,7 @@ const createExposurePreference = async (req, res) => {
 
     return sendSuccess(res, 'MercadoPago preference created successfully', {
       preferenceId: result.id,
-      paymentURL: result.sandbox_init_point,
+      paymentURL: result.init_point,
       result,
     })
   } catch (error) {
