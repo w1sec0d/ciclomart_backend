@@ -4,7 +4,7 @@ const { sendSuccess, sendError, handleError } = require('../utils/responseHandle
 const { isValidNumber } = require('../utils/validation')
 
 // Gets all the transactions
-const getTransacciones = async (request, response) => {
+const getTransactions = async (request, response) => {
   try {
     const results = await executeQuery('SELECT * FROM transaccion')
     return sendSuccess(response, 'Transactions obtained successfully', results)
@@ -53,4 +53,4 @@ const getSalesBySellerId = async (request, response) => {
   }
 }
 
-module.exports = { getTransacciones, getPurchasesByBuyerId, getSalesBySellerId }
+module.exports = { getTransactions, getPurchasesByBuyerId, getSalesBySellerId }

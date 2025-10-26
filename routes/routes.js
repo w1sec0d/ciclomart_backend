@@ -5,10 +5,10 @@ const router = express.Router()
 // Users controllers
 const {
   getUser,
-  registerUsuario,
-  getUsuarioPhoto,
-  updateUsuarioFoto,
-  updateUsuarioDireccion,
+  registerUser,
+  getUserPhoto,
+  updateUserPhoto,
+  updateUserAddress,
 } = require('../controllers/usuario.js')
 
 // Authentication controllers
@@ -22,29 +22,29 @@ const {
 
 // Transactions controllers
 const {
-  getTransacciones,
+  getTransactions,
   getPurchasesByBuyerId,
   getSalesBySellerId,
 } = require('../controllers/transaccion.js')
 
 // Store controllers
-const { getTiendas } = require('../controllers/tienda.js')
+const { getStores } = require('../controllers/tienda.js')
 
 // Search controller
 const { searchProducts } = require('../controllers/search.js')
 
 const {
-  getProducto,
+  getProduct,
   getProductById,
   createPreference,
-  publishProducto,
+  publishProduct,
   getModels,
   getBrands,
   uploadImage,
   getImages,
-  getBicicletas,
-  getComponentes,
-  getProductosOferta,
+  getBicycles,
+  getComponents,
+  getProductsOnOffer,
   addBrand
 } = require('../controllers/producto.js')
 
@@ -80,19 +80,16 @@ const {
 } = require('../controllers/questions.js')
 
 const { oauthCallback } = require('../controllers/oauth.js')
-
 const { preferenceTest } = require('../controllers/preferenceTest.js')
-
 const { debugPreference } = require('../controllers/debugPreference.js')
-
 const { debugPayment } = require('../controllers/debugPayment.js')
 
 // Users routes
 router.get('/getUser', getUser)
-router.get('/getUsuarioPhoto/:id', getUsuarioPhoto)
-router.post('/usuarios', registerUsuario)
-router.put('/updateUsuarioFoto/:idUsuario', updateUsuarioFoto)
-router.put('/updateUsuarioDireccion/:idUsuario', updateUsuarioDireccion)
+router.get('/getUserPhoto/:id', getUserPhoto)
+router.post('/users', registerUser)
+router.put('/updateUserPhoto/:idUser', updateUserPhoto)
+router.put('/updateUserAddress/:idUser', updateUserAddress)
 
 // Authentication routes
 router.post('/login', login)
@@ -102,23 +99,23 @@ router.post('/sendRegisterCode', sendRegisterCode)
 router.post('/validateCode', validateCode)
 
 // Transactions routes
-router.get('/transacciones', getTransacciones)
-router.get('/compras/:buyerId', getPurchasesByBuyerId)
-router.get('/ventas/:sellerId', getSalesBySellerId)
+router.get('/transactions', getTransactions)
+router.get('/purchases/:buyerId', getPurchasesByBuyerId)
+router.get('/sales/:sellerId', getSalesBySellerId)
 
 // Store routes
-router.get('/tiendas', getTiendas)
+router.get('/stores', getStores)
 
 // Products routes
 router.get('/search', searchProducts)
-router.get('/productos', getProducto)
-router.get('/bicicletas', getBicicletas)
-router.get('/componentes', getComponentes)
-router.get('/ofertas', getProductosOferta)
-router.post('/addProduct', publishProducto)
+router.get('/products', getProduct)
+router.get('/bicycles', getBicycles)
+router.get('/components', getComponents)
+router.get('/offers', getProductsOnOffer)
+router.post('/addProduct', publishProduct)
 router.get('/models/:tipo/:id', getModels)
 router.get('/brands', getBrands)
-router.get('/productos/:id', getProductById)
+router.get('/products/:id', getProductById)
 router.post('/uploadImage', uploadImage)
 router.get('/images/:id', getImages)
 router.post('/addBrand', addBrand)
