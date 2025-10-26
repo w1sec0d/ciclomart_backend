@@ -7,7 +7,7 @@ const axios = require('axios')
 const calculateFee = require('../utils/calculateFee')
 
 // Gets all products from the database
-const getProducto = async (req, res) => {
+const getProduct = async (req, res) => {
   try {
     const results = await executeQuery('SELECT * FROM vista_completa_producto')
     return sendSuccess(res, 'Products obtained successfully', results)
@@ -17,7 +17,7 @@ const getProducto = async (req, res) => {
 }
 
 // Gets all bicycles (filtered products)
-const getBicicletas = async (req, res) => {
+const getBicycles = async (req, res) => {
   try {
     const results = await executeQuery('SELECT * FROM vista_completa_producto WHERE tipo = "bicicleta"')
     return sendSuccess(res, 'Bicycles obtained successfully', results)
@@ -27,7 +27,7 @@ const getBicicletas = async (req, res) => {
 }
 
 // Gets all components (filtered products)
-const getComponentes = async (req, res) => {
+const getComponents = async (req, res) => {
   try {
     const results = await executeQuery('SELECT * FROM vista_completa_producto WHERE tipo = "componente"')
     return sendSuccess(res, 'Components obtained successfully', results)
@@ -37,7 +37,7 @@ const getComponentes = async (req, res) => {
 }
 
 // Gets all products that have an offer/discount
-const getProductosOferta = async (req, res) => {
+const getProductsOnOffer = async (req, res) => {
   try {
     const results = await executeQuery('SELECT * FROM vista_completa_producto WHERE precioCompleto IS NOT NULL')
     return sendSuccess(res, 'Offer products obtained successfully', results)
@@ -221,7 +221,7 @@ const createPreference = async (req, res) => {
 }
 
 // Publishes a new product to the marketplace
-const publishProducto = async (req, res) => {
+const publishProduct = async (req, res) => {
   try {
     const {
       idVendedor,
@@ -410,13 +410,13 @@ const addBrand = async (req, res) => {
 }
 
 module.exports = {
-  getProducto,
-  getBicicletas,
-  getComponentes,
-  getProductosOferta,
+  getProduct,
+  getBicycles,
+  getComponents,
+  getProductsOnOffer,
   getProductById,
   createPreference,
-  publishProducto,
+  publishProduct,
   getModels,
   getBrands,
   uploadImage,

@@ -6,7 +6,7 @@ const { extractBearerToken, verifyJwtToken } = require('../utils/authHelpers')
 const bcrypt = require('bcrypt')
 
 // Registers a new user
-const registerUsuario = async (request, response) => {
+const registerUser = async (request, response) => {
   try {
     const { nombre, apellido, email, password, telefono } = request.body
 
@@ -66,7 +66,7 @@ const getUser = async (request, response) => {
 }
 
 // Gets a user's photo by their ID
-const getUsuarioPhoto = async (request, response) => {
+const getUserPhoto = async (request, response) => {
   try {
     const { id } = request.params
 
@@ -87,10 +87,10 @@ const getUsuarioPhoto = async (request, response) => {
 }
 
 // Updates a user's photo
-const updateUsuarioFoto = async (request, response) => {
+const updateUserPhoto = async (request, response) => {
   try {
     const { photoUrl } = request.body
-    const { idUsuario } = request.params
+    const { idUser } = request.params
 
     // Validate required fields
     const validation = validateRequiredFields(request.body, ['photoUrl'])
@@ -98,7 +98,7 @@ const updateUsuarioFoto = async (request, response) => {
       return sendError(response, 'No photo URL provided', 400)
     }
 
-    if (!isValidNumber(idUsuario)) {
+    if (!isValidNumber(idUser)) {
       return sendError(response, 'Invalid user ID', 400)
     }
 
@@ -107,7 +107,7 @@ const updateUsuarioFoto = async (request, response) => {
       VALUES (?, ?)
       ON DUPLICATE KEY UPDATE url = VALUES(url)
     `
-    await executeQuery(query, [idUsuario, photoUrl])
+    await executeQuery(query, [idUser, photoUrl])
 
     return sendSuccess(response, 'User photo updated successfully')
   } catch (error) {
@@ -116,14 +116,14 @@ const updateUsuarioFoto = async (request, response) => {
 }
 
 // Updates a user's address
-const updateUsuarioDireccion = async (req, res) => {
+const updateUserAddress = async (request, response) => {
   try {
-    const { idUsuario } = req.params
-    const addressData = req.body
+    const { idUser } = request.params
+    const addressData = request.body
 
     // Validate user ID
-    if (!isValidNumber(idUsuario)) {
-      return sendError(res, 'Invalid user ID', 400)
+    if (!isValidNumber(idUser)) {
+      return sendError(response, 'Invalid user ID', 400)
     }
 
     // Validate required fields
@@ -134,22 +134,22 @@ const updateUsuarioDireccion = async (req, res) => {
       'direccionCiudad'
     ])
     if (!validation.isValid) {
-      return sendError(res, `Missing required fields: ${validation.missingFields.join(', ')}`, 400)
+      return sendError(response, `Missing required fields: ${validation.missingFields.join(', ')}`, 400)
     }
 
     // Update address using helper
-    await updateById('usuario', 'idUsuario', idUsuario, addressData)
+    await updateById('usuario', 'idUsuario', idUser, addressData)
 
-    return sendSuccess(res, 'Address updated successfully', addressData)
+    return sendSuccess(response, 'Address updated successfully', addressData)
   } catch (error) {
-    return handleError(res, error, 'Error updating address')
+    return handleError(response, error, 'Error updating address')
   }
 }
 
 module.exports = {
   getUser,
-  getUsuarioPhoto,
-  registerUsuario,
-  updateUsuarioFoto,
-  updateUsuarioDireccion,
+  getUserPhoto,
+  registerUser,
+  updateUserPhoto,
+  updateUserAddress,
 }
