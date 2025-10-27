@@ -4,6 +4,7 @@ const { Payment } = require('mercadopago')
 const { MercadoPagoConfig } = require('mercadopago')
 
 const webhookMercadoLibre = async (req, res) => {
+  console.log('Webhook de Mercado Libre recibido')
   const { body } = req
   console.log('Webhook de Mercado Libre:', JSON.stringify(body, null, 2))
 
