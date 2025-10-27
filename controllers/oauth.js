@@ -26,8 +26,6 @@ const oauthCallback = async (req, res) => {
       client_id: process.env.MP_CLIENT_ID,
       code: code,
       redirect_uri: process.env.MP_REDIRECT_URL,
-      grant_type: 'authorization_code',
-      test_token: true,
     }
 
     // Send the request to MercadoPago API using axios
