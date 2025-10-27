@@ -209,7 +209,7 @@ const createPreference = async (req, res) => {
 
     return sendSuccess(res, 'MercadoPago preference created successfully', {
       preferenceId: preferenceResult.id,
-      paymentURL: preferenceResult.sandbox_init_point || preferenceResult.init_point,
+      paymentURL: preferenceResult.init_point || preferenceResult.sandbox_init_point,
       sandboxURL: preferenceResult.sandbox_init_point,
       productionURL: preferenceResult.init_point,
       preferenceResult,
