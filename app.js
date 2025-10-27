@@ -14,18 +14,7 @@ app.use(bodyParser.json()) // Convert the request body to a JS object
 
 // Only allow requests from the authorized frontend
 const corsOptions = {
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps, curl, Postman, webhooks)
-    if (!origin) return callback(null, true)
-
-    // Allow requests from frontend
-    if (origin === process.env.FRONTEND_INTERNAL_URL) {
-      return callback(null, true)
-    }
-
-    // Reject other origins
-    callback(new Error('Not allowed by CORS'))
-  },
+  origin: process.env.FRONTEND_INTERNAL_URL,
   optionsSuccessStatus: 200,
 }
 app.use(cors(corsOptions))
