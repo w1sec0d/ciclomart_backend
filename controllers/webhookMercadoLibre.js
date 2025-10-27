@@ -1,52 +1,58 @@
+// This route is responsible for listening to notifications produced by Mercado Pago (Payment Gateway)
+// like the payment confirmations made by the users
 const { executeQuery } = require('../utils/dbHelpers')
 const { sendSuccess, handleError } = require('../utils/responseHandler')
+const { mercadoPagoClient } = require('../utils/mercadoPago')
 const { Payment } = require('mercadopago')
-const { MercadoPagoConfig } = require('mercadopago')
+const payment = new Payment(mercadoPagoClient)
 
 const webhookMercadoLibre = async (req, res) => {
-  console.log('Webhook de Mercado Libre recibido')
-  const { body } = req
-  console.log('Webhook de Mercado Libre:', JSON.stringify(body, null, 2))
+  try {
+    const { body } = req
+    console.log('Webhook de Mercado Libre:', body)
 
-  sendSuccess(res, 'Webhook received', body)
-
-  if (body.action === 'payment.created') {
-    try {
+    // a notification of payment confirmation is received
+    if (body.action === 'payment.created') {
       const paymentId = body.data.id
-      console.log('=== PROCESANDO PAGO ===')
-      console.log('Payment ID:', paymentId)
+      const paymentResponse = await payment.get({ id: paymentId })
+      const { status, external_reference } = paymentResponse
+      console.log('paymentResponse', paymentResponse)
 
-      // En TEST, buscar el carrito más reciente pendiente de pago para este vendedor
-      const carts = await executeQuery(
-        `SELECT idCarrito, external_reference 
-         FROM carrito 
-         WHERE estado='pendiente_pago' 
-         AND idVendedor IN (
-           SELECT idUsuario FROM usuario WHERE mp_user_id = ?
-         )
-         ORDER BY fecha DESC 
-         LIMIT 1`,
-        [body.user_id]
-      )
+      if (status === 'approved') {
+        const [category, idProducto, grade] = external_reference.split('-')
 
-      if (carts && carts.length > 0) {
-        const cartId = carts[0].idCarrito
+        if (category === 'exposicion') {
+          // If the payment is for an exposure, update the product exposure
+          console.log(
+            'EXPOSURE PAYMENT RECEIVED',
+            'CATEGORY',
+            category,
+            'PRODUCT ID',
+            idProducto,
+            'GRADE',
+            grade
+          )
 
-        await executeQuery(
-          "UPDATE carrito SET estado='pendiente_envio', idPago = ? WHERE idCarrito = ?",
-          [paymentId, cartId]
-        )
-        console.log('Cart updated successfully:', cartId)
-      } else {
-        console.log('No se encontró carrito pendiente para este vendedor')
+          await executeQuery(
+            'UPDATE producto SET exposicion = ? WHERE idProducto = ?',
+            [grade, idProducto]
+          )
+          console.log('Product updated successfully')
+        } else {
+          // If the payment is for a purchase, update the cart status
+          await executeQuery(
+            "UPDATE carrito SET estado='pendiente_envio', idPago = ? WHERE idCarrito = ?",
+            [paymentId, external_reference]
+          )
+          console.log('Cart status updated successfully')
+        }
       }
-
-      console.log('=== PAGO PROCESADO EXITOSAMENTE ===')
-    } catch (error) {
-      console.error('Error processing webhook:', error)
     }
+
+    return sendSuccess(res, 'Webhook received', body)
+  } catch (error) {
+    return handleError(res, error, 'Error processing webhook')
   }
 }
-
 
 module.exports = webhookMercadoLibre
