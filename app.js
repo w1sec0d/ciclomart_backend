@@ -19,17 +19,6 @@ const corsOptions = {
 }
 app.use(cors(corsOptions))
 
-app.use((req, res, next) => {
-  if (req.path.includes('webhook')) {
-    console.log('=== PETICIÓN WEBHOOK INTERCEPTADA ===')
-    console.log('Path:', req.path)
-    console.log('Method:', req.method)
-    console.log('Headers:', req.headers)
-    console.log('Body:', req.body)
-  }
-  next()
-})
-
 // Show the request logs in the console
 morgan.token('requestBody', (request) => JSON.stringify(request.body))
 app.use(morgan(' :method :url :response-time :requestBody'))
