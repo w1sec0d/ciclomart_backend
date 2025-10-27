@@ -159,7 +159,7 @@ const createPreference = async (req, res) => {
         failure: process.env.FRONTEND_EXTERNAL_URL + '/requestResult/purchaseFailed',
         pending: process.env.FRONTEND_EXTERNAL_URL + '/requestResult/purchasePending',
       },
-      notification_url: process.env.BACKEND_URL + '/api/webhookMercadoLibre',
+      notification_url: process.env.BACKEND_URL + '/webhookMercadoLibre',
       statement_descriptor: 'Compra CicloMart',
       auto_return: 'approved',
       external_reference: String(carritoId),
