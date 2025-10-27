@@ -4,85 +4,49 @@ const { Payment } = require('mercadopago')
 const { MercadoPagoConfig } = require('mercadopago')
 
 const webhookMercadoLibre = async (req, res) => {
+  console.log('Webhook de Mercado Libre recibido')
   const { body } = req
   console.log('Webhook de Mercado Libre:', JSON.stringify(body, null, 2))
 
   sendSuccess(res, 'Webhook received', body)
 
   if (body.action === 'payment.created') {
-    processPayment(body.data.id).catch(error => {
-      console.error('Error procesando pago en webhook:', error)
-    })
-  }
-}
-
-async function processPayment(paymentId, retryCount = 0) {
-  try {
-    console.log('=== PROCESANDO PAGO ===')
-    console.log('Payment ID:', paymentId)
-    console.log('Intento:', retryCount + 1)
-
-    // Primero, obtener información básica del pago usando las credenciales del integrador
-    const integratorClient = new MercadoPagoConfig({
-      accessToken: process.env.MP_ACCESS_TOKEN,
-    })
-    const integratorPayment = new Payment(integratorClient)
-
-    let paymentInfo
     try {
-      paymentInfo = await integratorPayment.get({ id: paymentId })
-      console.log('Payment info obtenida:', {
-        status: paymentInfo.status,
-        external_reference: paymentInfo.external_reference,
-        collector_id: paymentInfo.collector_id
-      })
-    } catch (error) {
-      console.error('Error obteniendo info del pago:', error.message)
+      const paymentId = body.data.id
+      console.log('=== PROCESANDO PAGO ===')
+      console.log('Payment ID:', paymentId)
 
-      // Si es error 404 y aún no hemos reintentado mucho, esperar y reintentar
-      if (error.status === 404 && retryCount < 3) {
-        const delaySeconds = (retryCount + 1) * 2 // 2s, 4s, 6s
-        console.log(`Payment not found, reintentando en ${delaySeconds} segundos...`)
+      // En TEST, buscar el carrito más reciente pendiente de pago para este vendedor
+      const carts = await executeQuery(
+        `SELECT idCarrito, external_reference 
+         FROM carrito 
+         WHERE estado='pendiente_pago' 
+         AND idVendedor IN (
+           SELECT idUsuario FROM usuario WHERE mp_user_id = ?
+         )
+         ORDER BY fecha DESC 
+         LIMIT 1`,
+        [body.user_id]
+      )
 
-        await new Promise(resolve => setTimeout(resolve, delaySeconds * 1000))
-        return processPayment(paymentId, retryCount + 1)
-      }
-
-      console.log('No se pudo obtener el pago después de varios intentos')
-      return
-    }
-
-    const { status, external_reference } = paymentInfo
-
-    if (status === 'approved') {
-      const [category, idProducto, grade] = external_reference.split('-')
-
-      if (category === 'exposicion') {
-        console.log('EXPOSURE PAYMENT RECEIVED', 'PRODUCT ID:', idProducto, 'GRADE:', grade)
-
-        await executeQuery(
-          'UPDATE producto SET exposicion = ? WHERE idProducto = ?',
-          [grade, idProducto]
-        )
-        console.log('Product exposure updated successfully')
-      } else {
-        console.log('PURCHASE PAYMENT RECEIVED', 'CART ID:', external_reference, 'PAYMENT ID:', paymentId)
+      if (carts && carts.length > 0) {
+        const cartId = carts[0].idCarrito
 
         await executeQuery(
           "UPDATE carrito SET estado='pendiente_envio', idPago = ? WHERE idCarrito = ?",
-          [paymentId, external_reference]
+          [paymentId, cartId]
         )
-        console.log('Cart status updated successfully')
+        console.log('Cart updated successfully:', cartId)
+      } else {
+        console.log('No se encontró carrito pendiente para este vendedor')
       }
-    } else {
-      console.log('Payment status is not approved:', status)
-    }
 
-    console.log('=== PAGO PROCESADO EXITOSAMENTE ===')
-  } catch (error) {
-    console.error('Error fatal en processPayment:', error)
-    console.error('Stack trace:', error.stack)
+      console.log('=== PAGO PROCESADO EXITOSAMENTE ===')
+    } catch (error) {
+      console.error('Error processing webhook:', error)
+    }
   }
 }
+
 
 module.exports = webhookMercadoLibre
