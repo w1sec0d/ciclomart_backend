@@ -21,6 +21,7 @@ const oauthCallback = async (req, res) => {
       return sendError(res, 'Invalid user ID', 400)
     }
 
+    console.log('oauthBody', oauthBody)
     const oauthBody = {
       client_secret: process.env.MP_CLIENT_SECRET,
       client_id: process.env.MP_CLIENT_ID,
