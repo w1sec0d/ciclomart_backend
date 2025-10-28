@@ -3,6 +3,11 @@
 [![en](https://img.shields.io/badge/Language-English-green)](README.md) [![es](https://img.shields.io/badge/Idioma-Español-green)](README.es.md)
 
 - Link de la app: [ciclomart.com](https://ciclomart.com)
+- Instrucciones de usuario: [Presentación en Canva](https://www.canva.com/design/DAG23e0XYS4/qg8KUY0ukJcyz4XLgN-wlw/edit?utm_content=DAG23e0XYS4&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
+- Listado de horas: [Hoja de cálculo en Google Sheets](https://docs.google.com/spreadsheets/d/16X9bC5Drs2z4pwJ-D0CnR451mCKMRXd3i1B2WLkOS3M/edit?usp=sharing)
+
+- Ciclomart Backend: [Repositorio de Github](https://github.com/w1sec0d/ciclomart_backend)
+- Ciclomart Frontend: [Repositorio de Github](https://github.com/w1sec0d/ciclomart_frontend)
 
 ## Descripción
 
