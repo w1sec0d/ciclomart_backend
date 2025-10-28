@@ -1,9 +1,55 @@
 -- Database setup script
+-- CicloMart: Bicycle Marketplace Database Schema
+-- 
+-- This database supports a marketplace platform for buying and selling bicycles,
+-- bike components, accessories, and related items. It handles user management,
+-- product listings, shopping carts, payments, ratings, and messaging between users.
+--
+-- ----------------------------------------------------------
+-- DATABASE SUMMARY
+-- ----------------------------------------------------------
+-- 
+-- Core Business Flow:
+-- 1. Users register and create accounts (usuario - user)
+-- 2. Brands and models (product blueprints) are added to the catalog (marca - brand, modelo - model)
+-- 3. Sellers create product listings referencing models (producto - product)
+-- 4. Buyers browse products and add items to cart (carrito - cart, carritoProducto - cart-product)
+-- 5. Payments are processed through MercadoPago (carrito with payment tracking)
+-- 6. Buyers ask questions about products (pregunta - question)
+-- 7. After purchase, buyers rate products and sellers (calificacion - rating)
+-- 8. Users communicate via messages (mensaje - message)
+--
+-- Key Relationships:
+-- - modelo (model) → marca (brand) - brands have many models
+-- - producto (product) → modelo - products reference catalog models or blueprints
+-- - producto → usuario (user) - products belong to sellers
+-- - carrito (cart) → usuario - carts belong to buyers and involve sellers
+-- - carritoProducto (cart product) → carrito + producto - junction table for cart items
+-- - calificacion (rating) → producto + usuario - ratings link products to buyers
+--
+-- Payment Integration:
+-- - MercadoPago integration via idPreferencia and idPago fields in carrito, which identify
+--   the seller unique id for payment, a discount is made by the marketplace (marketplace fee)
+--   and the rest of the payment is sent to the seller.
+-- - Order states tracked: pendiente_pago (pending payment) → pendiente_envio (pending shipment) → enviado (sent) → recibido (received)
+--
+-- Also see: database diagram on /database/diagram
+
 
 DROP DATABASE IF EXISTS ciclomart;
 CREATE DATABASE ciclomart;
 USE ciclomart;
 
+-- ----------------------------------------------------------
+-- CORE TABLES
+-- ----------------------------------------------------------
+
+-- Table: usuario (Users)
+-- Purpose: Stores all user accounts including buyers, sellers, and administrators
+-- Key Features: Includes shipping address, MercadoPago payment integration fields
+-- Fields: nombre (name), apellido (last name), correo (email), telefono (phone), etc.
+-- Related Tables: Referenced by producto (product), tienda (store), carrito (cart), pregunta (question), calificacion (rating), mensaje (message)
+-- Relationships: One user can have multiple products, carts, ratings, and messages
 CREATE TABLE `usuario` (
   `idUsuario` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `nombre` varchar(45) NOT NULL,
@@ -28,6 +74,12 @@ CREATE TABLE `usuario` (
   `mp_public_key` varchar(100)
 );
 
+-- Table: bicicleta (Bicycle Specifications)
+-- Purpose: Stores detailed bicycle specifications (frame, brakes, suspension, etc.)
+-- Key Features: Only used when the product is a complete bicycle
+-- Fields: tamañoMarco (frame size), materialMarco (frame material), tipoFrenos (brake type), etc.
+-- Related Tables: Linked to modelo when type is 'bicicleta' (bike)
+-- Relationships: One-to-one with modelo (optional)
 CREATE TABLE `bicicleta` (
   `idBicicleta` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `tipoBicicleta` varchar(45),
@@ -49,12 +101,23 @@ CREATE TABLE `bicicleta` (
   `tarjeta` varchar(255)
 );
 
+-- Table: marca (Brands)
+-- Purpose: Stores bicycle and component brand names
+-- Key Features: Includes index on name for faster searches
+-- Related Tables: Referenced by modelo (model)
+-- Relationships: One-to-many with modelo (one brand can have many models)
 CREATE TABLE `marca` (
   `idMarca` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `nombre` varchar(45) NOT NULL,
   INDEX `nombre` (`nombre`)
 );
 
+-- Table: modelo (Models/Products Catalog)
+-- Purpose: Main blueprint for all products (bikes, components, accessories)
+-- Key Features: Type can be 'bicicleta' (bike), 'componente'(component), 'accesorio'(accessory), or 'otro'(other)
+-- Related Tables: Links to marca (brand), bicicleta (bike); referenced by documento (document), producto (product), imagen (image)
+-- Relationships: Many-to-one with marca (brand), optional one-to-one with bicicleta (bike)
+-- Note: This is the main product catalog - individual listings are in 'producto'
 CREATE TABLE `modelo` (
   `idModelo` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `nombre` varchar(255) NOT NULL,
@@ -70,6 +133,11 @@ CREATE TABLE `modelo` (
   INDEX `nombre` (`nombre`)
 );
 
+-- Table: tienda (Stores)
+-- Purpose: Represents physical or online stores where products can be sold
+-- Key Features: Each store has an administrator (usuario with admin role)
+-- Related Tables: Referenced by producto (product), calificacion (rating)
+-- Relationships: Many-to-one with usuario (one admin per store, stores can have multiple products)
 CREATE TABLE `tienda` (
   `idTienda` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `idUsuarioAdministrador` int NOT NULL,
@@ -80,6 +148,13 @@ CREATE TABLE `tienda` (
   INDEX `nombre` (`nombre`)
 );
 
+-- Table: documento (User Documents/Ownership Records)
+-- Purpose: Stores user-owned items (e.g., documents for bicycles they own)
+-- Key Features: Can track purchase date and state of items
+-- Fields: fechaCompra (purchase date), estado (status), tipo (type)
+-- Related Tables: Links to modelo (model) and usuario (user); referenced by imagen (image)
+-- Relationships: Many-to-one with modelo (model) and usuario (user)
+-- Note: Used for tracking ownership and documentation of items
 CREATE TABLE `documento` (
   `idDocumento` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `idModelo` int NOT NULL,
@@ -93,6 +168,13 @@ CREATE TABLE `documento` (
   INDEX `idUsuario` (`idUsuario`)
 );
 
+-- Table: producto (Product Listings)
+-- Purpose: Individual product listings with pricing, inventory, and availability
+-- Key Features: Tracks sales, exposure, shipping options, and seller information
+-- Fields: precio (price), cantidad (quantity), ventas (sales), costoEnvio (shipping cost)
+-- Related Tables: Links to modelo, usuario, tienda; referenced by carritoProducto (cart product), pregunta (question), calificacion (rating)
+-- Relationships: Many-to-one with modelo, usuario (seller), and optional tienda
+-- Note: This is where sellers create listings - separate from the product catalog (modelo)
 CREATE TABLE `producto` (
   `idProducto` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `idModelo` int NOT NULL,
@@ -114,6 +196,12 @@ CREATE TABLE `producto` (
   FOREIGN KEY (`idTienda`) REFERENCES `tienda` (`idTienda`)
 );  
 
+-- Table: imagen (Images)
+-- Purpose: Stores image URLs for users, products, and documents
+-- Key Features: Can have images for buyer/seller profiles, product listings, or ownership docs
+-- Related Tables: Links to usuario (user), documento (document), modelo (model)
+-- Relationships: One-to-one with usuario (profile pics), many-to-one with documento and modelo
+-- Note: One image per entity (user, document, or product model)
 CREATE TABLE `imagen` (
   `idImagen` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `idUsuario` int UNIQUE,
@@ -128,6 +216,13 @@ CREATE TABLE `imagen` (
   INDEX `imagen_usuario` (`idUsuario`)
 );
 
+-- Table: carrito (Shopping Carts/Orders)
+-- Purpose: Represents shopping carts and order transactions
+-- Key Features: Tracks payment status, MercadoPago integration (idPreferencia, idPago)
+-- Fields: precioTotal (total price), direccionEnvio (shipping address), metodoPago (payment method)
+-- Related Tables: Links to usuario (buyer and seller); referenced by carritoProducto (cart product)
+-- Relationships: Many-to-one with usuario (both buyer and seller)
+-- Note: States: pendiente_pago (pending payment) → pendiente_envio (pending shipment) → enviado (sent) → recibido (received) or fallido (failed)/reembolsado (refunded)
 CREATE TABLE `carrito` (
   `idCarrito` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `idPreferencia` varchar(255) UNIQUE,
@@ -144,6 +239,12 @@ CREATE TABLE `carrito` (
   INDEX (`idPreferencia`)
 );
 
+-- Table: carritoProducto (Cart Items)
+-- Purpose: Junction table linking products to shopping carts/orders
+-- Key Features: Stores quantity per item; links to payment and preference IDs
+-- Related Tables: Links to carrito (cart) and producto (product)
+-- Relationships: Many-to-one with carrito and producto (one cart has many items, one product can be in many carts)
+-- Note: This is the shopping cart items table - multiple products per cart
 CREATE TABLE `carritoProducto` (
   `idCarritoProducto` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `idCarrito` int NOT NULL,
@@ -158,6 +259,12 @@ CREATE TABLE `carritoProducto` (
   FOREIGN KEY (`idProducto`) REFERENCES `producto` (`idProducto`)
 );
 
+-- Table: pregunta (Product Questions)
+-- Purpose: Allows buyers to ask sellers questions about products
+-- Key Features: Buyers can ask questions, sellers can respond
+-- Related Tables: Links to producto (product) and usuario (user)
+-- Relationships: Many-to-one with producto and usuario (users can ask multiple questions)
+-- Note: Supports Q&A functionality between buyers and sellers
 CREATE TABLE `pregunta` (
   `idPregunta` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `idProducto` int NOT NULL,
@@ -170,6 +277,13 @@ CREATE TABLE `pregunta` (
   INDEX `idUsuario` (`idUsuario`)
 );
 
+-- Table: calificacion (Ratings/Reviews)
+-- Purpose: Stores product ratings and reviews from buyers
+-- Key Features: Can rate products, sellers, or stores; includes comments and photos
+-- Fields: nota (rating), comentario (comment), fecha (date)
+-- Related Tables: Links to producto (product), usuario (buyer and seller), optional tienda (store)
+-- Relationships: Many-to-one with producto, usuario (both buyer and seller), optional tienda
+-- Note: Supports the review and rating system for products and sellers
 CREATE TABLE `calificacion` (
   `idCalificacion` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `idUsuarioComprador` int NOT NULL,
@@ -188,6 +302,12 @@ CREATE TABLE `calificacion` (
   INDEX `fk_calificacion_usuario1_idx` (`idUsuarioVendedor`)
 );
 
+-- Table: mensaje (Messages)
+-- Purpose: Stores messages between buyers and sellers related to specific cart items
+-- Key Features: Buyers and sellers can communicate about orders/products
+-- Related Tables: Links to usuario (sender and receiver) and carritoProducto (cart product)
+-- Relationships: Many-to-one with usuario (both message sender and receiver) and carritoProducto
+-- Note: Enables communication between users regarding specific cart items/orders
 CREATE TABLE `mensaje` (
   `idMensaje` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `idUsuarioEmisor` int NOT NULL,
@@ -208,14 +328,14 @@ CREATE TABLE `mensaje` (
 -- Insert sample users
 INSERT INTO `usuario` (`nombre`, `apellido`, `fechaNacimiento`, `rol`, `correo`, `direccionNombre`,`telefono`, `username`, `password`)
 VALUES 
-('Juan', 'Perez', '1985-05-15', 'comprador', 'juan.perez@ejemplo.com', 'Calle 123, Bogotá', '3001234567', 'juanp', '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.'),
-('Maria', 'Gomez', '1990-08-22', 'vendedor', 'maria.gomez@ejemplo.com', 'Carrera 45, Medellín', '3107654321', 'mariag', '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.'),
-('Carlos', 'Lopez', '1978-11-30', 'administrador', 'carlos.lopez@ejemplo.com', 'Avenida 10, Cali', '3209876543', 'carlosl', '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.');
+('John', 'Smith', '1985-05-15', 'comprador', 'john.smith@example.com', 'Calle 123, Bogotá', '3001234567', 'johnsmith', '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.'),
+('Sarah', 'Johnson', '1990-08-22', 'vendedor', 'sarah.johnson@example.com', 'Carrera 45, Medellín', '3107654321', 'sarahj', '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.'),
+('Michael', 'Williams', '1978-11-30', 'administrador', 'michael.williams@example.com', 'Avenida 10, Cali', '3209876543', 'michaelw', '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.');
 
 
 INSERT INTO `usuario` VALUES
-('4', 'Ronald', 'Ramírez', '2003-07-15', 'vendedor', 'vendedor@gmail.com', '110881', 'Calle 324', '48-50 Sur', '', '', 'Bogota', NULL, NULL, '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.', '0', '2025-03-01 14:51:26', '1025146485', 'TEST-7255018865819969-030116-23eb1d70ba61f02f9cee879c5752771d-1025146485', 'TG-67c367cb78aa6200011e1699-1025146485', 'TEST-46820db6-ac0c-42bd-9eac-b09db1a04d81'),
-('5', 'Johan', 'Madrid', NULL, 'comprador', 'comprador@gmail.com', '110881', 'Calle 324', '48-50 Sur', '', '', 'Bogota', NULL, NULL, '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.', '0', '2025-03-01 15:13:31', NULL, NULL, NULL, NULL);
+('4', 'Seller', 'Smith', '2003-07-15', 'vendedor', 'seller@example.com', '110881', 'Calle 324', '48-50 Sur', '', '', 'Bogota', NULL, NULL, '$2b$10$PqKSvdLV5aCgRAXZUSq8IuFcmdy6cyyoADJFFX4/HL7qhJ.XDajmS', '0', '2025-03-01 14:51:26', '2950485379', NULL, NULL, NULL),
+('5', 'Buyer', 'Smith', NULL, 'comprador', 'buyer@example.com', '110881', 'Calle 324', '48-50 Sur', '', '', 'Bogota', NULL, NULL, '$2b$10$PqKSvdLV5aCgRAXZUSq8IuFcmdy6cyyoADJFFX4/HL7qhJ.XDajmS', '0', '2025-03-01 15:13:31', '2950485379', 'APP_USR-6292844536291010-102714-afebc269123c44f7d1c72086306883a4-2950485379', 'TG-68ffba35d5bea2000188f0d1-2950485379', 'APP_USR-c85d21a5-dfbb-4a28-bf0f-5f7e8299bb39');
 
 
 -- Insert sample brands
@@ -225,64 +345,218 @@ VALUES
 ('Specialized'),
 ('Giant'),
 ('Shimano'),
-('Bontrager');
+('GW'),
+('Colnago'),
+('Cannondale');
 
 -- Insert sample models
 INSERT INTO `modelo` (`nombre`, `tipo`, `descripcion`, `categoria`, `compatibilidad`, `idMarca`)
 VALUES 
-('Trek Marlin 7', 'bicicleta', 'Bicicleta de montaña para senderos', 'MTB', 'Compatible con componentes Shimano', 1),
-('Specialized Allez', 'bicicleta', 'Bicicleta de carretera para carreras', 'Carretera', 'Compatible con componentes Shimano', 2),
-('Giant Defy Advanced', 'bicicleta', 'Bicicleta de carretera de resistencia', 'Carretera', 'Compatible con componentes Shimano', 3),
-('Plato Shimano Deore XT', 'componente', 'Monoplato mtb', 'Transmisión', 'Compatible con bicicletas de montaña', 4),
-('Pacha Shimano Altus', 'componente', 'Pacha altus de 8 velocidades', 'Transmisión', 'Compatible con bicicletas de carretera', 4),
-('Shimano 105', 'componente', 'Grupo de transmisión de 10 velocidades', 'Transmisión', 'Compatible con bicicletas de carretera', 4),
-('Casco Bontrager Starvos', 'accesorio', 'Casco de ciclismo de carretera', 'Casco', 'Talla única', 1),
-('Casco Specialized Propero', 'accesorio', 'Casco de ciclismo de carretera', 'Casco', 'Talla única', 2),
-('Casco Giant Rev', 'accesorio', 'Casco de ciclismo de carretera', 'Casco', 'Talla única', 3),
-('Neumático MTB rin 26"', 'componente', 'Neumatico rin 26"', 'Neumáticos', 'Compatible con bicicletas de montaña', null),
-('Zapatas de freno Genéricas', 'componente', 'Zapatas para cualquier bicicleta de frenos en herradura', 'Frenos', 'Compatible con cualquier bicicleta', null);
+-- Bicycles
+('Trek Marlin 7', 'bicicleta', 'Trail mountain bike with quality components', 'MTB', 'Compatible with Shimano components', 1),
+('Specialized Allez', 'bicicleta', 'Racing road bike for competitive riding', 'Carretera', 'Compatible with Shimano components', 2),
+('Giant Defy Advanced', 'bicicleta', 'Endurance road bike with carbon frame', 'Carretera', 'Compatible with Shimano components', 3),
+('Trek FX 3', 'bicicleta', 'Versatile fitness hybrid bike', 'Híbrida', 'Compatible with standard components', 1),
+('Specialized Rockhopper', 'bicicleta', 'Entry-level mountain bike', 'MTB', 'Compatible with Shimano components', 2),
 
--- Insert sample images
+-- Drivetrains / Transmisión
+('Shimano Deore XT Chainring', 'componente', 'MTB single chainring with 32T', 'Transmisión', 'Compatible with mountain bikes', 4),
+('Shimano Altus Cassette', 'componente', '8-speed cassette for MTB', 'Transmisión', 'Compatible with 8-speed systems', 4),
+('Shimano 105 Groupset', 'componente', '11-speed road groupset', 'Transmisión', 'Compatible with road bikes', 4),
+('SRAM GX Eagle Derailleur', 'componente', '12-speed rear derailleur for MTB', 'Transmisión', 'Compatible with SRAM 12-speed', 6),
+('SRAM NX Cassette', 'componente', '11-speed wide-range cassette', 'Transmisión', 'Compatible with SRAM 11-speed', 6),
+('Shimano Deore Chain', 'componente', '10-speed MTB chain', 'Transmisión', 'Compatible with 10-speed systems', 4),
+('SRAM PC-1110 Chain', 'componente', '11-speed chain for MTB and road', 'Transmisión', 'Compatible with 11-speed systems', 6),
+
+-- Brakes / Frenos
+('Shimano Deore Hydraulic Disc Brake', 'componente', 'Hydraulic disc brake set front and rear', 'Frenos', 'Compatible with all MTB', 4),
+('Shimano BR-R7000 Caliper Brake', 'componente', 'Road bike caliper brake set', 'Frenos', 'Compatible with road bikes', 4),
+('SRAM Level TLM Brake', 'componente', 'Trail hydraulic disc brake', 'Frenos', 'Compatible with MTB', 6),
+('Magura MT5 Brake Set', 'componente', 'High-performance hydraulic disc brake', 'Frenos', 'Compatible with all bikes', 15),
+('Hope Tech 3 E4 Brake', 'componente', 'Premium 4-piston hydraulic brake', 'Frenos', 'Compatible with MTB and e-bikes', 14),
+('Generic V-Brake Pads', 'componente', 'Brake pads for rim brakes', 'Frenos', 'Compatible with any V-brake system', null),
+('Shimano Resin Disc Brake Pads', 'componente', 'Replacement pads for disc brakes', 'Frenos', 'Compatible with Shimano disc brakes', 4),
+
+-- Suspension / Suspensión
+('RockShox Judy Silver TK', 'componente', '100mm travel air fork for XC', 'Suspensión', 'Compatible with MTB 29" or 27.5"', 7),
+('RockShox Recon RL', 'componente', '120mm travel fork for trail riding', 'Suspensión', 'Compatible with MTB', 7),
+('Fox 34 Float Performance', 'componente', '140mm travel fork for aggressive trail', 'Suspensión', 'Compatible with MTB 29"', 8),
+('RockShox Deluxe Select+', 'componente', 'Rear shock for trail bikes', 'Suspensión', 'Compatible with full suspension MTB', 7),
+('Fox Float DPS', 'componente', 'Lightweight rear shock', 'Suspensión', 'Compatible with XC and trail bikes', 8),
+
+-- Handlebars / Manubrio
+('Race Face Chester Handlebar', 'componente', 'Durable aluminum flat handlebar 780mm', 'Manubrio', 'Compatible with MTB', 12),
+('Bontrager Elite Drop Bar', 'componente', 'Road bike drop handlebar 42cm', 'Manubrio', 'Compatible with road bikes', 5),
+('Specialized S-Works Carbon Riser', 'componente', 'Lightweight carbon riser bar 760mm', 'Manubrio', 'Compatible with MTB', 2),
+('Giant Contact SLR Aero Bar', 'componente', 'Aerodynamic drop bar for road', 'Manubrio', 'Compatible with road bikes', 3),
+('Race Face Turbine R Handlebar', 'componente', 'Carbon fiber flat bar 785mm', 'Manubrio', 'Compatible with MTB', 12),
+
+-- Tires / Neumáticos
+('Maxxis Minion DHF 29x2.5', 'componente', 'Aggressive trail tire with excellent grip', 'Neumáticos', 'Compatible with 29" MTB', 9),
+('Continental Grand Prix 5000 700x25', 'componente', 'High-performance road tire', 'Neumáticos', 'Compatible with road bikes', 10),
+('Schwalbe Marathon Plus 26x1.75', 'componente', 'Puncture-proof touring tire', 'Neumáticos', 'Compatible with hybrid and city bikes', 11),
+('Maxxis Ardent 27.5x2.4', 'componente', 'All-around trail tire', 'Neumáticos', 'Compatible with 27.5" MTB', 9),
+('Continental Mountain King 26x2.2', 'componente', 'XC racing tire', 'Neumáticos', 'Compatible with 26" MTB', 10),
+('Schwalbe G-One Speed 700x35', 'componente', 'Gravel racing tire', 'Neumáticos', 'Compatible with gravel and road bikes', 11),
+
+-- Pedals / Pedales
+('Shimano PD-M520 SPD', 'componente', 'Clipless MTB pedals', 'Pedales', 'Compatible with all MTB', 4),
+('Crankbrothers Stamp 1', 'componente', 'Large platform flat pedals', 'Pedales', 'Compatible with all bikes', 13),
+('Shimano PD-R7000 105', 'componente', 'Road clipless pedals', 'Pedales', 'Compatible with road bikes', 4),
+('Race Face Chester Pedals', 'componente', 'Composite platform pedals', 'Pedales', 'Compatible with all bikes', 12),
+
+-- Helmets / Casco
+('Bontrager Starvos MIPS', 'accesorio', 'Road cycling helmet with MIPS protection', 'Casco', 'Universal fit', 5),
+('Specialized Propero III', 'accesorio', 'Lightweight road helmet', 'Casco', 'Universal fit', 2),
+('Giant Rev MIPS', 'accesorio', 'All-around cycling helmet', 'Casco', 'Universal fit', 3),
+('Fox Speedframe Pro', 'accesorio', 'MTB helmet with extended coverage', 'Casco', 'MTB specific', 8),
+
+-- Saddles / Sillín
+('Bontrager Montrose Elite', 'componente', 'Comfortable trail saddle', 'Sillín', 'Compatible with all bikes', 5),
+('Specialized Power Arc', 'componente', 'Performance road saddle', 'Sillín', 'Compatible with road bikes', 2),
+('Giant Fleet SLR', 'componente', 'Lightweight racing saddle', 'Sillín', 'Compatible with road bikes', 3),
+
+-- Other accessories
+('Generic Bike Bell', 'accesorio', 'Standard bicycle bell', 'Accesorios', 'Universal fit', null),
+('LED Bike Light Set', 'accesorio', 'Front and rear LED light set', 'Accesorios', 'Universal fit', null);
+
+-- Insert sample images (keeping existing images for first models, adding placeholders for new ones)
 INSERT INTO `imagen` (`idUsuario`, `idModelo`, `url`)
 VALUES 
 (null, 1, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739199906/ukc7nxqc5hm79o4utb39.png'),
 (null, 2, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739200194/qhvxoj4ggjp1qrdn1fpd.png'),
 (null, 3, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739200646/iyqe0j8piameldruninf.png'),
-(null, 4, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739201523/td7nvl10zjctewo5jgld.png'),
-(null, 5, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739201377/d10mnzoi5xp8ibs1apvm.png'),
-(null, 6, ''),
-(null, 7, ''),
+(null, 4, ''),
+(null, 5, ''),
+(null, 6, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739201523/td7nvl10zjctewo5jgld.png'),
+(null, 7, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739201377/d10mnzoi5xp8ibs1apvm.png'),
 (null, 8, ''),
 (null, 9, ''),
-(null, 10, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739203206/dgeumsxzyrlqv3kzqdw6.png'),
-(null, 11, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1740430801/pxjassqtrzvnbrpovqur.png');
+(null, 10, ''),
+(null, 11, ''),
+(null, 12, ''),
+(null, 13, ''),
+(null, 14, ''),
+(null, 15, ''),
+(null, 16, ''),
+(null, 17, ''),
+(null, 18, ''),
+(null, 19, ''),
+(null, 20, ''),
+(null, 21, ''),
+(null, 22, ''),
+(null, 23, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739203206/dgeumsxzyrlqv3kzqdw6.png'),
+(null, 24, ''),
+(null, 25, ''),
+(null, 26, ''),
+(null, 27, ''),
+(null, 28, ''),
+(null, 29, ''),
+(null, 30, ''),
+(null, 31, ''),
+(null, 32, ''),
+(null, 33, ''),
+(null, 34, ''),
+(null, 35, ''),
+(null, 36, ''),
+(null, 37, ''),
+(null, 38, ''),
+(null, 39, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1740430801/pxjassqtrzvnbrpovqur.png'),
+(null, 40, ''),
+(null, 41, ''),
+(null, 42, ''),
+(null, 43, ''),
+(null, 44, ''),
+(null, 45, ''),
+(null, 46, ''),
+(null, 47, ''),
+(null, 48, '');
 
 -- Insert sample bicycles
 INSERT INTO `bicicleta` (`tipoBicicleta`, `color`, `genero`, `edad`, `tamañoMarco`, `materialMarco`, `tamañoRueda`, `tipoFrenos`, `velocidades`, `suspension`, `transmision`, `tipoPedales`, `manubrio`, `pesoBicicleta`, `pesoMaximo`, `extras`)
 VALUES 
-('MTB', 'Negra', 'Unisex', 'Adulto', 'M', 'Aluminio', '29"', 'Disco', '21', 'Delantera', 'Shimano', 'Plataforma', 'Plano', 14.5, 120, 'Portabotellas'),
-('Carretera', 'Azul', 'Unisex', 'Adulto', 'L', 'Carbono', '28"', 'Caliper', '22', 'Ninguna', 'Shimano', 'Sin clip', 'Caída', 8.5, 100, 'Ninguno'),
-('Carretera','Azul','Unisex','Adulto','M','Carbono','28"','Caliper','22','Ninguna','Shimano','Sin clip','Caída',8.5,100,'Ninguno');
+('MTB', 'Negra', 'Unisex', 'Adulto', 'M', 'Aluminio', '29"', 'Disco', '21', 'Delantera', 'Shimano', 'Plataforma', 'Plano', 14.5, 120, 'Bottle cage, kickstand'),
+('Carretera', 'Azul', 'Unisex', 'Adulto', 'L', 'Carbono', '28"', 'Caliper', '22', 'Ninguna', 'Shimano', 'Sin clip', 'Caída', 8.5, 100, 'Carbon seatpost'),
+('Carretera', 'Azul', 'Unisex', 'Adulto', 'M', 'Carbono', '28"', 'Caliper', '22', 'Ninguna', 'Shimano', 'Sin clip', 'Caída', 8.5, 100, 'Lightweight wheels'),
+('Híbrida', 'Gris', 'Unisex', 'Adulto', 'M', 'Aluminio', '28"', 'Disco', '24', 'Delantera', 'Shimano', 'Plataforma', 'Plano', 12.8, 130, 'Fenders, rear rack'),
+('MTB', 'Roja', 'Unisex', 'Adulto', 'S', 'Aluminio', '27.5"', 'Disco', '18', 'Delantera', 'Shimano', 'Plataforma', 'Plano', 13.5, 110, 'Bottle cage');
 
 -- Insert sample stores
 INSERT INTO `tienda` (`idUsuarioAdministrador`, `nombre`, `descripcion`, `telefono`)
 VALUES 
-(3, 'Tienda de Bicis Bogotá', 'La mejor tienda de bicicletas en Bogotá', '3001234567');
+(3, 'Bogotá Bike Shop', 'The best bicycle shop in Bogotá with quality bikes and components', '3001234567'),
+(3, 'Mountain Riders Store', 'Specialized in mountain bikes and trail gear', '3105551234');
 
 -- Insert sample products
 INSERT INTO `producto` (`idModelo`, `idVendedor`, `idTienda`, `precio`, `precioCompleto`, `cantidad`,`ventas`, `estado`, `disponibilidad`, `costoEnvio`, `retiroEnTienda`)
 VALUES 
-(1, 4, null, 3000000, 3300000, 10,0, 'nuevo', 'disponible', 50.00, false),
-(2, 4, null, 2400000, 3000000, 5,2, 'nuevo', 'disponible', 0, false),
-(3, 4, null, 11000000, null, 3,10, 'nuevo', 'disponible', 50.00, false),
-(4, 4, null, 290000, 300000, 20,4, 'nuevo', 'disponible', 0, false),
-(5, 4, null, 120000, null, 15,0, 'nuevo', 'disponible', 0, false),
-(6, 4, null, 1500000, null, 5,0, 'nuevo', 'disponible', 0, false),
-(7, 4, null, 300000, null, 10,0, 'nuevo', 'disponible', 0, false),
-(8, 4, null, 460000, 500000, 5,0, 'nuevo', 'disponible', 0, false),
-(9, 4, null, 60000, null, 3,0, 'nuevo', 'disponible', 0, false),
-(10, 4, null, 5000, null, 15,9, 'nuevo', 'disponible', 0, false),
-(11, 4, null, 10000, 20000, 10,6, 'nuevo', 'disponible', 0, false);
+-- Bicycles
+(1, 4, null, 3000000, 3300000, 10, 0, 'nuevo', 'disponible', 50000, false),
+(2, 4, null, 2400000, 3000000, 5, 2, 'nuevo', 'disponible', 0, false),
+(3, 4, null, 11000000, null, 3, 10, 'nuevo', 'disponible', 50000, false),
+(4, 4, null, 1800000, null, 8, 3, 'nuevo', 'disponible', 45000, false),
+(5, 4, null, 1500000, 1800000, 12, 5, 'nuevo', 'disponible', 40000, false),
+
+-- Drivetrains
+(6, 4, null, 290000, 300000, 20, 4, 'nuevo', 'disponible', 10000, false),
+(7, 4, null, 120000, null, 15, 8, 'nuevo', 'disponible', 8000, false),
+(8, 4, null, 1500000, null, 5, 2, 'nuevo', 'disponible', 15000, false),
+(9, 4, null, 380000, 420000, 10, 6, 'nuevo', 'disponible', 10000, false),
+(10, 4, null, 200000, 250000, 18, 3, 'nuevo', 'disponible', 8000, false),
+(11, 4, null, 85000, null, 25, 12, 'nuevo', 'disponible', 5000, false),
+(12, 4, null, 95000, null, 20, 8, 'nuevo', 'disponible', 5000, false),
+
+-- Brakes
+(13, 4, null, 450000, 500000, 15, 7, 'nuevo', 'disponible', 12000, false),
+(14, 4, null, 180000, null, 12, 4, 'nuevo', 'disponible', 8000, false),
+(15, 4, null, 380000, 420000, 10, 5, 'nuevo', 'disponible', 10000, false),
+(16, 4, null, 550000, 600000, 8, 3, 'nuevo', 'disponible', 12000, false),
+(17, 4, null, 780000, null, 5, 2, 'nuevo', 'disponible', 15000, false),
+(18, 4, null, 15000, null, 50, 25, 'nuevo', 'disponible', 3000, false),
+(19, 4, null, 35000, 40000, 40, 18, 'nuevo', 'disponible', 3000, false),
+
+-- Suspension
+(20, 4, null, 1200000, 1400000, 8, 4, 'nuevo', 'disponible', 20000, false),
+(21, 4, null, 1500000, null, 6, 3, 'nuevo', 'disponible', 20000, false),
+(22, 4, null, 2800000, null, 4, 1, 'nuevo', 'disponible', 25000, false),
+(23, 4, null, 1800000, 2000000, 5, 2, 'nuevo', 'disponible', 20000, false),
+(24, 4, null, 2200000, null, 4, 1, 'nuevo', 'disponible', 20000, false),
+
+-- Handlebars
+(25, 4, null, 180000, null, 15, 8, 'nuevo', 'disponible', 8000, false),
+(26, 4, null, 220000, 250000, 10, 5, 'nuevo', 'disponible', 8000, false),
+(27, 4, null, 450000, null, 6, 3, 'nuevo', 'disponible', 10000, false),
+(28, 4, null, 380000, null, 8, 4, 'nuevo', 'disponible', 10000, false),
+(29, 4, null, 520000, 580000, 5, 2, 'nuevo', 'disponible', 10000, false),
+
+-- Tires
+(30, 4, null, 145000, 160000, 30, 15, 'nuevo', 'disponible', 8000, false),
+(31, 4, null, 180000, null, 25, 12, 'nuevo', 'disponible', 8000, false),
+(32, 4, null, 120000, null, 35, 20, 'nuevo', 'disponible', 8000, false),
+(33, 4, null, 135000, 150000, 28, 14, 'nuevo', 'disponible', 8000, false),
+(34, 4, null, 110000, null, 30, 16, 'nuevo', 'disponible', 8000, false),
+(35, 4, null, 155000, null, 22, 10, 'nuevo', 'disponible', 8000, false),
+
+-- Pedals
+(36, 4, null, 185000, 200000, 20, 10, 'nuevo', 'disponible', 8000, false),
+(37, 4, null, 120000, null, 25, 15, 'nuevo', 'disponible', 8000, false),
+(38, 4, null, 280000, null, 15, 8, 'nuevo', 'disponible', 10000, false),
+(39, 4, null, 95000, 110000, 30, 18, 'nuevo', 'disponible', 5000, false),
+
+-- Helmets
+(40, 4, null, 300000, 350000, 15, 8, 'nuevo', 'disponible', 10000, false),
+(41, 4, null, 460000, 500000, 10, 5, 'nuevo', 'disponible', 12000, false),
+(42, 4, null, 280000, null, 12, 6, 'nuevo', 'disponible', 10000, false),
+(43, 4, null, 380000, null, 8, 4, 'nuevo', 'disponible', 10000, false),
+
+-- Saddles
+(44, 4, null, 220000, 250000, 18, 9, 'nuevo', 'disponible', 8000, false),
+(45, 4, null, 380000, null, 10, 5, 'nuevo', 'disponible', 10000, false),
+(46, 4, null, 450000, 500000, 8, 3, 'nuevo', 'disponible', 10000, false),
+
+-- Accessories
+(47, 4, null, 25000, null, 50, 30, 'nuevo', 'disponible', 3000, false),
+(48, 4, null, 85000, 95000, 35, 20, 'nuevo', 'disponible', 5000, false);
 
 -- Insert sample payments
 INSERT INTO `carrito` (`idPreferencia`, `idPago`, `idVendedor`, `idComprador`, `estado`, `metodoPago`, `precioTotal`, `fecha`, `direccionEnvio`)
@@ -315,31 +589,41 @@ VALUES
 -- Insert sample ratings
 INSERT INTO `calificacion` (`idUsuarioComprador`, `idUsuarioVendedor`, `idProducto`, `idTienda`, `foto`, `comentario`, `nota`)
 VALUES 
-(2, 1, 1, 1, '', '¡Excelente bicicleta!', 5),
-(3, 2, 2, 1, '', 'Muy satisfecho', 4),
-(1, 2, 2, 1, '', 'La bici es buena pero es muy pesada', 3),
-(2,1,10,null, null, 'Muy buen producto, voy tres meses y no me he pinchado', 5),
-(3,1,10,null, null, 'Muy malo, me pinche a la primera salida', 1);
-
--- Insert sample ratings
-INSERT INTO `calificacion` (`idUsuarioComprador`, `idUsuarioVendedor`, `idProducto`, `idTienda`, `foto`, `comentario`, `nota`)
-VALUES 
-(1, 2, 1, 1, '', '¡Excelente bicicleta!', 5),
-(2, 3, 2, 1, '', 'Muy satisfecho', 4),
-(3, 2, 2, 1, '', 'La bici es buena pero es muy pesada', 3),
-(2,1,10,null, null, 'Muy buen producto, voy tres meses y no me he pinchado', 5),
-(3,1,10,null, null, 'Muy malo, me pinche a la primera salida', 1);
+(2, 1, 1, 1, '', 'Excellent bicycle! Very satisfied with the purchase', 5),
+(3, 2, 2, 1, '', 'Very satisfied with the quality', 4),
+(1, 2, 2, 1, '', 'The bike is good but quite heavy', 3),
+(2, 1, 10, null, null, 'Great product, been using it for three months without any flats', 5),
+(3, 1, 10, null, null, 'Poor quality, got a flat on the first ride', 1),
+(1, 2, 1, 1, '', 'Amazing bike for trail riding!', 5),
+(2, 3, 2, 1, '', 'Very happy with this purchase', 4),
+(3, 2, 2, 1, '', 'Good bike but a bit pricey', 3),
+(2, 1, 13, null, null, 'Excellent braking power, very responsive', 5),
+(3, 1, 20, null, null, 'Smooth suspension, great for trails', 5),
+(1, 2, 25, null, null, 'Comfortable handlebar, good width', 4),
+(2, 1, 30, null, null, 'Great tire, excellent grip on trails', 5),
+(3, 2, 36, null, null, 'Perfect pedals for my riding style', 4),
+(1, 2, 40, null, null, 'Good helmet, fits well and looks great', 5);
 
 -- Insert sample messages
 INSERT INTO `mensaje` (`idUsuarioEmisor`, `idUsuarioReceptor`, `idCarritoProducto`, `contenido`, `fecha`)
 VALUES 
-(1, 2, 1, '¿La bicicleta sigue disponible?', NOW()),
-(2, 1, 2, 'Sí, todavía está disponible.', NOW());
+(1, 2, 1, 'Is the bicycle still available?', NOW()),
+(2, 1, 2, 'Yes, it is still available.', NOW()),
+(1, 2, 3, 'Can you ship to Cali?', NOW()),
+(2, 1, 3, 'Yes, we ship nationwide.', NOW());
 
 -- ----------------------------------------------------------
--- Views
+-- VIEWS
 -- ----------------------------------------------------------
--- Complete cart products view
+-- Views provide pre-joined, optimized queries for common operations:
+-- - Combining multiple tables to show complete product information
+-- - Calculating aggregations (averages, totals)
+-- - Filtering by status (pending payments, completed orders)
+-- Note: Views are read-only and automatically update when underlying tables change
+
+-- View: vista_productos_carrito_usuario
+-- Purpose: Shows all products in user shopping carts with related info
+-- Joins: carrito + usuario + carritoProducto + producto + modelo
 DROP VIEW IF EXISTS vista_productos_carrito_usuario;
 CREATE VIEW vista_productos_carrito_usuario AS
 SELECT 
@@ -373,7 +657,9 @@ ORDER BY
     carrito.fecha DESC;
 
 
--- Consolidated product view
+-- View: vista_completa_producto
+-- Purpose: Complete product information including specs, brand, seller, and images
+-- Joins: producto + modelo + bicicleta + marca + imagen + usuario (seller)
 DROP VIEW IF EXISTS vista_completa_producto;
 CREATE VIEW vista_completa_producto AS
 SELECT 
@@ -439,7 +725,9 @@ LEFT JOIN
 ORDER BY 
     producto.ventas DESC;
 
--- Product ratings view
+-- View: vista_producto_calificacion
+-- Purpose: Product ratings with detailed review information
+-- Joins: producto + modelo + marca + calificacion
 DROP VIEW IF EXISTS vista_producto_calificacion;
 CREATE VIEW vista_producto_calificacion AS
 SELECT 
@@ -477,7 +765,9 @@ RIGHT JOIN
 ORDER BY 
     producto.ventas DESC;
 
--- Average product ratings view
+-- View: vista_producto_calificacion_promedio
+-- Purpose: Products with average ratings calculated across all reviews
+-- Joins: producto + modelo + marca + calificacion (with AVG aggregation)
 DROP VIEW IF EXISTS vista_producto_calificacion_promedio;
 CREATE VIEW vista_producto_calificacion_promedio AS
 SELECT 
@@ -532,7 +822,9 @@ ORDER BY
 
 DROP VIEW IF EXISTS vista_compras_pendientes;
 
--- Pending purchases view
+-- View: vista_compras_pendientes
+-- Purpose: Pending purchases awaiting payment processing
+-- Joins: usuario + carrito + carritoProducto
 CREATE VIEW vista_compras_pendientes AS
 SELECT 
     usuario.idUsuario,
@@ -563,7 +855,9 @@ ORDER BY
 
 DROP VIEW IF EXISTS vista_compras_usuario;
 
--- User purchases view
+-- View: vista_compras_usuario
+-- Purpose: Complete purchase history for buyers
+-- Joins: usuario + carrito + carritoProducto + producto + modelo + marca + imagen
 CREATE VIEW vista_compras_usuario AS
 SELECT 
     usuario.idUsuario,
@@ -607,7 +901,9 @@ ORDER BY
 
 DROP VIEW IF EXISTS vista_ventas_usuario;
 
--- User sales view
+-- View: vista_ventas_usuario
+-- Purpose: Sales information for sellers
+-- Joins: carrito + carritoProducto + producto + usuario (seller)
 CREATE VIEW vista_ventas_usuario AS
 SELECT 
     carrito.idCarrito,
@@ -633,7 +929,9 @@ ORDER BY
 
 DROP VIEW IF EXISTS vista_calificaciones_productos_vendedor;
 
--- Seller product ratings view
+-- View: vista_calificaciones_productos_vendedor
+-- Purpose: Ratings received by sellers with buyer and product information
+-- Joins: usuario (seller) + calificacion + usuario (buyer) + imagen for both
 CREATE VIEW vista_calificaciones_productos_vendedor AS
 SELECT 
     u.idUsuario,
@@ -669,7 +967,9 @@ LEFT JOIN
 -- Vista de productos asociados a un carrito
 DROP VIEW IF EXISTS vista_productos_carrito;
 
--- Cart products view
+-- View: vista_productos_carrito
+-- Purpose: All products in shopping carts with complete details
+-- Joins: carrito + carritoProducto + producto + modelo + marca + imagen
 CREATE VIEW vista_productos_carrito AS
 SELECT 
     carrito.idCarrito,
