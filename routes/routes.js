@@ -9,7 +9,7 @@ const {
   getUserPhoto,
   updateUserPhoto,
   updateUserAddress,
-} = require('../controllers/usuario.js')
+} = require('../controllers/user.js')
 
 // Authentication controllers
 const {
@@ -18,17 +18,17 @@ const {
   updatePassword,
   sendRegisterCode,
   validateCode,
-} = require('../controllers/login.js')
+} = require('../controllers/auth.js')
 
 // Transactions controllers
 const {
   getTransactions,
   getPurchasesByBuyerId,
   getSalesBySellerId,
-} = require('../controllers/transaccion.js')
+} = require('../controllers/transaction.js')
 
 // Store controllers
-const { getStores } = require('../controllers/tienda.js')
+const { getStores } = require('../controllers/store.js')
 
 // Search controller
 const { searchProducts } = require('../controllers/search.js')
@@ -46,9 +46,9 @@ const {
   getComponents,
   getProductsOnOffer,
   addBrand
-} = require('../controllers/producto.js')
+} = require('../controllers/product.js')
 
-const { createExposurePreference } = require('../controllers/exposicion.js')
+const { createExposurePreference } = require('../controllers/exposure.js')
 
 // Product ratings controllers
 const {
@@ -58,7 +58,7 @@ const {
   checkUserPurchase,
 } = require('../controllers/ratingProduct.js')
 
-const { getRatingSeller } = require('../controllers/vistaVendedor.js')
+const { getRatingSeller } = require('../controllers/seller.js')
 const webhookMercadoLibre = require('../controllers/webhookMercadoLibre.js')
 
 const {
@@ -71,18 +71,18 @@ const {
   getPurchasesById,
   confirmShipment,
   cancelPurchase,
-} = require('../controllers/purchases.js')
+} = require('../controllers/purchase.js')
 
 const {
   getQuestions,
   addQuestion,
   answerQuestions
-} = require('../controllers/questions.js')
+} = require('../controllers/question.js')
 
 const { oauthCallback } = require('../controllers/oauth.js')
-const { preferenceTest } = require('../controllers/preferenceTest.js')
-const { debugPreference } = require('../controllers/debugPreference.js')
-const { debugPayment } = require('../controllers/debugPayment.js')
+const { preferenceTest } = require('../debug/preferenceTest.js')
+const { debugPreference } = require('../debug/debugPreference.js')
+const { debugPayment } = require('../debug/debugPayment.js')
 
 // Users routes
 router.get('/getUser', getUser)
