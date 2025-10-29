@@ -487,19 +487,33 @@ VALUES
 (null, 49, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739203206/dgeumsxzyrlqv3kzqdw6.png');
 
 -- Insert sample bicycles
-INSERT INTO `bicicleta` (`tipoBicicleta`, `color`, `genero`, `edad`, `tamañoMarco`, `materialMarco`, `tamañoRueda`, `tipoFrenos`, `velocidades`, `suspension`, `transmision`, `tipoPedales`, `manubrio`, `pesoBicicleta`, `pesoMaximo`, `extras`)
+INSERT INTO `bicicleta` (`tipoBicicleta`, `color`, `genero`, `edad`, `tamañoMarco`, `materialMarco`, `tamañoRueda`, `tipoFrenos`, `velocidades`, `suspension`, `transmision`, `tipoPedales`, `manubrio`, `pesoBicicleta`, `pesoMaximo`, `extras`, `tarjeta`)
 VALUES 
-('MTB', 'Negra', 'Unisex', 'Adulto', 'M', 'Aluminio', '29"', 'Disco', '21', 'Delantera', 'Shimano', 'Plataforma', 'Plano', 14.5, 120, 'Bottle cage, kickstand'),
-('Carretera', 'Azul', 'Unisex', 'Adulto', 'L', 'Carbono', '28"', 'Caliper', '22', 'Ninguna', 'Shimano', 'Sin clip', 'Caída', 8.5, 100, 'Carbon seatpost'),
-('Carretera', 'Azul', 'Unisex', 'Adulto', 'M', 'Carbono', '28"', 'Caliper', '22', 'Ninguna', 'Shimano', 'Sin clip', 'Caída', 8.5, 100, 'Lightweight wheels'),
-('Híbrida', 'Gris', 'Unisex', 'Adulto', 'M', 'Aluminio', '28"', 'Disco', '24', 'Delantera', 'Shimano', 'Plataforma', 'Plano', 12.8, 130, 'Fenders, rear rack'),
-('MTB', 'Roja', 'Unisex', 'Adulto', 'S', 'Aluminio', '27.5"', 'Disco', '18', 'Delantera', 'Shimano', 'Plataforma', 'Plano', 13.5, 110, 'Bottle cage');
+('MTB', 'Negra', 'Unisex', 'Adulto', 'M', 'Aluminio', '29"', 'Disco', '21', 'Delantera', 'Shimano', 'Plataforma', 'Plano', 14.5, 120, 'Bottle cage, kickstand','https://res.cloudinary.com/drfmpnhaz/image/upload/v1741070744/dwktxnyvetrnhl5yowmg.jpg'),
+('Carretera', 'Azul', 'Unisex', 'Adulto', 'L', 'Carbono', '28"', 'Caliper', '22', 'Ninguna', 'Shimano', 'Sin clip', 'Caída', 8.5, 100, 'Carbon seatpost', 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1741070744/dwktxnyvetrnhl5yowmg.jpg'),
+('Carretera', 'Azul', 'Unisex', 'Adulto', 'M', 'Carbono', '28"', 'Caliper', '22', 'Ninguna', 'Shimano', 'Sin clip', 'Caída', 8.5, 100, 'Lightweight wheels', 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1741070744/dwktxnyvetrnhl5yowmg.jpg'),
+('Híbrida', 'Gris', 'Unisex', 'Adulto', 'M', 'Aluminio', '28"', 'Disco', '24', 'Delantera', 'Shimano', 'Plataforma', 'Plano', 12.8, 130, 'Fenders, rear rack', null),
+('MTB', 'Roja', 'Unisex', 'Adulto', 'S', 'Aluminio', '27.5"', 'Disco', '18', 'Delantera', 'Shimano', 'Plataforma', 'Plano', 13.5, 110, 'Bottle cage', null);
 
 -- Insert sample stores
 INSERT INTO `tienda` (`idUsuarioAdministrador`, `nombre`, `descripcion`, `telefono`)
 VALUES 
 (3, 'Bogotá Bike Shop', 'The best bicycle shop in Bogotá with quality bikes and components', '3001234567'),
 (3, 'Mountain Riders Store', 'Specialized in mountain bikes and trail gear', '3105551234');
+
+-- Insert sample documents (ownership records for bicycles)
+INSERT INTO `documento` (`idModelo`, `idUsuario`, `tipo`, `descripcion`, `estado`, `fechaCompra`)
+VALUES 
+(1, 4, 'Ownership Card', 'Original purchase invoice for Trek Marlin 7 MTB', 'Activo', '2024-06-15'),
+(2, 4, 'Ownership Card', 'Warranty documentation for Specialized Allez road bike', 'Activo', '2024-08-22'),
+(3, 4, 'Ownership Card', 'Purchase receipt for Giant Defy Advanced', 'Activo', '2024-09-10');
+
+-- Insert document images (images for ownership documents)
+INSERT INTO `imagen` (`idUsuario`, `idDocumento`, `idModelo`, `url`)
+VALUES 
+(NULL, 1, NULL, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1741070744/dwktxnyvetrnhl5yowmg.jpg'),
+(NULL, 2, NULL, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1741070744/dwktxnyvetrnhl5yowmg.jpg'),
+(NULL, 3, NULL, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1741070744/dwktxnyvetrnhl5yowmg.jpg');
 
 -- Insert sample products
 INSERT INTO `producto` (`idModelo`, `idVendedor`, `idTienda`, `precio`, `precioCompleto`, `cantidad`,`ventas`, `estado`, `disponibilidad`, `costoEnvio`, `retiroEnTienda`)
