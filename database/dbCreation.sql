@@ -620,20 +620,20 @@ VALUES
 -- Insert sample ratings
 INSERT INTO `calificacion` (`idUsuarioComprador`, `idUsuarioVendedor`, `idProducto`, `idTienda`, `foto`, `comentario`, `nota`)
 VALUES 
-(2, 1, 1, 1, '', 'Excellent bicycle! Very satisfied with the purchase', 5),
-(3, 2, 2, 1, '', 'Very satisfied with the quality', 4),
-(1, 2, 2, 1, '', 'The bike is good but quite heavy', 3),
-(2, 1, 10, null, null, 'Great product, been using it for three months without any flats', 5),
-(3, 1, 10, null, null, 'Poor quality, got a flat on the first ride', 1),
-(1, 2, 1, 1, '', 'Amazing bike for trail riding!', 5),
-(2, 3, 2, 1, '', 'Very happy with this purchase', 4),
-(3, 2, 2, 1, '', 'Good bike but a bit pricey', 3),
-(2, 1, 13, null, null, 'Excellent braking power, very responsive', 5),
-(3, 1, 20, null, null, 'Smooth suspension, great for trails', 5),
-(1, 2, 25, null, null, 'Comfortable handlebar, good width', 4),
-(2, 1, 30, null, null, 'Great tire, excellent grip on trails', 5),
-(3, 2, 36, null, null, 'Perfect pedals for my riding style', 4),
-(1, 2, 40, null, null, 'Good helmet, fits well and looks great', 5);
+(2, 4, 1, 1, '', 'Excellent bicycle! Very satisfied with the purchase', 5),
+(3, 4, 2, 1, '', 'Very satisfied with the quality', 4),
+(1, 4, 2, 1, '', 'The bike is good but quite heavy', 3),
+(2, 4, 10, null, null, 'Great product, been using it for three months without any flats', 5),
+(3, 4, 10, null, null, 'Poor quality, got a flat on the first ride', 1),
+(1, 4, 1, 1, '', 'Amazing bike for trail riding!', 5),
+(2, 4, 2, 1, '', 'Very happy with this purchase', 4),
+(3, 4, 2, 1, '', 'Good bike but a bit pricey', 3),
+(2, 4, 13, null, null, 'Excellent braking power, very responsive', 5),
+(3, 4, 20, null, null, 'Smooth suspension, great for trails', 5),
+(1, 4, 25, null, null, 'Comfortable handlebar, good width', 4),
+(2, 4, 30, null, null, 'Great tire, excellent grip on trails', 5),
+(3, 4, 36, null, null, 'Perfect pedals for my riding style', 4),
+(1, 4, 40, null, null, 'Good helmet, fits well and looks great', 5);
 
 -- Insert sample messages
 INSERT INTO `mensaje` (`idUsuarioEmisor`, `idUsuarioReceptor`, `idCarritoProducto`, `contenido`, `fecha`)
