@@ -511,9 +511,9 @@ VALUES
 -- Insert document images (images for ownership documents)
 INSERT INTO `imagen` (`idUsuario`, `idDocumento`, `idModelo`, `url`)
 VALUES 
-(NULL, 1, NULL, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1741070744/dwktxnyvetrnhl5yowmg.jpg'),
-(NULL, 2, NULL, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1741070744/dwktxnyvetrnhl5yowmg.jpg'),
-(NULL, 3, NULL, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1741070744/dwktxnyvetrnhl5yowmg.jpg');
+(NULL, 1, NULL, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761721280/tarjeta_anqoui.jpg'),
+(NULL, 2, NULL, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761721280/tarjeta_anqoui.jpg'),
+(NULL, 3, NULL, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761721280/tarjeta_anqoui.jpg');
 
 -- Insert sample products
 INSERT INTO `producto` (`idModelo`, `idVendedor`, `idTienda`, `precio`, `precioCompleto`, `cantidad`,`ventas`, `estado`, `disponibilidad`, `costoEnvio`, `retiroEnTienda`)
