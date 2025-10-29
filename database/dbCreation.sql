@@ -328,26 +328,38 @@ CREATE TABLE `mensaje` (
 -- Insert sample users
 INSERT INTO `usuario` (`nombre`, `apellido`, `fechaNacimiento`, `rol`, `correo`, `direccionNombre`,`telefono`, `username`, `password`)
 VALUES 
-('John', 'Smith', '1985-05-15', 'comprador', 'john.smith@example.com', 'Calle 123, Bogotá', '3001234567', 'johnsmith', '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.'),
-('Sarah', 'Johnson', '1990-08-22', 'vendedor', 'sarah.johnson@example.com', 'Carrera 45, Medellín', '3107654321', 'sarahj', '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.'),
-('Michael', 'Williams', '1978-11-30', 'administrador', 'michael.williams@example.com', 'Avenida 10, Cali', '3209876543', 'michaelw', '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.');
+('John', 'Smith', '1985-05-15', 'comprador', 'john.smith@example.com', 'Street 123, City', '3001234567', 'johnsmith', '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.'),
+('Sarah', 'Johnson', '1990-08-22', 'vendedor', 'sarah.johnson@example.com', 'Street 123, City', '3107654321', 'sarahj', '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.'),
+('Michael', 'Williams', '1978-11-30', 'administrador', 'michael.williams@example.com', 'Street 10, City', '3209876543', 'michaelw', '$2b$10$TbLwUaHLc9Pw6hEa8ZqojOgfzzEVjNuGOGLBezxVWTdU7W0r4weE.');
 
 
 INSERT INTO `usuario` VALUES
-('4', 'Seller', 'Smith', '2003-07-15', 'vendedor', 'seller@example.com', '110881', 'Calle 324', '48-50 Sur', '', '', 'Bogota', NULL, NULL, '$2b$10$PqKSvdLV5aCgRAXZUSq8IuFcmdy6cyyoADJFFX4/HL7qhJ.XDajmS', '0', '2025-03-01 14:51:26', '2950485379', NULL, NULL, NULL),
-('5', 'Buyer', 'Smith', NULL, 'comprador', 'buyer@example.com', '110881', 'Calle 324', '48-50 Sur', '', '', 'Bogota', NULL, NULL, '$2b$10$PqKSvdLV5aCgRAXZUSq8IuFcmdy6cyyoADJFFX4/HL7qhJ.XDajmS', '0', '2025-03-01 15:13:31', '2950485379', 'APP_USR-6292844536291010-102714-afebc269123c44f7d1c72086306883a4-2950485379', 'TG-68ffba35d5bea2000188f0d1-2950485379', 'APP_USR-c85d21a5-dfbb-4a28-bf0f-5f7e8299bb39');
+('4', 'Seller', 'Smith', '2003-07-15', 'vendedor', 'seller@example.com', '110382', 'Street 324, City', '48-50', '', '', 'Helsinki', '3001234567', 'mluukkai', '$2b$10$PqKSvdLV5aCgRAXZUSq8IuFcmdy6cyyoADJFFX4/HL7qhJ.XDajmS', '0', '2025-03-01 14:51:26', '2950485379', 'APP_USR-6292844536291010-102714-afebc269123c44f7d1c72086306883a4-2950485379', 'TG-68ffba35d5bea2000188f0d1-2950485379', 'APP_USR-c85d21a5-dfbb-4a28-bf0f-5f7e8299bb39'),
+('5', 'Buyer', 'Smith', '2003-04-16', 'comprador', 'buyer@example.com', '110382', 'Street 324, City', '48-50', '', '','Bogotá', '3001234567', 'wisecod', '$2b$10$PqKSvdLV5aCgRAXZUSq8IuFcmdy6cyyoADJFFX4/HL7qhJ.XDajmS', '0', '2025-03-01 15:13:31', NULL, NULL, NULL, NULL);
 
 
 -- Insert sample brands
-INSERT INTO `marca` (`nombre`)
+-- Note: IDs are explicitly set to ensure foreign key references work correctly
+INSERT INTO `marca` (`idMarca`, `nombre`)
 VALUES 
-('Trek'),
-('Specialized'),
-('Giant'),
-('Shimano'),
-('GW'),
-('Colnago'),
-('Cannondale');
+(1, 'Trek'),
+(2, 'Specialized'),
+(3, 'Giant'),
+(4, 'Shimano'),
+(5, 'GW'),
+(6, 'Colnago'),
+(7, 'Cannondale'),
+(8, 'Bontrager'),
+(9, 'SRAM'),
+(10, 'RockShox'),
+(11, 'Fox Racing'),
+(12, 'Maxxis'),
+(13, 'Continental'),
+(14, 'Schwalbe'),
+(15, 'Race Face'),
+(16, 'Crankbrothers'),
+(17, 'Hope'),
+(18, 'Magura');
 
 -- Insert sample models
 INSERT INTO `modelo` (`nombre`, `tipo`, `descripcion`, `categoria`, `compatibilidad`, `idMarca`)
@@ -363,62 +375,63 @@ VALUES
 ('Shimano Deore XT Chainring', 'componente', 'MTB single chainring with 32T', 'Transmisión', 'Compatible with mountain bikes', 4),
 ('Shimano Altus Cassette', 'componente', '8-speed cassette for MTB', 'Transmisión', 'Compatible with 8-speed systems', 4),
 ('Shimano 105 Groupset', 'componente', '11-speed road groupset', 'Transmisión', 'Compatible with road bikes', 4),
-('SRAM GX Eagle Derailleur', 'componente', '12-speed rear derailleur for MTB', 'Transmisión', 'Compatible with SRAM 12-speed', 6),
-('SRAM NX Cassette', 'componente', '11-speed wide-range cassette', 'Transmisión', 'Compatible with SRAM 11-speed', 6),
+('SRAM GX Eagle Derailleur', 'componente', '12-speed rear derailleur for MTB', 'Transmisión', 'Compatible with SRAM 12-speed', 9),
+('SRAM NX Cassette', 'componente', '11-speed wide-range cassette', 'Transmisión', 'Compatible with SRAM 11-speed', 9),
 ('Shimano Deore Chain', 'componente', '10-speed MTB chain', 'Transmisión', 'Compatible with 10-speed systems', 4),
-('SRAM PC-1110 Chain', 'componente', '11-speed chain for MTB and road', 'Transmisión', 'Compatible with 11-speed systems', 6),
+('SRAM PC-1110 Chain', 'componente', '11-speed chain for MTB and road', 'Transmisión', 'Compatible with 11-speed systems', 9),
 
 -- Brakes / Frenos
 ('Shimano Deore Hydraulic Disc Brake', 'componente', 'Hydraulic disc brake set front and rear', 'Frenos', 'Compatible with all MTB', 4),
 ('Shimano BR-R7000 Caliper Brake', 'componente', 'Road bike caliper brake set', 'Frenos', 'Compatible with road bikes', 4),
-('SRAM Level TLM Brake', 'componente', 'Trail hydraulic disc brake', 'Frenos', 'Compatible with MTB', 6),
-('Magura MT5 Brake Set', 'componente', 'High-performance hydraulic disc brake', 'Frenos', 'Compatible with all bikes', 15),
-('Hope Tech 3 E4 Brake', 'componente', 'Premium 4-piston hydraulic brake', 'Frenos', 'Compatible with MTB and e-bikes', 14),
+('SRAM Level TLM Brake', 'componente', 'Trail hydraulic disc brake', 'Frenos', 'Compatible with MTB', 9),
+('Magura MT5 Brake Set', 'componente', 'High-performance hydraulic disc brake', 'Frenos', 'Compatible with all bikes', 18),
+('Hope Tech 3 E4 Brake', 'componente', 'Premium 4-piston hydraulic brake', 'Frenos', 'Compatible with MTB and e-bikes', 17),
 ('Generic V-Brake Pads', 'componente', 'Brake pads for rim brakes', 'Frenos', 'Compatible with any V-brake system', null),
 ('Shimano Resin Disc Brake Pads', 'componente', 'Replacement pads for disc brakes', 'Frenos', 'Compatible with Shimano disc brakes', 4),
 
 -- Suspension / Suspensión
-('RockShox Judy Silver TK', 'componente', '100mm travel air fork for XC', 'Suspensión', 'Compatible with MTB 29" or 27.5"', 7),
-('RockShox Recon RL', 'componente', '120mm travel fork for trail riding', 'Suspensión', 'Compatible with MTB', 7),
-('Fox 34 Float Performance', 'componente', '140mm travel fork for aggressive trail', 'Suspensión', 'Compatible with MTB 29"', 8),
-('RockShox Deluxe Select+', 'componente', 'Rear shock for trail bikes', 'Suspensión', 'Compatible with full suspension MTB', 7),
-('Fox Float DPS', 'componente', 'Lightweight rear shock', 'Suspensión', 'Compatible with XC and trail bikes', 8),
+('RockShox Judy Silver TK', 'componente', '100mm travel air fork for XC', 'Suspensión', 'Compatible with MTB 29" or 27.5"', 10),
+('RockShox Recon RL', 'componente', '120mm travel fork for trail riding', 'Suspensión', 'Compatible with MTB', 10),
+('Fox 34 Float Performance', 'componente', '140mm travel fork for aggressive trail', 'Suspensión', 'Compatible with MTB 29"', 11),
+('RockShox Deluxe Select+', 'componente', 'Rear shock for trail bikes', 'Suspensión', 'Compatible with full suspension MTB', 10),
+('Fox Float DPS', 'componente', 'Lightweight rear shock', 'Suspensión', 'Compatible with XC and trail bikes', 11),
 
 -- Handlebars / Manubrio
-('Race Face Chester Handlebar', 'componente', 'Durable aluminum flat handlebar 780mm', 'Manubrio', 'Compatible with MTB', 12),
-('Bontrager Elite Drop Bar', 'componente', 'Road bike drop handlebar 42cm', 'Manubrio', 'Compatible with road bikes', 5),
+('Race Face Chester Handlebar', 'componente', 'Durable aluminum flat handlebar 780mm', 'Manubrio', 'Compatible with MTB', 15),
+('Bontrager Elite Drop Bar', 'componente', 'Road bike drop handlebar 42cm', 'Manubrio', 'Compatible with road bikes', 8),
 ('Specialized S-Works Carbon Riser', 'componente', 'Lightweight carbon riser bar 760mm', 'Manubrio', 'Compatible with MTB', 2),
 ('Giant Contact SLR Aero Bar', 'componente', 'Aerodynamic drop bar for road', 'Manubrio', 'Compatible with road bikes', 3),
-('Race Face Turbine R Handlebar', 'componente', 'Carbon fiber flat bar 785mm', 'Manubrio', 'Compatible with MTB', 12),
+('Race Face Turbine R Handlebar', 'componente', 'Carbon fiber flat bar 785mm', 'Manubrio', 'Compatible with MTB', 15),
 
 -- Tires / Neumáticos
-('Maxxis Minion DHF 29x2.5', 'componente', 'Aggressive trail tire with excellent grip', 'Neumáticos', 'Compatible with 29" MTB', 9),
-('Continental Grand Prix 5000 700x25', 'componente', 'High-performance road tire', 'Neumáticos', 'Compatible with road bikes', 10),
-('Schwalbe Marathon Plus 26x1.75', 'componente', 'Puncture-proof touring tire', 'Neumáticos', 'Compatible with hybrid and city bikes', 11),
-('Maxxis Ardent 27.5x2.4', 'componente', 'All-around trail tire', 'Neumáticos', 'Compatible with 27.5" MTB', 9),
-('Continental Mountain King 26x2.2', 'componente', 'XC racing tire', 'Neumáticos', 'Compatible with 26" MTB', 10),
-('Schwalbe G-One Speed 700x35', 'componente', 'Gravel racing tire', 'Neumáticos', 'Compatible with gravel and road bikes', 11),
+('Maxxis Minion DHF 29x2.5', 'componente', 'Aggressive trail tire with excellent grip', 'Neumáticos', 'Compatible with 29" MTB', 12),
+('Continental Grand Prix 5000 700x25', 'componente', 'High-performance road tire', 'Neumáticos', 'Compatible with road bikes', 13),
+('Schwalbe Marathon Plus 26x1.75', 'componente', 'Puncture-proof touring tire', 'Neumáticos', 'Compatible with hybrid and city bikes', 14),
+('Maxxis Ardent 27.5x2.4', 'componente', 'All-around trail tire', 'Neumáticos', 'Compatible with 27.5" MTB', 12),
+('Continental Mountain King 26x2.2', 'componente', 'XC racing tire', 'Neumáticos', 'Compatible with 26" MTB', 13),
+('Schwalbe G-One Speed 700x35', 'componente', 'Gravel racing tire', 'Neumáticos', 'Compatible with gravel and road bikes', 14),
 
 -- Pedals / Pedales
 ('Shimano PD-M520 SPD', 'componente', 'Clipless MTB pedals', 'Pedales', 'Compatible with all MTB', 4),
-('Crankbrothers Stamp 1', 'componente', 'Large platform flat pedals', 'Pedales', 'Compatible with all bikes', 13),
+('Crankbrothers Stamp 1', 'componente', 'Large platform flat pedals', 'Pedales', 'Compatible with all bikes', 16),
 ('Shimano PD-R7000 105', 'componente', 'Road clipless pedals', 'Pedales', 'Compatible with road bikes', 4),
-('Race Face Chester Pedals', 'componente', 'Composite platform pedals', 'Pedales', 'Compatible with all bikes', 12),
+('Race Face Chester Pedals', 'componente', 'Composite platform pedals', 'Pedales', 'Compatible with all bikes', 15),
 
 -- Helmets / Casco
-('Bontrager Starvos MIPS', 'accesorio', 'Road cycling helmet with MIPS protection', 'Casco', 'Universal fit', 5),
+('Bontrager Starvos MIPS', 'accesorio', 'Road cycling helmet with MIPS protection', 'Casco', 'Universal fit', 8),
 ('Specialized Propero III', 'accesorio', 'Lightweight road helmet', 'Casco', 'Universal fit', 2),
 ('Giant Rev MIPS', 'accesorio', 'All-around cycling helmet', 'Casco', 'Universal fit', 3),
-('Fox Speedframe Pro', 'accesorio', 'MTB helmet with extended coverage', 'Casco', 'MTB specific', 8),
+('Fox Speedframe Pro', 'accesorio', 'MTB helmet with extended coverage', 'Casco', 'MTB specific', 11),
 
 -- Saddles / Sillín
-('Bontrager Montrose Elite', 'componente', 'Comfortable trail saddle', 'Sillín', 'Compatible with all bikes', 5),
+('Bontrager Montrose Elite', 'componente', 'Comfortable trail saddle', 'Sillín', 'Compatible with all bikes', 8),
 ('Specialized Power Arc', 'componente', 'Performance road saddle', 'Sillín', 'Compatible with road bikes', 2),
 ('Giant Fleet SLR', 'componente', 'Lightweight racing saddle', 'Sillín', 'Compatible with road bikes', 3),
 
 -- Other accessories
 ('Generic Bike Bell', 'accesorio', 'Standard bicycle bell', 'Accesorios', 'Universal fit', null),
-('LED Bike Light Set', 'accesorio', 'Front and rear LED light set', 'Accesorios', 'Universal fit', null);
+('LED Bike Light Set', 'accesorio', 'Front and rear LED light set', 'Accesorios', 'Universal fit', null),
+('Generic Inner Tube', 'componente', 'Universal bicycle inner tube for various wheel sizes', 'Neumáticos', 'Compatible with most bicycles', null);
 
 -- Insert sample images (keeping existing images for first models, adding placeholders for new ones)
 INSERT INTO `imagen` (`idUsuario`, `idModelo`, `url`)
@@ -426,51 +439,52 @@ VALUES
 (null, 1, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739199906/ukc7nxqc5hm79o4utb39.png'),
 (null, 2, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739200194/qhvxoj4ggjp1qrdn1fpd.png'),
 (null, 3, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739200646/iyqe0j8piameldruninf.png'),
-(null, 4, ''),
-(null, 5, ''),
+(null, 4, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761693921/trek-fx-3---2025-iv-798681-2_u7vamz.png'),
+(null, 5, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761694216/specialized-specialized-rockhopper-29-comp-2024_bugp7w.webp'),
 (null, 6, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739201523/td7nvl10zjctewo5jgld.png'),
 (null, 7, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739201377/d10mnzoi5xp8ibs1apvm.png'),
-(null, 8, ''),
-(null, 9, ''),
-(null, 10, ''),
-(null, 11, ''),
-(null, 12, ''),
-(null, 13, ''),
-(null, 14, ''),
-(null, 15, ''),
-(null, 16, ''),
-(null, 17, ''),
-(null, 18, ''),
-(null, 19, ''),
-(null, 20, ''),
-(null, 21, ''),
-(null, 22, ''),
-(null, 23, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739203206/dgeumsxzyrlqv3kzqdw6.png'),
-(null, 24, ''),
-(null, 25, ''),
-(null, 26, ''),
-(null, 27, ''),
-(null, 28, ''),
-(null, 29, ''),
-(null, 30, ''),
-(null, 31, ''),
-(null, 32, ''),
-(null, 33, ''),
-(null, 34, ''),
-(null, 35, ''),
-(null, 36, ''),
-(null, 37, ''),
-(null, 38, ''),
-(null, 39, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1740430801/pxjassqtrzvnbrpovqur.png'),
-(null, 40, ''),
-(null, 41, ''),
-(null, 42, ''),
-(null, 43, ''),
-(null, 44, ''),
-(null, 45, ''),
-(null, 46, ''),
-(null, 47, ''),
-(null, 48, '');
+(null, 8, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761694261/498052-1-bbbd5d-large-1693226651_zrbakd.png'),
+(null, 9, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761694294/tensorgx_large_99cf6dfe-7854-404d-a4ef-da990ae4f9ab_uqfpez.png'),
+(null, 10, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761694808/sram-sram-pg-1230-cassette-nx-eagle-12-speeds-11-5_rr1hvf.png'),
+(null, 11, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761694488/s-l1600_-_2021-11-17T085924.596-removebg-preview_hemfw7.png'),
+(null, 12, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761694546/s-l1600__21_-removebg-preview_affrbu.png'),
+(null, 13, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761694625/ShimanoDeoreXTHydraulicBrakeLeverBL-M8100_Left_withBrakeCaliperBR-M8100_Front_8e1bac99-edd6-476e-a40c-0b8d750cf288_h3yzem.png'),
+(null, 14, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761694675/image-removebg-preview_33_06298793-dfd9-477f-9849-45b782b785c5_1080x_ords00.png'),
+(null, 15, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761694736/sram-sram-level-hydraulic-disc-brake_nmgczy.png'),
+(null, 16, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761694866/PimpMyMT5-600x354px_aggzzw.png'),
+(null, 17, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761695000/Untitled-design--49_oown9a.png'),
+(null, 18, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1740430801/pxjassqtrzvnbrpovqur.png'),
+(null, 19, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761695115/ShimanoB-TypeB05S-RXResin_umusnp.png'),
+(null, 20, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761695200/c120mmblackfrontdv_beqh6d.png'),
+(null, 21, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761695241/c130mmblack3qdv_lq4gim.png'),
+(null, 22, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761695280/MY26_34SL__PS_E_Matte_GripSL_KaboltSL__2_Hero_1600x1600_vbtyfp.png'),
+(null, 23, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761695381/rs-sdlxc-sel-230x65-lnm-hb-ss-b1-c-3q-v-v02_rk4bb0.png'),
+(null, 24, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761695412/dps_performance_3_pos_standard_side_frscuh.png'),
+(null, 25, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761695445/original_2015_HBR35_CHESTER_RS_20mm_BLK_WHT_pytosd.png'),
+(null, 26, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761695488/13294_A_1_Elite_Road_Bar_Handlebar_tegp2d.png'),
+(null, 27, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761695536/21017-00_CMPNT_SW-CARBON-AEROFLY-BAR-25-RD-BAR_SATIN-CARBON_kgi4lp.png'),
+(null, 28, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761695582/GiantContactSLRAeroHandlebar440mmMy18Propel_ry9dqw.png'),
+(null, 29, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761695609/original_Handlebar_35mm_Turbine_R_820_RS20_Blue.png_etpjcg.png'),
+(null, 30, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761695680/Maxxis-Minion-DHF-29er-Tyre-Pushbikes_994x_hqfzmv.png'),
+(null, 31, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761695783/2a928571-064a-521e-906f-1eece315d15e_oygd1l.png'),
+(null, 32, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761695839/hs440_schwalbe_marathon-plus.png_q7bxsz.webp'),
+(null, 33, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761695875/bike-mtb-ardent-skw_taejf7.webp'),
+(null, 34, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761695973/100514_angle1_1000x1000-300x300_utlmxw_ljmkck.png'),
+(null, 35, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761696021/Schwalbe_G-One_Speed_V-guard_foldedae_1725021564_uusfiu.png'),
+(null, 36, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761696062/4_PD-M520SPDPEDALSBLACK_pykbqx.png'),
+(null, 37, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761696108/Stamp_1_small_purple-_1_1080x_jqez9f.png'),
+(null, 38, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761696148/10001031_Shimano_105_PD_R7000_Pedale_dio544.png'),
+(null, 39, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761696247/race-face-chester-pedal-376874-11_kxvhlf.png'),
+(null, 40, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761696282/CascoBontragerStarvosMips-7_720x_r9l4o4.png'),
+(null, 41, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761696331/specialized-propero-3-angi-ready_fpaxyl.png'),
+(null, 42, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761696358/image-f5775c69217a4c8d88528ba7b6a71244_jytkgt.png'),
+(null, 43, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761696391/25102001_1_nlt6zn.webp'),
+(null, 44, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761696462/14009_A_1_Montrose_Elite_Saddle_ym3wbn.png'),
+(null, 45, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761696506/27118-171_SDDL_SW-POWER-ARC-CARBON_RED_HERO_nnqdp6.png'),
+(null, 46, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761696580/adjustable-bicycle-seat-802743058-kev6w1hj_lc3p2x.png'),
+(null, 47, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761696643/BBBBBB-14D-MIXED_fta7aj_lsukon.png'),
+(null, 48, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761696691/L-HEBIKEFRR-1_eqj0yz.png'),
+(null, 49, 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1739203206/dgeumsxzyrlqv3kzqdw6.png');
 
 -- Insert sample bicycles
 INSERT INTO `bicicleta` (`tipoBicicleta`, `color`, `genero`, `edad`, `tamañoMarco`, `materialMarco`, `tamañoRueda`, `tipoFrenos`, `velocidades`, `suspension`, `transmision`, `tipoPedales`, `manubrio`, `pesoBicicleta`, `pesoMaximo`, `extras`)
@@ -491,63 +505,63 @@ VALUES
 INSERT INTO `producto` (`idModelo`, `idVendedor`, `idTienda`, `precio`, `precioCompleto`, `cantidad`,`ventas`, `estado`, `disponibilidad`, `costoEnvio`, `retiroEnTienda`)
 VALUES 
 -- Bicycles
-(1, 4, null, 3000000, 3300000, 10, 0, 'nuevo', 'disponible', 50000, false),
+(1, 4, null, 3000000, 3300000, 10, 0, 'nuevo', 'disponible', 0, false),
 (2, 4, null, 2400000, 3000000, 5, 2, 'nuevo', 'disponible', 0, false),
 (3, 4, null, 11000000, null, 3, 10, 'nuevo', 'disponible', 50000, false),
 (4, 4, null, 1800000, null, 8, 3, 'nuevo', 'disponible', 45000, false),
 (5, 4, null, 1500000, 1800000, 12, 5, 'nuevo', 'disponible', 40000, false),
 
 -- Drivetrains
-(6, 4, null, 290000, 300000, 20, 4, 'nuevo', 'disponible', 10000, false),
-(7, 4, null, 120000, null, 15, 8, 'nuevo', 'disponible', 8000, false),
+(6, 4, null, 290000, 300000, 20, 4, 'nuevo', 'disponible', 0, false),
+(7, 4, null, 120000, null, 15, 8, 'nuevo', 'disponible', 0, false),
 (8, 4, null, 1500000, null, 5, 2, 'nuevo', 'disponible', 15000, false),
 (9, 4, null, 380000, 420000, 10, 6, 'nuevo', 'disponible', 10000, false),
 (10, 4, null, 200000, 250000, 18, 3, 'nuevo', 'disponible', 8000, false),
-(11, 4, null, 85000, null, 25, 12, 'nuevo', 'disponible', 5000, false),
-(12, 4, null, 95000, null, 20, 8, 'nuevo', 'disponible', 5000, false),
+(11, 4, null, 85000, null, 25, 12, 'nuevo', 'disponible', 0, false),
+(12, 4, null, 95000, null, 20, 8, 'nuevo', 'disponible', 0, false),
 
 -- Brakes
 (13, 4, null, 450000, 500000, 15, 7, 'nuevo', 'disponible', 12000, false),
 (14, 4, null, 180000, null, 12, 4, 'nuevo', 'disponible', 8000, false),
-(15, 4, null, 380000, 420000, 10, 5, 'nuevo', 'disponible', 10000, false),
-(16, 4, null, 550000, 600000, 8, 3, 'nuevo', 'disponible', 12000, false),
-(17, 4, null, 780000, null, 5, 2, 'nuevo', 'disponible', 15000, false),
+(15, 4, null, 380000, 420000, 10, 5, 'nuevo', 'disponible', 0, false),
+(16, 4, null, 550000, 600000, 8, 3, 'nuevo', 'disponible', 0, false),
+(17, 4, null, 780000, null, 5, 2, 'nuevo', 'disponible', 0, false),
 (18, 4, null, 15000, null, 50, 25, 'nuevo', 'disponible', 3000, false),
 (19, 4, null, 35000, 40000, 40, 18, 'nuevo', 'disponible', 3000, false),
 
 -- Suspension
-(20, 4, null, 1200000, 1400000, 8, 4, 'nuevo', 'disponible', 20000, false),
+(20, 4, null, 1200000, 1400000, 8, 4, 'nuevo', 'disponible', 0, false),
 (21, 4, null, 1500000, null, 6, 3, 'nuevo', 'disponible', 20000, false),
-(22, 4, null, 2800000, null, 4, 1, 'nuevo', 'disponible', 25000, false),
+(22, 4, null, 2800000, null, 4, 1, 'nuevo', 'disponible', 0, false),
 (23, 4, null, 1800000, 2000000, 5, 2, 'nuevo', 'disponible', 20000, false),
 (24, 4, null, 2200000, null, 4, 1, 'nuevo', 'disponible', 20000, false),
 
 -- Handlebars
 (25, 4, null, 180000, null, 15, 8, 'nuevo', 'disponible', 8000, false),
-(26, 4, null, 220000, 250000, 10, 5, 'nuevo', 'disponible', 8000, false),
-(27, 4, null, 450000, null, 6, 3, 'nuevo', 'disponible', 10000, false),
-(28, 4, null, 380000, null, 8, 4, 'nuevo', 'disponible', 10000, false),
+(26, 4, null, 220000, 250000, 10, 5, 'nuevo', 'disponible', 0, false),
+(27, 4, null, 450000, null, 6, 3, 'nuevo', 'disponible', 0, false),
+(28, 4, null, 380000, null, 8, 4, 'nuevo', 'disponible', 0, false),
 (29, 4, null, 520000, 580000, 5, 2, 'nuevo', 'disponible', 10000, false),
 
 -- Tires
-(30, 4, null, 145000, 160000, 30, 15, 'nuevo', 'disponible', 8000, false),
-(31, 4, null, 180000, null, 25, 12, 'nuevo', 'disponible', 8000, false),
-(32, 4, null, 120000, null, 35, 20, 'nuevo', 'disponible', 8000, false),
-(33, 4, null, 135000, 150000, 28, 14, 'nuevo', 'disponible', 8000, false),
+(30, 4, null, 145000, 160000, 30, 15, 'nuevo', 'disponible', 0, false),
+(31, 4, null, 180000, null, 25, 12, 'nuevo', 'disponible', 0, false),
+(32, 4, null, 120000, null, 35, 20, 'nuevo', 'disponible', 0, false),
+(33, 4, null, 135000, 150000, 28, 14, 'nuevo', 'disponible', 0, false),
 (34, 4, null, 110000, null, 30, 16, 'nuevo', 'disponible', 8000, false),
 (35, 4, null, 155000, null, 22, 10, 'nuevo', 'disponible', 8000, false),
 
 -- Pedals
 (36, 4, null, 185000, 200000, 20, 10, 'nuevo', 'disponible', 8000, false),
-(37, 4, null, 120000, null, 25, 15, 'nuevo', 'disponible', 8000, false),
+(37, 4, null, 120000, null, 25, 15, 'nuevo', 'disponible', 0, false),
 (38, 4, null, 280000, null, 15, 8, 'nuevo', 'disponible', 10000, false),
 (39, 4, null, 95000, 110000, 30, 18, 'nuevo', 'disponible', 5000, false),
 
 -- Helmets
 (40, 4, null, 300000, 350000, 15, 8, 'nuevo', 'disponible', 10000, false),
-(41, 4, null, 460000, 500000, 10, 5, 'nuevo', 'disponible', 12000, false),
+(41, 4, null, 460000, 500000, 10, 5, 'nuevo', 'disponible', 0, false),
 (42, 4, null, 280000, null, 12, 6, 'nuevo', 'disponible', 10000, false),
-(43, 4, null, 380000, null, 8, 4, 'nuevo', 'disponible', 10000, false),
+(43, 4, null, 380000, null, 8, 4, 'nuevo', 'disponible', 0, false),
 
 -- Saddles
 (44, 4, null, 220000, 250000, 18, 9, 'nuevo', 'disponible', 8000, false),
@@ -555,8 +569,11 @@ VALUES
 (46, 4, null, 450000, 500000, 8, 3, 'nuevo', 'disponible', 10000, false),
 
 -- Accessories
-(47, 4, null, 25000, null, 50, 30, 'nuevo', 'disponible', 3000, false),
-(48, 4, null, 85000, 95000, 35, 20, 'nuevo', 'disponible', 5000, false);
+(47, 4, null, 25000, null, 50, 30, 'nuevo', 'disponible', 0, false),
+(48, 4, null, 85000, 95000, 35, 20, 'nuevo', 'disponible', 5000, false),
+
+-- Inner Tube (Best Seller - Most Sold Product)
+(49, 4, null, 5000, null, 100, 250, 'nuevo', 'disponible', 0, false);
 
 -- Insert sample payments
 INSERT INTO `carrito` (`idPreferencia`, `idPago`, `idVendedor`, `idComprador`, `estado`, `metodoPago`, `precioTotal`, `fecha`, `direccionEnvio`)
