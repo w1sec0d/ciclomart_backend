@@ -84,11 +84,6 @@ const addRatingProduct = async (request, response) => {
   try {
     const { productId, comment, buyerId, sellerId, rating, photo } = request.body
 
-    // Validate rating is between 1-5
-    if (!isValidNumber(rating) || rating < 1 || rating > 5) {
-      return sendError(response, 'Rating must be a number between 1 and 5', 400)
-    }
-
     const query = `INSERT INTO calificacion (idProducto, comentario, idUsuarioComprador, idUsuarioVendedor, nota, foto) VALUES (?, ?, ?, ?, ?, ?)`
 
     await executeQuery(query, [productId, comment, buyerId, sellerId, rating, photo])
