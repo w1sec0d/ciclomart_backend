@@ -2,4 +2,3 @@ node_modules
 .env
 ecosystem.config.js
 /logs/*
-debug/
