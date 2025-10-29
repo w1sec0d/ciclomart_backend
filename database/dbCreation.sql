@@ -754,6 +754,7 @@ LEFT JOIN
 LEFT JOIN 
     imagen AS imagen_vendedor ON usuario.idUsuario = imagen_vendedor.idUsuario
 ORDER BY 
+    producto.exposicion DESC,
     producto.ventas DESC;
 
 -- View: vista_producto_calificacion
