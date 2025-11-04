@@ -489,9 +489,9 @@ VALUES
 -- Insert sample bicycles
 INSERT INTO `bicicleta` (`tipoBicicleta`, `color`, `genero`, `edad`, `tamañoMarco`, `materialMarco`, `tamañoRueda`, `tipoFrenos`, `velocidades`, `suspension`, `transmision`, `tipoPedales`, `manubrio`, `pesoBicicleta`, `pesoMaximo`, `extras`, `tarjeta`)
 VALUES 
-('MTB', 'Negra', 'Unisex', 'Adulto', 'M', 'Aluminio', '29"', 'Disco', '21', 'Delantera', 'Shimano', 'Plataforma', 'Plano', 14.5, 120, 'Bottle cage, kickstand','https://res.cloudinary.com/drfmpnhaz/image/upload/v1741070744/dwktxnyvetrnhl5yowmg.jpg'),
-('Carretera', 'Azul', 'Unisex', 'Adulto', 'L', 'Carbono', '28"', 'Caliper', '22', 'Ninguna', 'Shimano', 'Sin clip', 'Caída', 8.5, 100, 'Carbon seatpost', 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1741070744/dwktxnyvetrnhl5yowmg.jpg'),
-('Carretera', 'Azul', 'Unisex', 'Adulto', 'M', 'Carbono', '28"', 'Caliper', '22', 'Ninguna', 'Shimano', 'Sin clip', 'Caída', 8.5, 100, 'Lightweight wheels', 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1741070744/dwktxnyvetrnhl5yowmg.jpg'),
+('MTB', 'Negra', 'Unisex', 'Adulto', 'M', 'Aluminio', '29"', 'Disco', '21', 'Delantera', 'Shimano', 'Plataforma', 'Plano', 14.5, 120, 'Bottle cage, kickstand','https://res.cloudinary.com/drfmpnhaz/image/upload/v1761721280/tarjeta_anqoui.jpg'),
+('Carretera', 'Azul', 'Unisex', 'Adulto', 'L', 'Carbono', '28"', 'Caliper', '22', 'Ninguna', 'Shimano', 'Sin clip', 'Caída', 8.5, 100, 'Carbon seatpost', 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761721280/tarjeta_anqoui.jpg'),
+('Carretera', 'Azul', 'Unisex', 'Adulto', 'M', 'Carbono', '28"', 'Caliper', '22', 'Ninguna', 'Shimano', 'Sin clip', 'Caída', 8.5, 100, 'Lightweight wheels', 'https://res.cloudinary.com/drfmpnhaz/image/upload/v1761721280/tarjeta_anqoui.jpg'),
 ('Híbrida', 'Gris', 'Unisex', 'Adulto', 'M', 'Aluminio', '28"', 'Disco', '24', 'Delantera', 'Shimano', 'Plataforma', 'Plano', 12.8, 130, 'Fenders, rear rack', null),
 ('MTB', 'Roja', 'Unisex', 'Adulto', 'S', 'Aluminio', '27.5"', 'Disco', '18', 'Delantera', 'Shimano', 'Plataforma', 'Plano', 13.5, 110, 'Bottle cage', null);
 

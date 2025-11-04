@@ -95,7 +95,7 @@ const createPreference = async (req, res) => {
     }
 
     if (producto.idVendedor === idComprador) {
-      return sendError(res, 'A user cannot buy from themselves in marketplace mode', 400)
+      return sendError(res, 'A user cannot buy from themselves in marketplace mode. Please log in with a valid buyer account', 400)
     }
 
     if (vendedor.mp_user_id && comprador.mp_user_id && vendedor.mp_user_id === comprador.mp_user_id) {
