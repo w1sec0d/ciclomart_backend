@@ -78,6 +78,12 @@ To run the project correctly, you must include a .env file in the project root w
 - MP_PUBLIC_KEY: MercadoPago (Payment Gateway) public key
 - MP_REDIRECT_URL: MercadoPago (Payment Gateway) redirect URL
 
+### Encryption Variables (required for sensitive data encryption)
+
+- AES_KEY: AES-256 encryption key (exactly 32 characters). Used to encrypt sensitive user data like phone numbers, addresses, and payment tokens. Generate a secure key with: `openssl rand -base64 24 | head -c 32`
+
+For more details on encryption, see [docs/ENCRYPTION.md](docs/ENCRYPTION.md).
+
 These parameters must match a MySQL database instance, which can be initialized with the script in `./database/dbCreation.sql`
 
 ## License

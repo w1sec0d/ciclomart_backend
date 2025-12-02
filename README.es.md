@@ -75,6 +75,12 @@ Para ejecutar correctamente el projecto debe incluirse un archivo .env en la rai
 - MP_PUBLIC_KEY: Clave pública de MercadoPago (Payment Gateway)
 - MP_REDIRECT_URL: URL de redirección de MercadoPago (Payment Gateway)
 
+### Variables de encriptación (requeridas para encriptar datos sensibles)
+
+- AES_KEY: Clave de encriptación AES-256 (exactamente 32 caracteres). Se usa para encriptar datos sensibles del usuario como teléfonos, direcciones y tokens de pago. Genera una clave segura con: `openssl rand -base64 24 | head -c 32`
+
+Para más detalles sobre encriptación, ver [docs/ENCRYPTION.md](docs/ENCRYPTION.md).
+
 Estos parametros deben coincidir con una instancia de base de datos MySQL, puede ser inicializada con el script en `./database/dbCreation.sql`
 
 ## Licencia

@@ -7,7 +7,10 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "json-server": "json-server --watch test-db.json --port 4000",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "benchmark:encryption": "node benchmarks/encryption.benchmark.js",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
@@ -32,10 +35,21 @@
     "nodemon": "^3.1.9"
   },
   "devDependencies": {
+    "jest": "^29.7.0",
     "prettier": "^3.4.2"
   },
   "overrides": {
     "ajv": "^8.17.1",
     "whatwg-url": "^14.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/__tests__/**/*.test.js"
+    ],
+    "collectCoverageFrom": [
+      "utils/**/*.js",
+      "!**/node_modules/**"
+    ]
   }
 }
