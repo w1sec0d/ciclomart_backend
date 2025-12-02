@@ -28,6 +28,12 @@ const {
     decryptSensitiveFieldsArray
 } = require("../utils/sensitiveFields");
 
+const {
+    decryptData,
+    FIELDS_TO_DECRYPT,
+    FIELDS_TO_REMOVE
+} = require("../middleware/decryptResponse");
+
 describe("encryption.js", () => {
     describe("encrypt/decrypt (low-level)", () => {
         test("should encrypt and decrypt a simple string", () => {
@@ -333,6 +339,196 @@ describe("sensitiveFields.js", () => {
             const result = decryptSensitiveFieldsArray("usuario", notArray);
 
             expect(result).toEqual(notArray);
+        });
+    });
+});
+
+describe("decryptResponse middleware", () => {
+    describe("FIELDS_TO_DECRYPT configuration", () => {
+        test("should include user-visible fields", () => {
+            expect(FIELDS_TO_DECRYPT).toContain("telefono");
+            expect(FIELDS_TO_DECRYPT).toContain("direccionNombre");
+        });
+
+        test("should include aliased fields from views", () => {
+            expect(FIELDS_TO_DECRYPT).toContain("telefonoVendedor");
+            expect(FIELDS_TO_DECRYPT).toContain("direccionEnvio");
+        });
+
+        test("should NOT include server secrets (they go in FIELDS_TO_REMOVE)", () => {
+            expect(FIELDS_TO_DECRYPT).not.toContain("mp_access_token");
+            expect(FIELDS_TO_DECRYPT).not.toContain("mp_refresh_token");
+            expect(FIELDS_TO_DECRYPT).not.toContain("password");
+        });
+    });
+
+    describe("FIELDS_TO_REMOVE configuration", () => {
+        test("should include MercadoPago tokens", () => {
+            expect(FIELDS_TO_REMOVE).toContain("mp_access_token");
+            expect(FIELDS_TO_REMOVE).toContain("mp_refresh_token");
+        });
+
+        test("should include password", () => {
+            expect(FIELDS_TO_REMOVE).toContain("password");
+        });
+    });
+
+    describe("decryptData", () => {
+        test("should decrypt encrypted fields in object", () => {
+            const data = {
+                nombre: "John",
+                telefono: encryptField("3001234567"),
+                correo: "john@example.com"
+            };
+
+            const result = decryptData(data);
+
+            expect(result.nombre).toBe("John");
+            expect(result.telefono).toBe("3001234567");
+            expect(result.correo).toBe("john@example.com");
+        });
+
+        test("should decrypt nested objects", () => {
+            const data = {
+                message: "success",
+                data: {
+                    user: {
+                        nombre: "John",
+                        telefono: encryptField("3001234567")
+                    }
+                }
+            };
+
+            const result = decryptData(data);
+
+            expect(result.data.user.telefono).toBe("3001234567");
+        });
+
+        test("should decrypt arrays of objects", () => {
+            const data = {
+                message: "success",
+                data: [
+                    { nombre: "John", telefono: encryptField("111") },
+                    { nombre: "Jane", telefono: encryptField("222") }
+                ]
+            };
+
+            const result = decryptData(data);
+
+            expect(result.data[0].telefono).toBe("111");
+            expect(result.data[1].telefono).toBe("222");
+        });
+
+        test("should handle aliased fields from views", () => {
+            const data = {
+                idProducto: 1,
+                nombreVendedor: "John",
+                telefonoVendedor: encryptField("3001234567")
+            };
+
+            const result = decryptData(data);
+
+            expect(result.telefonoVendedor).toBe("3001234567");
+        });
+
+        test("should handle null/undefined", () => {
+            expect(decryptData(null)).toBeNull();
+            expect(decryptData(undefined)).toBeUndefined();
+        });
+
+        test("should handle unencrypted values (backwards compatibility)", () => {
+            const data = {
+                telefono: "3001234567" // Not encrypted
+            };
+
+            const result = decryptData(data);
+
+            expect(result.telefono).toBe("3001234567");
+        });
+
+        test("should not modify fields not in FIELDS_TO_DECRYPT", () => {
+            const encryptedValue = encryptField("secret");
+            const data = {
+                customField: encryptedValue // Not in FIELDS_TO_DECRYPT
+            };
+
+            const result = decryptData(data);
+
+            // Should remain encrypted since customField is not in the list
+            expect(result.customField).toBe(encryptedValue);
+        });
+
+        test("should remove server secrets (mp_access_token, mp_refresh_token)", () => {
+            const data = {
+                idUsuario: 1,
+                nombre: "John",
+                mp_access_token: "APP_USR-secret-token",
+                mp_refresh_token: "TG-refresh-token",
+                telefono: encryptField("3001234567")
+            };
+
+            const result = decryptData(data);
+
+            // User data should be present
+            expect(result.idUsuario).toBe(1);
+            expect(result.nombre).toBe("John");
+            expect(result.telefono).toBe("3001234567");
+
+            // Server secrets should be REMOVED
+            expect(result.mp_access_token).toBeUndefined();
+            expect(result.mp_refresh_token).toBeUndefined();
+        });
+
+        test("should remove password from responses", () => {
+            const data = {
+                idUsuario: 1,
+                nombre: "John",
+                correo: "john@example.com",
+                password: "$2b$10$hashedpassword..."
+            };
+
+            const result = decryptData(data);
+
+            expect(result.idUsuario).toBe(1);
+            expect(result.nombre).toBe("John");
+            expect(result.correo).toBe("john@example.com");
+            expect(result.password).toBeUndefined();
+        });
+
+        test("should remove secrets from nested objects", () => {
+            const data = {
+                message: "success",
+                data: {
+                    user: {
+                        nombre: "John",
+                        mp_access_token: "secret-token",
+                        telefono: encryptField("123")
+                    }
+                }
+            };
+
+            const result = decryptData(data);
+
+            expect(result.data.user.nombre).toBe("John");
+            expect(result.data.user.telefono).toBe("123");
+            expect(result.data.user.mp_access_token).toBeUndefined();
+        });
+
+        test("should remove secrets from arrays of objects", () => {
+            const data = [
+                { nombre: "John", mp_access_token: "token1", password: "hash1" },
+                { nombre: "Jane", mp_access_token: "token2", password: "hash2" }
+            ];
+
+            const result = decryptData(data);
+
+            expect(result[0].nombre).toBe("John");
+            expect(result[0].mp_access_token).toBeUndefined();
+            expect(result[0].password).toBeUndefined();
+
+            expect(result[1].nombre).toBe("Jane");
+            expect(result[1].mp_access_token).toBeUndefined();
+            expect(result[1].password).toBeUndefined();
         });
     });
 });

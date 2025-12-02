@@ -7,6 +7,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const morgan = require('morgan') // Middleware to show the request logs
+const { decryptResponseMiddleware } = require('./middleware/decryptResponse')
 
 // Create the express application
 const app = express()
@@ -22,6 +23,9 @@ app.use(cors(corsOptions))
 // Show the request logs in the console
 morgan.token('requestBody', (request) => JSON.stringify(request.body))
 app.use(morgan(' :method :url :response-time :requestBody'))
+
+// Middleware to automatically decrypt sensitive fields in responses
+app.use(decryptResponseMiddleware)
 
 // Load the API routes
 app.use('/api', require('./routes/routes'))
