@@ -6,7 +6,7 @@
  * 2. Decrypts user-visible encrypted fields before sending them to the client
  */
 
-const { decryptField, isEncrypted } = require('../utils/encryption')
+const { decryptFieldAsync, isEncrypted } = require('../utils/encryption')
 
 /**
  * Fields that are server secrets and should NEVER be sent to the frontend.
@@ -39,12 +39,12 @@ const FIELDS_TO_DECRYPT = [
 /**
  * Recursively processes data to:
  * 1. Remove server secrets
- * 2. Decrypt encrypted user-visible fields
+ * 2. Decrypt encrypted user-visible fields (supports KMS encryption)
  *
  * @param {any} data - The data to process
- * @returns {any} - The processed data (secrets removed, fields decrypted)
+ * @returns {Promise<any>} - The processed data (secrets removed, fields decrypted)
  */
-function decryptData(data) {
+async function decryptData(data) {
     // Handle null/undefined
     if (data === null || data === undefined) {
         return data
@@ -52,7 +52,7 @@ function decryptData(data) {
 
     // Handle arrays
     if (Array.isArray(data)) {
-        return data.map(item => decryptData(item))
+        return Promise.all(data.map(item => decryptData(item)))
     }
 
     // Handle objects
@@ -67,14 +67,14 @@ function decryptData(data) {
             // Decrypt fields that the user can see
             if (FIELDS_TO_DECRYPT.includes(key) && typeof value === 'string' && isEncrypted(value)) {
                 try {
-                    result[key] = decryptField(value)
+                    result[key] = await decryptFieldAsync(value)
                 } catch (error) {
                     // If decryption fails, keep original value and log warning
                     console.warn(`Warning: Failed to decrypt field '${key}':`, error.message)
                     result[key] = value
                 }
             } else if (typeof value === 'object') {
-                result[key] = decryptData(value)
+                result[key] = await decryptData(value)
             } else {
                 result[key] = value
             }
@@ -89,16 +89,16 @@ function decryptData(data) {
 /**
  * Express middleware that intercepts JSON responses to:
  * 1. Remove server secrets from responses
- * 2. Decrypt encrypted fields for user visibility
+ * 2. Decrypt encrypted fields for user visibility (including KMS)
  */
 function decryptResponseMiddleware(req, res, next) {
     // Store original json method
     const originalJson = res.json.bind(res)
 
-    // Override json method
-    res.json = function (data) {
+    // Override json method with async handler
+    res.json = async function (data) {
         try {
-            const processedData = decryptData(data)
+            const processedData = await decryptData(data)
             return originalJson(processedData)
         } catch (error) {
             console.error('Error in decryptResponseMiddleware:', error)

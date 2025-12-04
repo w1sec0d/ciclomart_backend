@@ -31,7 +31,7 @@ const executeQuery = (query, params = []) => {
 const findUserById = async (userId) => {
     const results = await executeQuery('SELECT * FROM usuario WHERE idUsuario = ?', [userId])
     if (results.length === 0) return null
-    return decryptSensitiveFields('usuario', results[0])
+    return await decryptSensitiveFields('usuario', results[0])
 }
 
 /**
@@ -42,7 +42,7 @@ const findUserById = async (userId) => {
 const findUserByEmail = async (email) => {
     const results = await executeQuery('SELECT * FROM usuario WHERE correo = ?', [email])
     if (results.length === 0) return null
-    return decryptSensitiveFields('usuario', results[0])
+    return await decryptSensitiveFields('usuario', results[0])
 }
 
 /**
@@ -67,7 +67,7 @@ const recordExists = async (table, column, value) => {
 const findById = async (table, idColumn, id) => {
     const results = await executeQuery(`SELECT * FROM ${table} WHERE ${idColumn} = ?`, [id])
     if (results.length === 0) return null
-    return decryptSensitiveFields(table, results[0])
+    return await decryptSensitiveFields(table, results[0])
 }
 
 /**

@@ -8,15 +8,21 @@
     "dev": "nodemon index.js",
     "json-server": "json-server --watch test-db.json --port 4000",
     "test": "jest",
+    "test:verbose": "jest --verbose",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "benchmark:encryption": "node benchmarks/encryption.benchmark.js",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "encrypt:migrate": "node scripts/migrate_encrypt_users.js",
+    "kms:migrate": "node scripts/migrate_to_kms.js",
+    "kms:reencrypt": "node scripts/reencrypt_kms.js",
+    "kms:rotate": "node scripts/rotate_key.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-kms": "^3.943.0",
     "@eslint/eslintrc": "^3.3.0",
     "@mysql/xdevapi": "^8.0.35",
     "axios": "^1.8.1",

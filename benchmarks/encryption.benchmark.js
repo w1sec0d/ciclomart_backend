@@ -226,3 +226,6 @@ console.log(`
   - Encryption overhead is minimal compared to network/DB latency
 `);
 
+// prueba = encrypt("12345678901234567890123456789012你好 🌍");
+// console.log(prueba);
+// console.log(decrypt(prueba));

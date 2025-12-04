@@ -80,9 +80,25 @@ To run the project correctly, you must include a .env file in the project root w
 
 ### Encryption Variables (required for sensitive data encryption)
 
-- AES_KEY: AES-256 encryption key (exactly 32 characters). Used to encrypt sensitive user data like phone numbers, addresses, and payment tokens. Generate a secure key with: `openssl rand -base64 24 | head -c 32`
+**Basic (single key):**
 
-For more details on encryption, see [docs/ENCRYPTION.md](docs/ENCRYPTION.md).
+- AES_KEY: AES-256 encryption key (exactly 32 characters). Generate with: `openssl rand -base64 24 | head -c 32`
+
+**Advanced (key rotation):**
+
+- AES_KEY_V1, AES_KEY_V2, etc.: Versioned keys for rotation
+- AES_CURRENT_VERSION: Current version for new encryptions (e.g., "v2")
+
+**AWS KMS (production recommended):**
+
+- KEY_PROVIDER: Set to "aws-kms" to use AWS KMS
+- AWS_REGION: AWS region (default: us-east-1)
+- AWS_KMS_KEY_ID: KMS key ARN or alias
+
+For more details, see:
+
+- [docs/ENCRYPTION.md](docs/ENCRYPTION.md) - Encryption basics
+- [docs/KEY_ROTATION.md](docs/KEY_ROTATION.md) - Key rotation and AWS KMS
 
 These parameters must match a MySQL database instance, which can be initialized with the script in `./database/dbCreation.sql`
 

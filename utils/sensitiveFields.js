@@ -5,7 +5,7 @@
  * Used by dbHelpers.js for automatic encryption/decryption.
  */
 
-const { encryptField, decryptField } = require("./encryption");
+const { encryptField, decryptFieldAsync } = require("./encryption");
 
 /**
  * Map of table names to their sensitive fields that require encryption.
@@ -76,12 +76,13 @@ function encryptSensitiveFields(table, data) {
  * Decrypts sensitive fields in a data object after SELECT.
  * Only decrypts fields that are defined as sensitive for the given table.
  * Non-sensitive fields are left unchanged.
+ * Supports both local and KMS encryption.
  * 
  * @param {string} table - The table name
  * @param {object} data - The data object with field-value pairs (possibly encrypted)
- * @returns {object} - New object with sensitive fields decrypted
+ * @returns {Promise<object>} - New object with sensitive fields decrypted
  */
-function decryptSensitiveFields(table, data) {
+async function decryptSensitiveFields(table, data) {
     if (!data || typeof data !== "object") return data;
 
     const sensitiveFields = getSensitiveFields(table);
@@ -92,11 +93,17 @@ function decryptSensitiveFields(table, data) {
     for (const field of sensitiveFields) {
         if (field in result && result[field] !== null && result[field] !== undefined) {
             try {
-                result[field] = decryptField(result[field]);
+                result[field] = await decryptFieldAsync(result[field]);
             } catch (error) {
-                // Log error but don't fail - field might not be encrypted yet
-                console.error(`Warning: Failed to decrypt ${table}.${field}:`, error.message);
-                // Keep original value if decryption fails
+                // For KMS encrypted data, we MUST decrypt - don't fail silently
+                const { isKmsEncrypted } = require('./encryption');
+                if (isKmsEncrypted(result[field])) {
+                    console.error(`ERROR: KMS decryption failed for ${table}.${field}. Check AWS credentials.`);
+                    console.error(`  - Ensure AWS_REGION, AWS_KMS_KEY_ID, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY are set`);
+                    throw new Error(`KMS decryption failed for ${table}.${field}: ${error.message}`);
+                }
+                // For non-KMS data, warn but continue (backwards compatibility)
+                console.warn(`Warning: Failed to decrypt ${table}.${field}:`, error.message);
             }
         }
     }
@@ -110,11 +117,11 @@ function decryptSensitiveFields(table, data) {
  * 
  * @param {string} table - The table name
  * @param {object[]} rows - Array of data objects
- * @returns {object[]} - New array with sensitive fields decrypted
+ * @returns {Promise<object[]>} - New array with sensitive fields decrypted
  */
-function decryptSensitiveFieldsArray(table, rows) {
+async function decryptSensitiveFieldsArray(table, rows) {
     if (!Array.isArray(rows)) return rows;
-    return rows.map(row => decryptSensitiveFields(table, row));
+    return Promise.all(rows.map(row => decryptSensitiveFields(table, row)));
 }
 
 module.exports = {

@@ -77,9 +77,25 @@ Para ejecutar correctamente el projecto debe incluirse un archivo .env en la rai
 
 ### Variables de encriptación (requeridas para encriptar datos sensibles)
 
-- AES_KEY: Clave de encriptación AES-256 (exactamente 32 caracteres). Se usa para encriptar datos sensibles del usuario como teléfonos, direcciones y tokens de pago. Genera una clave segura con: `openssl rand -base64 24 | head -c 32`
+**Básico (una clave):**
 
-Para más detalles sobre encriptación, ver [docs/ENCRYPTION.md](docs/ENCRYPTION.md).
+- AES_KEY: Clave de encriptación AES-256 (exactamente 32 caracteres). Genera con: `openssl rand -base64 24 | head -c 32`
+
+**Avanzado (rotación de claves):**
+
+- AES_KEY_V1, AES_KEY_V2, etc.: Claves versionadas para rotación
+- AES_CURRENT_VERSION: Versión actual para nuevas encriptaciones (ej: "v2")
+
+**AWS KMS (recomendado para producción):**
+
+- KEY_PROVIDER: Establecer a "aws-kms" para usar AWS KMS
+- AWS_REGION: Región de AWS (default: us-east-1)
+- AWS_KMS_KEY_ID: ARN o alias de la clave KMS
+
+Para más detalles, ver:
+
+- [docs/ENCRYPTION.md](docs/ENCRYPTION.md) - Encriptación básica
+- [docs/KEY_ROTATION.md](docs/KEY_ROTATION.md) - Rotación de claves y AWS KMS
 
 Estos parametros deben coincidir con una instancia de base de datos MySQL, puede ser inicializada con el script en `./database/dbCreation.sql`
 

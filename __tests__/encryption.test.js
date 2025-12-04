@@ -281,7 +281,7 @@ describe("sensitiveFields.js", () => {
     });
 
     describe("decryptSensitiveFields", () => {
-        test("should decrypt sensitive fields only", () => {
+        test("should decrypt sensitive fields only", async () => {
             // First encrypt
             const original = {
                 nombre: "John",
@@ -289,32 +289,32 @@ describe("sensitiveFields.js", () => {
             };
             const encrypted = encryptSensitiveFields("usuario", original);
 
-            // Then decrypt
-            const decrypted = decryptSensitiveFields("usuario", encrypted);
+            // Then decrypt (now async)
+            const decrypted = await decryptSensitiveFields("usuario", encrypted);
 
             expect(decrypted.nombre).toBe("John");
             expect(decrypted.telefono).toBe("3001234567");
         });
 
-        test("should handle unencrypted values (backwards compatibility)", () => {
+        test("should handle unencrypted values (backwards compatibility)", async () => {
             const data = {
                 nombre: "John",
                 telefono: "3001234567" // Not encrypted
             };
 
-            const result = decryptSensitiveFields("usuario", data);
+            const result = await decryptSensitiveFields("usuario", data);
 
             // Should return as-is
             expect(result.telefono).toBe("3001234567");
         });
 
-        test("should handle null/undefined values", () => {
+        test("should handle null/undefined values", async () => {
             const data = {
                 telefono: null,
                 direccionNombre: undefined
             };
 
-            const result = decryptSensitiveFields("usuario", data);
+            const result = await decryptSensitiveFields("usuario", data);
 
             expect(result.telefono).toBeNull();
             expect(result.direccionNombre).toBeUndefined();
@@ -322,21 +322,21 @@ describe("sensitiveFields.js", () => {
     });
 
     describe("decryptSensitiveFieldsArray", () => {
-        test("should decrypt array of records", () => {
+        test("should decrypt array of records", async () => {
             const records = [
                 { nombre: "John", telefono: encryptField("111") },
                 { nombre: "Jane", telefono: encryptField("222") }
             ];
 
-            const result = decryptSensitiveFieldsArray("usuario", records);
+            const result = await decryptSensitiveFieldsArray("usuario", records);
 
             expect(result[0].telefono).toBe("111");
             expect(result[1].telefono).toBe("222");
         });
 
-        test("should handle non-array input", () => {
+        test("should handle non-array input", async () => {
             const notArray = { field: "value" };
-            const result = decryptSensitiveFieldsArray("usuario", notArray);
+            const result = await decryptSensitiveFieldsArray("usuario", notArray);
 
             expect(result).toEqual(notArray);
         });
@@ -374,21 +374,21 @@ describe("decryptResponse middleware", () => {
     });
 
     describe("decryptData", () => {
-        test("should decrypt encrypted fields in object", () => {
+        test("should decrypt encrypted fields in object", async () => {
             const data = {
                 nombre: "John",
                 telefono: encryptField("3001234567"),
                 correo: "john@example.com"
             };
 
-            const result = decryptData(data);
+            const result = await decryptData(data);
 
             expect(result.nombre).toBe("John");
             expect(result.telefono).toBe("3001234567");
             expect(result.correo).toBe("john@example.com");
         });
 
-        test("should decrypt nested objects", () => {
+        test("should decrypt nested objects", async () => {
             const data = {
                 message: "success",
                 data: {
@@ -399,12 +399,12 @@ describe("decryptResponse middleware", () => {
                 }
             };
 
-            const result = decryptData(data);
+            const result = await decryptData(data);
 
             expect(result.data.user.telefono).toBe("3001234567");
         });
 
-        test("should decrypt arrays of objects", () => {
+        test("should decrypt arrays of objects", async () => {
             const data = {
                 message: "success",
                 data: [
@@ -413,52 +413,52 @@ describe("decryptResponse middleware", () => {
                 ]
             };
 
-            const result = decryptData(data);
+            const result = await decryptData(data);
 
             expect(result.data[0].telefono).toBe("111");
             expect(result.data[1].telefono).toBe("222");
         });
 
-        test("should handle aliased fields from views", () => {
+        test("should handle aliased fields from views", async () => {
             const data = {
                 idProducto: 1,
                 nombreVendedor: "John",
                 telefonoVendedor: encryptField("3001234567")
             };
 
-            const result = decryptData(data);
+            const result = await decryptData(data);
 
             expect(result.telefonoVendedor).toBe("3001234567");
         });
 
-        test("should handle null/undefined", () => {
-            expect(decryptData(null)).toBeNull();
-            expect(decryptData(undefined)).toBeUndefined();
+        test("should handle null/undefined", async () => {
+            expect(await decryptData(null)).toBeNull();
+            expect(await decryptData(undefined)).toBeUndefined();
         });
 
-        test("should handle unencrypted values (backwards compatibility)", () => {
+        test("should handle unencrypted values (backwards compatibility)", async () => {
             const data = {
                 telefono: "3001234567" // Not encrypted
             };
 
-            const result = decryptData(data);
+            const result = await decryptData(data);
 
             expect(result.telefono).toBe("3001234567");
         });
 
-        test("should not modify fields not in FIELDS_TO_DECRYPT", () => {
+        test("should not modify fields not in FIELDS_TO_DECRYPT", async () => {
             const encryptedValue = encryptField("secret");
             const data = {
                 customField: encryptedValue // Not in FIELDS_TO_DECRYPT
             };
 
-            const result = decryptData(data);
+            const result = await decryptData(data);
 
             // Should remain encrypted since customField is not in the list
             expect(result.customField).toBe(encryptedValue);
         });
 
-        test("should remove server secrets (mp_access_token, mp_refresh_token)", () => {
+        test("should remove server secrets (mp_access_token, mp_refresh_token)", async () => {
             const data = {
                 idUsuario: 1,
                 nombre: "John",
@@ -467,7 +467,7 @@ describe("decryptResponse middleware", () => {
                 telefono: encryptField("3001234567")
             };
 
-            const result = decryptData(data);
+            const result = await decryptData(data);
 
             // User data should be present
             expect(result.idUsuario).toBe(1);
@@ -479,7 +479,7 @@ describe("decryptResponse middleware", () => {
             expect(result.mp_refresh_token).toBeUndefined();
         });
 
-        test("should remove password from responses", () => {
+        test("should remove password from responses", async () => {
             const data = {
                 idUsuario: 1,
                 nombre: "John",
@@ -487,7 +487,7 @@ describe("decryptResponse middleware", () => {
                 password: "$2b$10$hashedpassword..."
             };
 
-            const result = decryptData(data);
+            const result = await decryptData(data);
 
             expect(result.idUsuario).toBe(1);
             expect(result.nombre).toBe("John");
@@ -495,7 +495,7 @@ describe("decryptResponse middleware", () => {
             expect(result.password).toBeUndefined();
         });
 
-        test("should remove secrets from nested objects", () => {
+        test("should remove secrets from nested objects", async () => {
             const data = {
                 message: "success",
                 data: {
@@ -507,20 +507,20 @@ describe("decryptResponse middleware", () => {
                 }
             };
 
-            const result = decryptData(data);
+            const result = await decryptData(data);
 
             expect(result.data.user.nombre).toBe("John");
             expect(result.data.user.telefono).toBe("123");
             expect(result.data.user.mp_access_token).toBeUndefined();
         });
 
-        test("should remove secrets from arrays of objects", () => {
+        test("should remove secrets from arrays of objects", async () => {
             const data = [
                 { nombre: "John", mp_access_token: "token1", password: "hash1" },
                 { nombre: "Jane", mp_access_token: "token2", password: "hash2" }
             ];
 
-            const result = decryptData(data);
+            const result = await decryptData(data);
 
             expect(result[0].nombre).toBe("John");
             expect(result[0].mp_access_token).toBeUndefined();
