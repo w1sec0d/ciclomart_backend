@@ -15,6 +15,10 @@ CicloMart is a web application for buying and selling bicycles and cycling spare
 
 <!-- ### User Instructions -->
 
+## System Architecture
+
+![System Architecture](docs/system_architecture.png)
+
 ## Team Members
 
 - **Juan David Madrid Contreras** - [JuMad-SE](https://github.com/JuMad-SE)
