@@ -15,6 +15,26 @@
 
 [Haz clic aquí para ver la demo completa](https://youtu.be/vG_Zx618jJ4)
 
+### Página de inicio
+
+![Página de inicio de CicloMart](docs/landingPage.png)
+
+### Página de registro
+
+![Página de registro](docs/register.png)
+
+### Filtro avanzado de repuestos
+
+![Filtro avanzado de repuestos](docs/SparePartsFilter.png)
+
+### Vista de producto
+
+![Vista de producto](docs/productView.png)
+
+### Perfil de usuario
+
+![Perfil de usuario](docs/profile.png)
+
 ## Arquitectura del sistema
 
 ![Arquitectura del sistema](docs/system_architecture_es.png)
