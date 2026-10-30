@@ -9,9 +9,13 @@
 - Ciclomart Backend: [Repositorio de Github](https://github.com/w1sec0d/ciclomart_backend)
 - Ciclomart Frontend: [Repositorio de Github](https://github.com/w1sec0d/ciclomart_frontend)
 
+## Demo
+
+![Demo de CicloMart](docs/preview.gif)
+
 ## Arquitectura del sistema
 
-![Arquitectura del sistema](docs/system_architecture.png)
+![Arquitectura del sistema](docs/system_architecture_es.png)
 
 ## Descripción
 
