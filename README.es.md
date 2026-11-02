@@ -2,7 +2,7 @@
 
 [![en](https://img.shields.io/badge/Language-English-green)](README.md) [![es](https://img.shields.io/badge/Idioma-Español-green)](README.es.md)
 
-- Link de la app: [ciclomart.com](https://ciclomart.com)
+- Link de la app: _antes desplegada en [ciclomart.com](https://ciclomart.com) — ahora fuera de línea; ver el video de demostración abajo_
 - Instrucciones de usuario: [Presentación en Canva](https://www.canva.com/design/DAG23e0XYS4/qg8KUY0ukJcyz4XLgN-wlw/edit?utm_content=DAG23e0XYS4&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
 - Listado de horas: [Hoja de cálculo en Google Sheets](https://docs.google.com/spreadsheets/d/16X9bC5Drs2z4pwJ-D0CnR451mCKMRXd3i1B2WLkOS3M/edit?usp=sharing)
 
@@ -55,7 +55,7 @@ CicloMart es una aplicación web de compra-venta de bicicletas y repuestos de ci
 1. Clona el repositorio:
 
    ```bash
-   git clone https://github.com/RonaldDaniel20/CicloMart_Back.git
+   git clone https://github.com/w1sec0d/ciclomart_backend.git
    ```
 
 2. Instala las dependencias:
@@ -70,7 +70,7 @@ CicloMart es una aplicación web de compra-venta de bicicletas y repuestos de ci
     npm run dev
    ```
 
-Para ejecutar correctamente el projecto debe incluirse un archivo .env en la raiz del proyecto con las siguientes variables de entorno:
+Para ejecutar correctamente el proyecto, copia `.env.example` a `.env` en la raíz del proyecto y completa los valores:
 
 ### Variables de la base de datos
 
